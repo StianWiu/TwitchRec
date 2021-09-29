@@ -1,0 +1,32 @@
+{
+  "name": "puppeteer-webscraping",
+  "version": "1.0.0",
+  "description": "puppeteer-webscraping",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "tsc": "tsc -w --skipLibCheck --downlevelIteration",
+    "dev": "nodemon index.ts"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Pignuuu/puppeteer-webscraping.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/Pignuuu/puppeteer-webscraping/issues"
+  },
+  "homepage": "https://github.com/Pignuuu/puppeteer-webscraping#readme",
+  "dependencies": {
+    "nodemon": "^2.0.12",
+    "puppeteer": "^10.4.0",
+    "randomstring": "^1.2.1",
+    "ts-node": "^10.2.1"
+  },
+  "devDependencies": {
+    "@types/node": "^16.9.4",
+    "typescript": "^4.4.3"
+  }
+}
