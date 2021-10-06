@@ -98,101 +98,71 @@ var filename = randomstring.generate({
     length: 10,
     charset: "hex"
 });
-// const file = fs.createWriteStream(__dirname + `/videos/${filename}.mp4`);
-// async function startRecording() {
-//   const browser = await launch({
-//     executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
-//     defaultViewport: {
-//       width: 1920,
-//       height: 1080,
-//     },
-//   });
-//   const page = await browser.newPage();
-//   await page.goto(options.link);
-//   await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
-//   await page.keyboard.press("f");
-//   try {
-//     await Promise.all([
-//       await page.click(
-//         `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button`
-//       ),
-//     ]);
-//     console.log("Stream is agerestricted");
-//   } catch (err) {
-//     console.log("Stream is not agerestricted");
-//   }
-//   const stream = await getStream(page, { audio: true, video: true });
-//   console.log("recording");
-//   stream.pipe(file);
-//   setTimeout(async () => {
-//     await stream.destroy();
-//     file.close();
-//     console.log("finished");
-//     process.exit();
-//   }, 15000 * options.time);
-// }
-var startRecording = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var PuppeteerVideoRecorder, recorder, browser, page, _a, _b, err_1;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
-            case 0:
-                PuppeteerVideoRecorder = require("puppeteer-video-recorder");
-                recorder = new PuppeteerVideoRecorder();
-                return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
+var file = fs.createWriteStream(__dirname + ("/videos/" + filename + ".mp4"));
+function startRecording() {
+    return __awaiter(this, void 0, void 0, function () {
+        var browser, page, _a, _b, err_1, stream;
+        var _this = this;
+        return __generator(this, function (_c) {
+            switch (_c.label) {
+                case 0: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
                         executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
                         defaultViewport: {
                             width: 1920,
                             height: 1080
                         }
                     })];
-            case 1:
-                browser = _c.sent();
-                return [4 /*yield*/, browser.newPage()];
-            case 2:
-                page = _c.sent();
-                return [4 /*yield*/, page.goto(options.link)];
-            case 3:
-                _c.sent();
-                return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-            case 4:
-                _c.sent();
-                return [4 /*yield*/, page.keyboard.press("f")];
-            case 5:
-                _c.sent();
-                _c.label = 6;
-            case 6:
-                _c.trys.push([6, 9, , 10]);
-                _b = (_a = Promise).all;
-                return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button")];
-            case 7: return [4 /*yield*/, _b.apply(_a, [[
-                        _c.sent()
-                    ]])];
-            case 8:
-                _c.sent();
-                console.log("Stream is agerestricted");
-                return [3 /*break*/, 10];
-            case 9:
-                err_1 = _c.sent();
-                console.log("Stream is not agerestricted");
-                return [3 /*break*/, 10];
-            case 10: return [4 /*yield*/, recorder.init(page, "./videos/" + filename + ".mp4")];
-            case 11:
-                _c.sent();
-                return [4 /*yield*/, recorder.start()];
-            case 12:
-                _c.sent();
-                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 10000); })];
-            case 13:
-                _c.sent();
-                return [4 /*yield*/, recorder.stop()];
-            case 14:
-                _c.sent();
-                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-            case 15:
-                _c.sent();
-                process.exit();
-                return [2 /*return*/];
-        }
+                case 1:
+                    browser = _c.sent();
+                    return [4 /*yield*/, browser.newPage()];
+                case 2:
+                    page = _c.sent();
+                    return [4 /*yield*/, page.goto(options.link)];
+                case 3:
+                    _c.sent();
+                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
+                case 4:
+                    _c.sent();
+                    return [4 /*yield*/, page.keyboard.press("f")];
+                case 5:
+                    _c.sent();
+                    _c.label = 6;
+                case 6:
+                    _c.trys.push([6, 9, , 10]);
+                    _b = (_a = Promise).all;
+                    return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button")];
+                case 7: return [4 /*yield*/, _b.apply(_a, [[
+                            _c.sent()
+                        ]])];
+                case 8:
+                    _c.sent();
+                    console.log("Stream is agerestricted");
+                    return [3 /*break*/, 10];
+                case 9:
+                    err_1 = _c.sent();
+                    console.log("Stream is not agerestricted");
+                    return [3 /*break*/, 10];
+                case 10: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
+                case 11:
+                    stream = _c.sent();
+                    console.log("recording");
+                    stream.pipe(file);
+                    setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, stream.destroy()];
+                                case 1:
+                                    _a.sent();
+                                    file.close();
+                                    console.log("finished");
+                                    process.exit();
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); }, 60000 * options.time);
+                    return [2 /*return*/];
+            }
+        });
     });
-}); };
+}
 checkIfUrlIsValid();
