@@ -37,6 +37,7 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 var commander_1 = require("commander");
+var puppeteer_stream_1 = require("puppeteer-stream");
 var program = new commander_1.Command();
 var puppeteer = require("puppeteer");
 var randomstring = require("randomstring");
@@ -46,12 +47,13 @@ var noLinkSpecified = function () {
     console.log("Missing argument -l or --link");
     process.exit();
 };
-// const noPathSpecified = () => {
-//   console.log("Missing argument -o or --output");
-//   process.exit();
-// };
-program.option("-l, --link <link>", "link to webscrape");
-//   .option("-o, --output <output>", "what folder to output to");
+var noTimeSpecified = function () {
+    console.log("Missing argument -t or --time");
+    process.exit();
+};
+program
+    .option("-l, --link <link>", "link to webscrape")
+    .option("-t, --time <time>", "how many minutes to record");
 program.parse(process.argv);
 var options = program.opts();
 var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -59,6 +61,8 @@ var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, f
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
+                if (options.time == undefined)
+                    noTimeSpecified();
                 if (!options.link) return [3 /*break*/, 7];
                 _a.label = 1;
             case 1:
@@ -76,7 +80,7 @@ var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, f
             case 4:
                 _a.sent();
                 console.log("Link is valid");
-                startScrapingProcess();
+                startRecording();
                 return [3 /*break*/, 6];
             case 5:
                 e_1 = _a.sent();
@@ -91,89 +95,65 @@ var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, f
         }
     });
 }); };
-var startScrapingProcess = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var returnedLinks, nextLink, i, nextLinkLoop, getLinksLoop, getLinksLoop_1;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, scrapeAvailableLinks(options.link)];
-            case 1:
-                returnedLinks = _a.sent();
-                return [4 /*yield*/, scrapeRandomLink(returnedLinks)];
-            case 2:
-                nextLink = _a.sent();
-                i = 0;
-                nextLinkLoop = undefined;
-                _a.label = 3;
-            case 3:
-                if (!true) return [3 /*break*/, 9];
-                if (!(i == 0)) return [3 /*break*/, 5];
-                return [4 /*yield*/, scrapeAvailableLinks(nextLink)];
-            case 4:
-                getLinksLoop = _a.sent();
-                return [3 /*break*/, 7];
-            case 5: return [4 /*yield*/, scrapeAvailableLinks(nextLinkLoop)];
-            case 6:
-                getLinksLoop_1 = _a.sent();
-                _a.label = 7;
-            case 7: return [4 /*yield*/, scrapeRandomLink(getLinksLoop)];
-            case 8:
-                nextLinkLoop = _a.sent();
-                i++;
-                return [3 /*break*/, 3];
-            case 9: return [2 /*return*/];
-        }
-    });
-}); };
-var scrapeAvailableLinks = function (link) { return __awaiter(void 0, void 0, void 0, function () {
-    var grabLinks, page, linksArray;
-    return __generator(this, function (_a) {
-        switch (_a.label) {
-            case 0: return [4 /*yield*/, puppeteer.launch({
-                    defaultViewport: { width: 1920, height: 1080 },
-                    headless: true,
-                    args: ["--no-sandbox"]
-                })];
-            case 1:
-                grabLinks = _a.sent();
-                return [4 /*yield*/, grabLinks.newPage()];
-            case 2:
-                page = _a.sent();
-                return [4 /*yield*/, page.goto(link)];
-            case 3:
-                _a.sent();
-                console.log("Opening " + link);
-                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1500); })];
-            case 4:
-                _a.sent();
-                return [4 /*yield*/, page.evaluate(function () {
-                        return Array.from(document.querySelectorAll("a")).map(function (anchor) { return [anchor.href]; });
+var filename = randomstring.generate({
+    length: 10,
+    charset: "hex"
+});
+var file = fs.createWriteStream(__dirname + ("/videos/" + filename + ".webm"));
+function startRecording() {
+    return __awaiter(this, void 0, void 0, function () {
+        var browser, page, stream;
+        var _this = this;
+        return __generator(this, function (_a) {
+            switch (_a.label) {
+                case 0: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
+                        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
+                        defaultViewport: {
+                            width: 1920,
+                            height: 1080
+                        }
                     })];
-            case 5:
-                linksArray = _a.sent();
-                grabLinks.close();
-                return [2 /*return*/, linksArray];
-        }
-    });
-}); };
-var scrapeRandomLink = function (linksArray) { return __awaiter(void 0, void 0, void 0, function () {
-    var arrayLength, rng, rng;
-    return __generator(this, function (_a) {
-        arrayLength = linksArray.length;
-        console.log(linksArray);
-        if (arrayLength > 0) {
-            if (arrayLength == 1) {
-                rng = 1;
+                case 1:
+                    browser = _a.sent();
+                    return [4 /*yield*/, browser.newPage()];
+                case 2:
+                    page = _a.sent();
+                    return [4 /*yield*/, page.goto(options.link)];
+                case 3:
+                    _a.sent();
+                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
+                case 4:
+                    _a.sent();
+                    return [4 /*yield*/, page.keyboard.press("f")];
+                case 5:
+                    _a.sent();
+                    return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
+                case 6:
+                    stream = _a.sent();
+                    console.log("recording");
+                    stream.pipe(file);
+                    setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+                        var ffmpeg;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, stream.destroy()];
+                                case 1:
+                                    _a.sent();
+                                    file.close();
+                                    console.log("finished");
+                                    ffmpeg = require("ffmpeg");
+                                    ffmpeg - i;
+                                    "Spider-Man.webm" - qscale;
+                                    0;
+                                    "Spider-Man.mp4";
+                                    process.exit();
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); }, 15000 * options.time);
+                    return [2 /*return*/];
             }
-            else {
-                rng = random.int(0, arrayLength - 1);
-            }
-            return [2 /*return*/, linksArray[rng].join()];
-        }
-        else {
-            console.log("No more links to explore");
-            process.exit();
-        }
-        return [2 /*return*/];
+        });
     });
-}); };
+}
 checkIfUrlIsValid();
