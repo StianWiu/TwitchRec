@@ -106,7 +106,9 @@ function startRecording() {
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
-                        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
+                        // If using windows change to this
+                        // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+                        executablePath: "/usr/bin/google-chrome-stable",
                         defaultViewport: {
                             width: 1920,
                             height: 1080
@@ -142,7 +144,7 @@ function startRecording() {
                     err_1 = _c.sent();
                     console.log("Stream is not agerestricted");
                     return [3 /*break*/, 10];
-                case 10: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
+                case 10: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: false })];
                 case 11:
                     stream = _c.sent();
                     console.log("recording");

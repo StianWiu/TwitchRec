@@ -47,7 +47,9 @@ const file = fs.createWriteStream(__dirname + `/videos/${filename}.mp4`);
 
 async function startRecording() {
   const browser = await launch({
-    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe",
+    // If using windows change to this
+    // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+    executablePath: "/usr/bin/google-chrome-stable",
     defaultViewport: {
       width: 1920,
       height: 1080,
@@ -68,7 +70,7 @@ async function startRecording() {
   } catch (err) {
     console.log("Stream is not agerestricted");
   }
-  const stream = await getStream(page, { audio: true, video: true });
+  const stream = await getStream(page, { audio: true, video: false });
   console.log("recording");
 
   stream.pipe(file);
