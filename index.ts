@@ -73,17 +73,17 @@ async function startRecording() {
   }
   const stream = await getStream(page, { audio: true, video: true });
   console.log("recording");
-  const ffmpeg = exec(
-    `ffmpeg -y -threads 1 -i - ./videos/${filename}-export.mp4`
-  );
-  ffmpeg.stderr.on("data", (chunk) => {
-    console.log(chunk.toString());
-  });
-
-  stream.pipe(ffmpeg.stdin);
-
-  stream.pipe(file);
   setTimeout(async () => {
+    const ffmpeg = exec(
+      `ffmpeg -y -threads 1 -i - ./videos/${filename}-export.mp4`
+    );
+    ffmpeg.stderr.on("data", (chunk) => {
+      console.log(chunk.toString());
+    });
+
+    stream.pipe(ffmpeg.stdin);
+
+    stream.pipe(file);
     await stream.destroy();
     file.close();
     console.log("finished");
@@ -93,7 +93,7 @@ async function startRecording() {
     ffmpeg.kill();
 
     process.exit();
-  }, 60000 * options.time);
+  }, 15000 * options.time);
 }
 
 checkIfUrlIsValid();
