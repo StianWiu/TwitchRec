@@ -76,11 +76,10 @@ async function startRecording() {
   const ffmpeg = exec(
     `ffmpeg -y -threads 1 -i - ./videos/${filename}-export.mp4`
   );
+  ffmpeg.stderr.on("data", (chunk) => {
+    console.log(chunk.toString());
+  });
   setTimeout(async () => {
-    ffmpeg.stderr.on("data", (chunk) => {
-      console.log(chunk.toString());
-    });
-
     stream.pipe(ffmpeg.stdin);
 
     stream.pipe(file);
