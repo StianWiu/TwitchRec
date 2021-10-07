@@ -174,19 +174,16 @@ function startRecording() {
                                     _c.label = 9;
                                 case 9: return [4 /*yield*/, checkIfLive()];
                                 case 10:
-                                    if (!((_c.sent()) == true)) return [3 /*break*/, 13];
+                                    if (!((_c.sent()) == true)) return [3 /*break*/, 12];
                                     console.log("Streamer is still streaming");
                                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 10000); })];
                                 case 11:
                                     _c.sent();
-                                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-                                case 12:
-                                    _c.sent();
                                     return [3 /*break*/, 9];
-                                case 13:
+                                case 12:
                                     stream.pipe(file);
                                     return [4 /*yield*/, stream.destroy()];
-                                case 14:
+                                case 13:
                                     _c.sent();
                                     file.close();
                                     console.log("finished");

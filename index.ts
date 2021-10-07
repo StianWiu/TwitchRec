@@ -94,7 +94,6 @@ async function startRecording() {
     while ((await checkIfLive()) == true) {
       console.log("Streamer is still streaming");
       await new Promise((resolve) => setTimeout(resolve, 10000));
-      await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
     }
     stream.pipe(file);
     await stream.destroy();
