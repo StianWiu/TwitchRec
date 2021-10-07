@@ -138,7 +138,6 @@ function startRecording() {
                     _a.sent();
                     record = function () { return __awaiter(_this, void 0, void 0, function () {
                         var _a, _b, err_1, stream, ffmpeg;
-                        var _this = this;
                         return __generator(this, function (_c) {
                             switch (_c.label) {
                                 case 0: return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
@@ -172,25 +171,30 @@ function startRecording() {
                                         console.log(chunk.toString());
                                     });
                                     stream.pipe(ffmpeg.stdin);
-                                    setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
-                                        return __generator(this, function (_a) {
-                                            switch (_a.label) {
-                                                case 0:
-                                                    stream.pipe(file);
-                                                    return [4 /*yield*/, stream.destroy()];
-                                                case 1:
-                                                    _a.sent();
-                                                    file.close();
-                                                    console.log("finished");
-                                                    ffmpeg.stdin.setEncoding("utf8");
-                                                    ffmpeg.stdin.write("q");
-                                                    ffmpeg.stdin.end();
-                                                    ffmpeg.kill();
-                                                    process.exit();
-                                                    return [2 /*return*/];
-                                            }
-                                        });
-                                    }); }, 15000 * options.time);
+                                    _c.label = 9;
+                                case 9: return [4 /*yield*/, checkIfLive()];
+                                case 10:
+                                    if (!((_c.sent()) == true)) return [3 /*break*/, 13];
+                                    console.log("Streamer is still streaming");
+                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 10000); })];
+                                case 11:
+                                    _c.sent();
+                                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
+                                case 12:
+                                    _c.sent();
+                                    return [3 /*break*/, 9];
+                                case 13:
+                                    stream.pipe(file);
+                                    return [4 /*yield*/, stream.destroy()];
+                                case 14:
+                                    _c.sent();
+                                    file.close();
+                                    console.log("finished");
+                                    ffmpeg.stdin.setEncoding("utf8");
+                                    ffmpeg.stdin.write("q");
+                                    ffmpeg.stdin.end();
+                                    ffmpeg.kill();
+                                    process.exit();
                                     return [2 /*return*/];
                             }
                         });

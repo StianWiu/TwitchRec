@@ -91,18 +91,20 @@ async function startRecording() {
       console.log(chunk.toString());
     });
     stream.pipe(ffmpeg.stdin);
-    setTimeout(async () => {
-      stream.pipe(file);
-      await stream.destroy();
-      file.close();
-      console.log("finished");
-      ffmpeg.stdin.setEncoding("utf8");
-      ffmpeg.stdin.write("q");
-      ffmpeg.stdin.end();
-      ffmpeg.kill();
-
-      process.exit();
-    }, 15000 * options.time);
+    while ((await checkIfLive()) == true) {
+      console.log("Streamer is still streaming");
+      await new Promise((resolve) => setTimeout(resolve, 10000));
+      await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+    }
+    stream.pipe(file);
+    await stream.destroy();
+    file.close();
+    console.log("finished");
+    ffmpeg.stdin.setEncoding("utf8");
+    ffmpeg.stdin.write("q");
+    ffmpeg.stdin.end();
+    ffmpeg.kill();
+    process.exit();
   };
   while ((await checkIfLive()) == false) {
     console.log("Streamer is not live");
