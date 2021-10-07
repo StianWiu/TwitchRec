@@ -79,9 +79,8 @@ async function startRecording() {
   ffmpeg.stderr.on("data", (chunk) => {
     console.log(chunk.toString());
   });
+  stream.pipe(ffmpeg.stdin);
   setTimeout(async () => {
-    stream.pipe(ffmpeg.stdin);
-
     stream.pipe(file);
     await stream.destroy();
     file.close();

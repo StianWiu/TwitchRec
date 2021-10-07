@@ -153,11 +153,11 @@ function startRecording() {
                     ffmpeg.stderr.on("data", function (chunk) {
                         console.log(chunk.toString());
                     });
+                    stream.pipe(ffmpeg.stdin);
                     setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    stream.pipe(ffmpeg.stdin);
                                     stream.pipe(file);
                                     return [4 /*yield*/, stream.destroy()];
                                 case 1:
