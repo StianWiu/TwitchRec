@@ -47,13 +47,12 @@ var noLinkSpecified = function () {
     console.log("Missing argument -l or --link");
     process.exit();
 };
-var noTimeSpecified = function () {
-    console.log("Missing argument -t or --time");
-    process.exit();
-};
-program
-    .option("-l, --link <link>", "link to webscrape")
-    .option("-t, --time <time>", "how many minutes to record");
+// const noTimeSpecified = () => {
+//   console.log("Missing argument -t or --time");
+//   process.exit();
+// };
+program.option("-l, --link <link>", "link to webscrape");
+// .option("-t, --time <time>", "how many minutes to record");
 program.parse(process.argv);
 var options = program.opts();
 var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -61,8 +60,6 @@ var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, f
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (options.time == undefined)
-                    noTimeSpecified();
                 if (!options.link) return [3 /*break*/, 7];
                 _a.label = 1;
             case 1:

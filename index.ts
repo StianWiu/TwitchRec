@@ -10,20 +10,19 @@ const noLinkSpecified = () => {
   console.log("Missing argument -l or --link");
   process.exit();
 };
-const noTimeSpecified = () => {
-  console.log("Missing argument -t or --time");
-  process.exit();
-};
+// const noTimeSpecified = () => {
+//   console.log("Missing argument -t or --time");
+//   process.exit();
+// };
 
-program
-  .option("-l, --link <link>", "link to webscrape")
-  .option("-t, --time <time>", "how many minutes to record");
+program.option("-l, --link <link>", "link to webscrape");
+// .option("-t, --time <time>", "how many minutes to record");
 
 program.parse(process.argv);
 
 const options = program.opts();
 const checkIfUrlIsValid = async () => {
-  if (options.time == undefined) noTimeSpecified();
+  // if (options.time == undefined) noTimeSpecified();
   if (options.link) {
     try {
       const browser = await puppeteer.launch({
