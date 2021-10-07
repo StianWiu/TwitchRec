@@ -188,6 +188,10 @@ function startRecording() {
                                     ffmpeg.stdin.write("q");
                                     ffmpeg.stdin.end();
                                     ffmpeg.kill();
+                                    fs.unlinkSync("./videos/" + filename + ".mp4");
+                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                                case 14:
+                                    _c.sent();
                                     process.exit();
                                     return [2 /*return*/];
                             }

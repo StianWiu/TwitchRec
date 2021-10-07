@@ -102,6 +102,8 @@ async function startRecording() {
     ffmpeg.stdin.write("q");
     ffmpeg.stdin.end();
     ffmpeg.kill();
+    fs.unlinkSync(`./videos/${filename}.mp4`);
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     process.exit();
   };
   while ((await checkIfLive()) == false) {
