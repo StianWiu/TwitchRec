@@ -102,7 +102,7 @@ var filename = randomstring.generate({
 var file = fs.createWriteStream(__dirname + ("/videos/" + filename + ".mp4"));
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var browser, page, record, found;
+        var browser, checkIfLive, page, record;
         var _this = this;
         return __generator(this, function (_a) {
             switch (_a.label) {
@@ -117,6 +117,19 @@ function startRecording() {
                     })];
                 case 1:
                     browser = _a.sent();
+                    checkIfLive = function () { return __awaiter(_this, void 0, void 0, function () {
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0: return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div")];
+                                case 1:
+                                    if ((_a.sent()) !== null)
+                                        return [2 /*return*/, true];
+                                    else
+                                        return [2 /*return*/, false];
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); };
                     return [4 /*yield*/, browser.newPage()];
                 case 2:
                     page = _a.sent();
@@ -182,19 +195,19 @@ function startRecording() {
                             }
                         });
                     }); };
-                    found = false;
                     _a.label = 4;
-                case 4:
-                    if (!(found == false)) return [3 /*break*/, 6];
-                    return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div")];
+                case 4: return [4 /*yield*/, checkIfLive()];
                 case 5:
-                    if ((_a.sent()) !== null)
-                        found = true;
-                    else {
-                        found = true;
-                    }
-                    return [3 /*break*/, 4];
+                    if (!((_a.sent()) == false)) return [3 /*break*/, 8];
+                    console.log("Streamer is not live");
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 10000); })];
                 case 6:
+                    _a.sent();
+                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
+                case 7:
+                    _a.sent();
+                    return [3 /*break*/, 4];
+                case 8:
                     record();
                     return [2 /*return*/];
             }

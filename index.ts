@@ -56,6 +56,15 @@ async function startRecording() {
       height: 768,
     },
   });
+  const checkIfLive = async () => {
+    if (
+      (await page.$(
+        `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div`
+      )) !== null
+    )
+      return true;
+    else return false;
+  };
 
   const page = await browser.newPage();
   await page.goto(options.link);
@@ -95,17 +104,10 @@ async function startRecording() {
       process.exit();
     }, 15000 * options.time);
   };
-  var found = false;
-  while (found == false) {
-    if (
-      (await page.$(
-        `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div`
-      )) !== null
-    )
-      found = true;
-    else {
-      found = true;
-    }
+  while ((await checkIfLive()) == false) {
+    console.log("Streamer is not live");
+    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   }
   record();
 }
