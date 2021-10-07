@@ -145,8 +145,14 @@ function startRecording() {
                     err_1 = _c.sent();
                     console.log("Stream is not agerestricted");
                     return [3 /*break*/, 10];
-                case 10: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
+                case 10: return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div")];
                 case 11:
+                    if ((_c.sent()) !== null)
+                        console.log("found");
+                    else
+                        console.log("not found");
+                    return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
+                case 12:
                     stream = _c.sent();
                     console.log("recording");
                     ffmpeg = exec("ffmpeg -y -threads 1 -i - ./videos/" + filename + "-export.mp4");
