@@ -92,7 +92,7 @@ async function startRecording() {
     stream.pipe(ffmpeg.stdin);
     while ((await checkIfLive()) == true) {
       console.log("Streamer is still streaming");
-      await new Promise((resolve) => setTimeout(resolve, 10000));
+      await new Promise((resolve) => setTimeout(resolve, 60000));
     }
     stream.pipe(file);
     await stream.destroy();
@@ -106,7 +106,7 @@ async function startRecording() {
   };
   while ((await checkIfLive()) == false) {
     console.log("Streamer is not live");
-    await new Promise((resolve) => setTimeout(resolve, 10000));
+    await new Promise((resolve) => setTimeout(resolve, 60000));
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   }
   record();

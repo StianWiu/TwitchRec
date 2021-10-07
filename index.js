@@ -173,7 +173,7 @@ function startRecording() {
                                 case 10:
                                     if (!((_c.sent()) == true)) return [3 /*break*/, 12];
                                     console.log("Streamer is still streaming");
-                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 10000); })];
+                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
                                 case 11:
                                     _c.sent();
                                     return [3 /*break*/, 9];
@@ -198,7 +198,7 @@ function startRecording() {
                 case 5:
                     if (!((_a.sent()) == false)) return [3 /*break*/, 8];
                     console.log("Streamer is not live");
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 10000); })];
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
                 case 6:
                     _a.sent();
                     return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
