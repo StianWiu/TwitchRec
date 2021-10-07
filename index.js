@@ -102,10 +102,10 @@ var filename = randomstring.generate({
 var file = fs.createWriteStream(__dirname + ("/videos/" + filename + ".mp4"));
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var browser, page, _a, _b, err_1, stream, ffmpeg;
+        var browser, page, record, found;
         var _this = this;
-        return __generator(this, function (_c) {
-            switch (_c.label) {
+        return __generator(this, function (_a) {
+            switch (_a.label) {
                 case 0: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
                         // If using windows change to this
                         // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
@@ -116,69 +116,86 @@ function startRecording() {
                         }
                     })];
                 case 1:
-                    browser = _c.sent();
+                    browser = _a.sent();
                     return [4 /*yield*/, browser.newPage()];
                 case 2:
-                    page = _c.sent();
+                    page = _a.sent();
                     return [4 /*yield*/, page.goto(options.link)];
                 case 3:
-                    _c.sent();
-                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-                case 4:
-                    _c.sent();
-                    return [4 /*yield*/, page.keyboard.press("f")];
-                case 5:
-                    _c.sent();
-                    _c.label = 6;
-                case 6:
-                    _c.trys.push([6, 9, , 10]);
-                    _b = (_a = Promise).all;
-                    return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button")];
-                case 7: return [4 /*yield*/, _b.apply(_a, [[
-                            _c.sent()
-                        ]])];
-                case 8:
-                    _c.sent();
-                    console.log("Stream is agerestricted");
-                    return [3 /*break*/, 10];
-                case 9:
-                    err_1 = _c.sent();
-                    console.log("Stream is not agerestricted");
-                    return [3 /*break*/, 10];
-                case 10: return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div")];
-                case 11:
-                    if ((_c.sent()) !== null)
-                        console.log("found");
-                    else
-                        console.log("not found");
-                    return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
-                case 12:
-                    stream = _c.sent();
-                    console.log("recording");
-                    ffmpeg = exec("ffmpeg -y -threads 1 -i - ./videos/" + filename + "-export.mp4");
-                    ffmpeg.stderr.on("data", function (chunk) {
-                        console.log(chunk.toString());
-                    });
-                    stream.pipe(ffmpeg.stdin);
-                    setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0:
-                                    stream.pipe(file);
-                                    return [4 /*yield*/, stream.destroy()];
+                    _a.sent();
+                    record = function () { return __awaiter(_this, void 0, void 0, function () {
+                        var _a, _b, err_1, stream, ffmpeg;
+                        var _this = this;
+                        return __generator(this, function (_c) {
+                            switch (_c.label) {
+                                case 0: return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
                                 case 1:
-                                    _a.sent();
-                                    file.close();
-                                    console.log("finished");
-                                    ffmpeg.stdin.setEncoding("utf8");
-                                    ffmpeg.stdin.write("q");
-                                    ffmpeg.stdin.end();
-                                    ffmpeg.kill();
-                                    process.exit();
+                                    _c.sent();
+                                    return [4 /*yield*/, page.keyboard.press("f")];
+                                case 2:
+                                    _c.sent();
+                                    _c.label = 3;
+                                case 3:
+                                    _c.trys.push([3, 6, , 7]);
+                                    _b = (_a = Promise).all;
+                                    return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button")];
+                                case 4: return [4 /*yield*/, _b.apply(_a, [[
+                                            _c.sent()
+                                        ]])];
+                                case 5:
+                                    _c.sent();
+                                    console.log("Stream is agerestricted");
+                                    return [3 /*break*/, 7];
+                                case 6:
+                                    err_1 = _c.sent();
+                                    console.log("Stream is not agerestricted");
+                                    return [3 /*break*/, 7];
+                                case 7: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
+                                case 8:
+                                    stream = _c.sent();
+                                    console.log("recording");
+                                    ffmpeg = exec("ffmpeg -y -threads 1 -i - ./videos/" + filename + "-export.mp4");
+                                    ffmpeg.stderr.on("data", function (chunk) {
+                                        console.log(chunk.toString());
+                                    });
+                                    stream.pipe(ffmpeg.stdin);
+                                    setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
+                                        return __generator(this, function (_a) {
+                                            switch (_a.label) {
+                                                case 0:
+                                                    stream.pipe(file);
+                                                    return [4 /*yield*/, stream.destroy()];
+                                                case 1:
+                                                    _a.sent();
+                                                    file.close();
+                                                    console.log("finished");
+                                                    ffmpeg.stdin.setEncoding("utf8");
+                                                    ffmpeg.stdin.write("q");
+                                                    ffmpeg.stdin.end();
+                                                    ffmpeg.kill();
+                                                    process.exit();
+                                                    return [2 /*return*/];
+                                            }
+                                        });
+                                    }); }, 15000 * options.time);
                                     return [2 /*return*/];
                             }
                         });
-                    }); }, 15000 * options.time);
+                    }); };
+                    found = false;
+                    _a.label = 4;
+                case 4:
+                    if (!(found == false)) return [3 /*break*/, 6];
+                    return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div")];
+                case 5:
+                    if ((_a.sent()) !== null)
+                        found = true;
+                    else {
+                        found = true;
+                    }
+                    return [3 /*break*/, 4];
+                case 6:
+                    record();
                     return [2 /*return*/];
             }
         });

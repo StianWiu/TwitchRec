@@ -59,46 +59,54 @@ async function startRecording() {
 
   const page = await browser.newPage();
   await page.goto(options.link);
-  await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
-  await page.keyboard.press("f");
-  try {
-    await Promise.all([
-      await page.click(
-        `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button`
-      ),
-    ]);
-    console.log("Stream is agerestricted");
-  } catch (err) {
-    console.log("Stream is not agerestricted");
+  const record = async () => {
+    await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+    await page.keyboard.press("f");
+    try {
+      await Promise.all([
+        await page.click(
+          `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button`
+        ),
+      ]);
+      console.log("Stream is agerestricted");
+    } catch (err) {
+      console.log("Stream is not agerestricted");
+    }
+
+    const stream = await getStream(page, { audio: true, video: true });
+    console.log("recording");
+    const ffmpeg = exec(
+      `ffmpeg -y -threads 1 -i - ./videos/${filename}-export.mp4`
+    );
+    ffmpeg.stderr.on("data", (chunk) => {
+      console.log(chunk.toString());
+    });
+    stream.pipe(ffmpeg.stdin);
+    setTimeout(async () => {
+      stream.pipe(file);
+      await stream.destroy();
+      file.close();
+      console.log("finished");
+      ffmpeg.stdin.setEncoding("utf8");
+      ffmpeg.stdin.write("q");
+      ffmpeg.stdin.end();
+      ffmpeg.kill();
+
+      process.exit();
+    }, 15000 * options.time);
+  };
+  var found = false;
+  while (found == false) {
+    if (
+      (await page.$(
+        `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div`
+      )) !== null
+    )
+      found = true;
+    else {
+      found = true;
+    }
   }
-  if (
-    (await page.$(
-      `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div`
-    )) !== null
-  )
-    console.log("found");
-  else console.log("not found");
-  const stream = await getStream(page, { audio: true, video: true });
-  console.log("recording");
-  const ffmpeg = exec(
-    `ffmpeg -y -threads 1 -i - ./videos/${filename}-export.mp4`
-  );
-  ffmpeg.stderr.on("data", (chunk) => {
-    console.log(chunk.toString());
-  });
-  stream.pipe(ffmpeg.stdin);
-  setTimeout(async () => {
-    stream.pipe(file);
-    await stream.destroy();
-    file.close();
-    console.log("finished");
-    ffmpeg.stdin.setEncoding("utf8");
-    ffmpeg.stdin.write("q");
-    ffmpeg.stdin.end();
-    ffmpeg.kill();
-
-    process.exit();
-  }, 15000 * options.time);
+  record();
 }
-
 checkIfUrlIsValid();
