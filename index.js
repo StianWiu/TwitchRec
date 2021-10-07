@@ -42,6 +42,7 @@ var program = new commander_1.Command();
 var puppeteer = require("puppeteer");
 var randomstring = require("randomstring");
 var fs = require("fs");
+var exec = require("child_process").exec;
 var noLinkSpecified = function () {
     console.log("Missing argument -l or --link");
     process.exit();
@@ -101,14 +102,14 @@ var filename = randomstring.generate({
 var file = fs.createWriteStream(__dirname + ("/videos/" + filename + ".mp4"));
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var browser, page, _a, _b, err_1, stream;
+        var browser, page, _a, _b, err_1, stream, ffmpeg;
         var _this = this;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
                         // If using windows change to this
-                        // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-                        executablePath: "/usr/bin/google-chrome-stable",
+                        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+                        // executablePath: "/usr/bin/google-chrome-stable",
                         defaultViewport: {
                             width: 1920,
                             height: 1080
@@ -144,10 +145,15 @@ function startRecording() {
                     err_1 = _c.sent();
                     console.log("Stream is not agerestricted");
                     return [3 /*break*/, 10];
-                case 10: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: false })];
+                case 10: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
                 case 11:
                     stream = _c.sent();
                     console.log("recording");
+                    ffmpeg = exec("ffmpeg -y -i - output.mp4");
+                    ffmpeg.stderr.on("data", function (chunk) {
+                        console.log(chunk.toString());
+                    });
+                    stream.pipe(ffmpeg.stdin);
                     stream.pipe(file);
                     setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
@@ -157,6 +163,10 @@ function startRecording() {
                                     _a.sent();
                                     file.close();
                                     console.log("finished");
+                                    ffmpeg.stdin.setEncoding("utf8");
+                                    ffmpeg.stdin.write("q");
+                                    ffmpeg.stdin.end();
+                                    ffmpeg.kill();
                                     process.exit();
                                     return [2 /*return*/];
                             }
