@@ -149,7 +149,7 @@ function startRecording() {
                 case 11:
                     stream = _c.sent();
                     console.log("recording");
-                    ffmpeg = exec("ffmpeg -y -i - ./videos/" + filename + ".mp4");
+                    ffmpeg = exec("ffmpeg -y -i - ./videos/" + filename + "-export.mp4");
                     ffmpeg.stderr.on("data", function (chunk) {
                         console.log(chunk.toString());
                     });
