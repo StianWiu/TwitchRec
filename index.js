@@ -102,7 +102,7 @@ var filename = randomstring.generate({
 var file = fs.createWriteStream(__dirname + ("/videos/" + filename + ".mp4"));
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var browser, page, _a, _b, err_1, stream;
+        var browser, page, _a, _b, err_1, stream, ffmpeg;
         var _this = this;
         return __generator(this, function (_c) {
             switch (_c.label) {
@@ -149,12 +149,11 @@ function startRecording() {
                 case 11:
                     stream = _c.sent();
                     console.log("recording");
+                    ffmpeg = exec("ffmpeg -y -threads 1 -i - ./videos/" + filename + "-export.mp4");
                     setTimeout(function () { return __awaiter(_this, void 0, void 0, function () {
-                        var ffmpeg;
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    ffmpeg = exec("ffmpeg -y -threads 1 -i - ./videos/" + filename + "-export.mp4");
                                     ffmpeg.stderr.on("data", function (chunk) {
                                         console.log(chunk.toString());
                                     });
