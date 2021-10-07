@@ -73,7 +73,7 @@ async function startRecording() {
   }
   const stream = await getStream(page, { audio: true, video: true });
   console.log("recording");
-  const ffmpeg = exec(`ffmpeg -y -i - output.mp4`);
+  const ffmpeg = exec(`ffmpeg -y -i - ./videos/${filename}.mp4`);
   ffmpeg.stderr.on("data", (chunk) => {
     console.log(chunk.toString());
   });
