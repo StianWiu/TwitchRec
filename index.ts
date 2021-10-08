@@ -49,8 +49,8 @@ const file = fs.createWriteStream(__dirname + `/videos/${filename}.mp4`);
 async function startRecording() {
   const browser = await launch({
     // If using windows change to this
-    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-    // executablePath: "/usr/bin/google-chrome-stable",
+    // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+    executablePath: "/usr/bin/google-chrome-stable",
     defaultViewport: {
       width: 1920,
       height: 1080,

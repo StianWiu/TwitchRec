@@ -106,8 +106,8 @@ function startRecording() {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
                         // If using windows change to this
-                        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-                        // executablePath: "/usr/bin/google-chrome-stable",
+                        // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+                        executablePath: "/usr/bin/google-chrome-stable",
                         defaultViewport: {
                             width: 1920,
                             height: 1080
