@@ -23,6 +23,7 @@ program.option("-l, --link <link>", "link to webscrape");
 program.parse(process.argv);
 
 const options = program.opts();
+// make sure provided link actually opens
 const checkIfUrlIsValid = async () => {
   if (options.link) {
     try {
@@ -40,6 +41,7 @@ const checkIfUrlIsValid = async () => {
     }
   } else noLinkSpecified();
 };
+// generate random hex string to use for filename
 const filename = randomstring.generate({
   length: 10,
   charset: "hex",
@@ -48,15 +50,20 @@ const file = fs.createWriteStream(__dirname + `/videos/${filename}.mp4`);
 
 async function startRecording() {
   const browser = await launch({
-    // If using windows change to this
-    // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-    executablePath: "/usr/bin/google-chrome-stable",
+    // if using windows change to this
+    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+    // if using ubuntu linux change to this
+    // executablePath: "/usr/bin/google-chrome-stable",
+
+    // change to appropriate resolution
     defaultViewport: {
       width: 1024,
       height: 768,
     },
     args: ["--start-maximized"],
   });
+
+  // returns true or false if current opened stream is live or not. Reruns count as being live
   const checkIfLive = async () => {
     if (
       (await page.$(
@@ -90,22 +97,24 @@ async function startRecording() {
     console.log("Starting to record");
 
     // un comment for ubuntu linux
+    // -r specifies what the wanted fps is
     const ffmpeg = exec(
-      `ffmpeg -y -i - -r 31 -threads 1 ./videos/${filename}-export.mp4`
+      `ffmpeg -y -i - -r 24 ./videos/${filename}-export.mp4 -threads 1`
     );
 
     // un comment for windows
+    // -r specifies what the wanted fps is
     // const ffmpeg = exec(
-    //   `ffmpeg.exe -y -i - -r 31 -threads 1 ./videos/${filename}-export.mp4`
+    //   `ffmpeg.exe -y -i - -r 24 ./videos/${filename}-export.mp4 -threads 1`
     // );
 
     var progress = undefined;
+    // outputs rendering data
     ffmpeg.stderr.on("data", (chunk) => {
       console.log(chunk.toString());
       progress = chunk;
     });
     stream.pipe(ffmpeg.stdin);
-
     rl.question("", function (stringFromConsole) {
       if (stringFromConsole == "") {
         stopWhileLoop = true;
@@ -113,7 +122,7 @@ async function startRecording() {
       rl.close();
     });
 
-    // Wait until
+    // wait until stream is over or enter is pressed in terminal
     while ((await checkIfLive()) == true) {
       if (stopWhileLoop) {
         break;
@@ -129,7 +138,7 @@ async function startRecording() {
     var test1 = 0;
     var test2 = 1;
     await browser.close();
-    // make sure render is finished before continuing to save file.
+    // checks if the rendering data has changed. If it hasn't changed withing 5 seconds it will stop rendering and close file
     while (test1 != test2) {
       test1 = progress;
       await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -140,8 +149,8 @@ async function startRecording() {
     ffmpeg.stdin.write("q");
     ffmpeg.stdin.end();
     ffmpeg.kill();
-    console.log("Deleting stream file");
     await new Promise((resolve) => setTimeout(resolve, 5000));
+    console.log("Deleting stream file");
     fs.unlinkSync(`./videos/${filename}.mp4`);
     process.exit();
   };

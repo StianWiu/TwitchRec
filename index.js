@@ -56,6 +56,7 @@ var noLinkSpecified = function () {
 program.option("-l, --link <link>", "link to webscrape");
 program.parse(process.argv);
 var options = program.opts();
+// make sure provided link actually opens
 var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, function () {
     var browser, page, e_1;
     return __generator(this, function (_a) {
@@ -93,6 +94,7 @@ var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, f
         }
     });
 }); };
+// generate random hex string to use for filename
 var filename = randomstring.generate({
     length: 10,
     charset: "hex"
@@ -105,9 +107,11 @@ function startRecording() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
-                        // If using windows change to this
-                        // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-                        executablePath: "/usr/bin/google-chrome-stable",
+                        // if using windows change to this
+                        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+                        // if using ubuntu linux change to this
+                        // executablePath: "/usr/bin/google-chrome-stable",
+                        // change to appropriate resolution
                         defaultViewport: {
                             width: 1024,
                             height: 768
@@ -169,8 +173,9 @@ function startRecording() {
                                 case 8:
                                     stream = _c.sent();
                                     console.log("Starting to record");
-                                    ffmpeg = exec("ffmpeg -y -i - -r 31 -threads 1 ./videos/" + filename + "-export.mp4");
+                                    ffmpeg = exec("ffmpeg -y -i - -r 24 ./videos/" + filename + "-export.mp4 -threads 1");
                                     progress = undefined;
+                                    // outputs rendering data
                                     ffmpeg.stderr.on("data", function (chunk) {
                                         console.log(chunk.toString());
                                         progress = chunk;
@@ -221,10 +226,10 @@ function startRecording() {
                                     ffmpeg.stdin.write("q");
                                     ffmpeg.stdin.end();
                                     ffmpeg.kill();
-                                    console.log("Deleting stream file");
                                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                                 case 18:
                                     _c.sent();
+                                    console.log("Deleting stream file");
                                     fs.unlinkSync("./videos/" + filename + ".mp4");
                                     process.exit();
                                     return [2 /*return*/];
