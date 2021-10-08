@@ -6,23 +6,24 @@ const randomstring = require("randomstring");
 const fs = require("fs");
 const { exec } = require("child_process");
 
+let stopWhileLoop = false;
+const readline = require("readline");
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout,
+});
+
 const noLinkSpecified = () => {
   console.log("Missing argument -l or --link");
   process.exit();
 };
-// const noTimeSpecified = () => {
-//   console.log("Missing argument -t or --time");
-//   process.exit();
-// };
 
 program.option("-l, --link <link>", "link to webscrape");
-// .option("-t, --time <time>", "how many minutes to record");
 
 program.parse(process.argv);
 
 const options = program.opts();
 const checkIfUrlIsValid = async () => {
-  // if (options.time == undefined) noTimeSpecified();
   if (options.link) {
     try {
       const browser = await puppeteer.launch({
@@ -48,12 +49,13 @@ const file = fs.createWriteStream(__dirname + `/videos/${filename}.mp4`);
 async function startRecording() {
   const browser = await launch({
     // If using windows change to this
-    // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-    executablePath: "/usr/bin/google-chrome-stable",
+    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+    // executablePath: "/usr/bin/google-chrome-stable",
     defaultViewport: {
-      width: 1024,
-      height: 768,
+      width: 1920,
+      height: 1080,
     },
+    args: ["--start-maximized"],
   });
   const checkIfLive = async () => {
     if (
@@ -66,7 +68,9 @@ async function startRecording() {
   };
 
   const page = await browser.newPage();
+  await page.setDefaultNavigationTimeout(0);
   await page.goto(options.link);
+
   const record = async () => {
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
     await page.keyboard.press("f");
@@ -77,35 +81,71 @@ async function startRecording() {
         ),
       ]);
       console.log("Stream is agerestricted");
+      console.log(`"Clicked "Start Watching" button`);
     } catch (err) {
       console.log("Stream is not agerestricted");
     }
 
     const stream = await getStream(page, { audio: true, video: true });
-    console.log("recording");
+    console.log("Starting to record");
+
+    // un comment for ubuntu linux
     const ffmpeg = exec(
-      `ffmpeg -y -threads 1 -i - ./videos/${filename}-export.mp4`
+      `ffmpeg -y -i - -r 31 -threads 1 ./videos/${filename}-export.mp4`
     );
+
+    // un comment for windows
+    // const ffmpeg = exec(
+    //   `ffmpeg.exe -y -i - -r 31 -threads 1 ./videos/${filename}-export.mp4`
+    // );
+
+    var progress = undefined;
     ffmpeg.stderr.on("data", (chunk) => {
       console.log(chunk.toString());
+      progress = chunk;
     });
     stream.pipe(ffmpeg.stdin);
+
+    rl.question("", function (stringFromConsole) {
+      if (stringFromConsole == "") {
+        stopWhileLoop = true;
+      }
+      rl.close();
+    });
+
+    // Wait until
     while ((await checkIfLive()) == true) {
-      console.log("Streamer is still streaming");
+      if (stopWhileLoop) {
+        break;
+      }
       await new Promise((resolve) => setTimeout(resolve, 60000));
     }
+
     stream.pipe(file);
     await stream.destroy();
     file.close();
-    console.log("finished");
+    console.log("Recording finished");
+    console.log("Waiting for render to finish");
+    var test1 = 0;
+    var test2 = 1;
+    await browser.close();
+    // make sure render is finished before continuing to save file.
+    while (test1 != test2) {
+      test1 = progress;
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      test2 = progress;
+    }
+    console.log("Render finished");
     ffmpeg.stdin.setEncoding("utf8");
     ffmpeg.stdin.write("q");
     ffmpeg.stdin.end();
     ffmpeg.kill();
-    fs.unlinkSync(`./videos/${filename}.mp4`);
+    console.log("Deleting stream file");
     await new Promise((resolve) => setTimeout(resolve, 5000));
+    fs.unlinkSync(`./videos/${filename}.mp4`);
     process.exit();
   };
+  await new Promise((resolve) => setTimeout(resolve, 5000));
   while ((await checkIfLive()) == false) {
     console.log("Streamer is not live");
     await new Promise((resolve) => setTimeout(resolve, 60000));

@@ -43,16 +43,17 @@ var puppeteer = require("puppeteer");
 var randomstring = require("randomstring");
 var fs = require("fs");
 var exec = require("child_process").exec;
+var stopWhileLoop = false;
+var readline = require("readline");
+var rl = readline.createInterface({
+    input: process.stdin,
+    output: process.stdout
+});
 var noLinkSpecified = function () {
     console.log("Missing argument -l or --link");
     process.exit();
 };
-// const noTimeSpecified = () => {
-//   console.log("Missing argument -t or --time");
-//   process.exit();
-// };
 program.option("-l, --link <link>", "link to webscrape");
-// .option("-t, --time <time>", "how many minutes to record");
 program.parse(process.argv);
 var options = program.opts();
 var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -105,12 +106,13 @@ function startRecording() {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
                         // If using windows change to this
-                        // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-                        executablePath: "/usr/bin/google-chrome-stable",
+                        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+                        // executablePath: "/usr/bin/google-chrome-stable",
                         defaultViewport: {
-                            width: 1024,
-                            height: 768
-                        }
+                            width: 1920,
+                            height: 1080
+                        },
+                        args: ["--start-maximized"]
                     })];
                 case 1:
                     browser = _a.sent();
@@ -130,11 +132,14 @@ function startRecording() {
                     return [4 /*yield*/, browser.newPage()];
                 case 2:
                     page = _a.sent();
-                    return [4 /*yield*/, page.goto(options.link)];
+                    return [4 /*yield*/, page.setDefaultNavigationTimeout(0)];
                 case 3:
                     _a.sent();
+                    return [4 /*yield*/, page.goto(options.link)];
+                case 4:
+                    _a.sent();
                     record = function () { return __awaiter(_this, void 0, void 0, function () {
-                        var _a, _b, err_1, stream, ffmpeg;
+                        var _a, _b, err_1, stream, ffmpeg, progress, test1, test2;
                         return __generator(this, function (_c) {
                             switch (_c.label) {
                                 case 0: return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
@@ -154,6 +159,7 @@ function startRecording() {
                                 case 5:
                                     _c.sent();
                                     console.log("Stream is agerestricted");
+                                    console.log("\"Clicked \"Start Watching\" button");
                                     return [3 /*break*/, 7];
                                 case 6:
                                     err_1 = _c.sent();
@@ -162,17 +168,27 @@ function startRecording() {
                                 case 7: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
                                 case 8:
                                     stream = _c.sent();
-                                    console.log("recording");
-                                    ffmpeg = exec("ffmpeg -y -threads 1 -i - ./videos/" + filename + "-export.mp4");
+                                    console.log("Starting to record");
+                                    ffmpeg = exec("ffmpeg -y -i - -r 31 -threads 1 ./videos/" + filename + "-export.mp4");
+                                    progress = undefined;
                                     ffmpeg.stderr.on("data", function (chunk) {
                                         console.log(chunk.toString());
+                                        progress = chunk;
                                     });
                                     stream.pipe(ffmpeg.stdin);
+                                    rl.question("", function (stringFromConsole) {
+                                        if (stringFromConsole == "") {
+                                            stopWhileLoop = true;
+                                        }
+                                        rl.close();
+                                    });
                                     _c.label = 9;
                                 case 9: return [4 /*yield*/, checkIfLive()];
                                 case 10:
                                     if (!((_c.sent()) == true)) return [3 /*break*/, 12];
-                                    console.log("Streamer is still streaming");
+                                    if (stopWhileLoop) {
+                                        return [3 /*break*/, 12];
+                                    }
                                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
                                 case 11:
                                     _c.sent();
@@ -183,33 +199,54 @@ function startRecording() {
                                 case 13:
                                     _c.sent();
                                     file.close();
-                                    console.log("finished");
+                                    console.log("Recording finished");
+                                    console.log("Waiting for render to finish");
+                                    test1 = 0;
+                                    test2 = 1;
+                                    return [4 /*yield*/, browser.close()];
+                                case 14:
+                                    _c.sent();
+                                    _c.label = 15;
+                                case 15:
+                                    if (!(test1 != test2)) return [3 /*break*/, 17];
+                                    test1 = progress;
+                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                                case 16:
+                                    _c.sent();
+                                    test2 = progress;
+                                    return [3 /*break*/, 15];
+                                case 17:
+                                    console.log("Render finished");
                                     ffmpeg.stdin.setEncoding("utf8");
                                     ffmpeg.stdin.write("q");
                                     ffmpeg.stdin.end();
                                     ffmpeg.kill();
-                                    fs.unlinkSync("./videos/" + filename + ".mp4");
+                                    console.log("Deleting stream file");
                                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-                                case 14:
+                                case 18:
                                     _c.sent();
+                                    fs.unlinkSync("./videos/" + filename + ".mp4");
                                     process.exit();
                                     return [2 /*return*/];
                             }
                         });
                     }); };
-                    _a.label = 4;
-                case 4: return [4 /*yield*/, checkIfLive()];
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                 case 5:
-                    if (!((_a.sent()) == false)) return [3 /*break*/, 8];
+                    _a.sent();
+                    _a.label = 6;
+                case 6: return [4 /*yield*/, checkIfLive()];
+                case 7:
+                    if (!((_a.sent()) == false)) return [3 /*break*/, 10];
                     console.log("Streamer is not live");
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
-                case 6:
+                case 8:
                     _a.sent();
                     return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-                case 7:
+                case 9:
                     _a.sent();
-                    return [3 /*break*/, 4];
-                case 8:
+                    return [3 /*break*/, 6];
+                case 10:
                     record();
                     return [2 /*return*/];
             }
