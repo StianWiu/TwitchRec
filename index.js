@@ -109,8 +109,8 @@ function startRecording() {
                         // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
                         executablePath: "/usr/bin/google-chrome-stable",
                         defaultViewport: {
-                            width: 1920,
-                            height: 1080
+                            width: 1024,
+                            height: 768
                         },
                         args: ["--start-maximized"]
                     })];
