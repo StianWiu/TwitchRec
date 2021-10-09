@@ -25,7 +25,7 @@ const noOsSpecified = () => {
 };
 
 program.option("-u, --user <username>", "twitch user to record");
-program.option("-w, --windows <windows>", "using windows true or false");
+program.option("-w, --windows <true/false>", "using windows true or false");
 program.parse(process.argv);
 const options = program.opts();
 
@@ -169,11 +169,11 @@ const startRecording = async () => {
         console.log("Stopping recording because streamer raided someone else");
         break;
       }
-      await new Promise((resolve) => setTimeout(resolve, 15000));
-      if ((await checkIfRerun()) == true && rerunStream == false) {
+      if ((await checkIfRerun()) == false && rerunStream == false) {
         console.log("Stream is a rerun");
         break;
       }
+      await new Promise((resolve) => setTimeout(resolve, 15000));
     }
 
     stream.pipe(file);

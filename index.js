@@ -60,7 +60,7 @@ var noOsSpecified = function () {
     process.exit();
 };
 program.option("-u, --user <username>", "twitch user to record");
-program.option("-w, --windows <windows>", "using windows true or false");
+program.option("-w, --windows <true/false>", "using windows true or false");
 program.parse(process.argv);
 var options = program.opts();
 // make sure provided link actually opens
@@ -254,15 +254,15 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                                     console.log("Stopping recording because streamer raided someone else");
                                     return [3 /*break*/, 13];
                                 }
-                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 15000); })];
-                            case 11:
-                                _c.sent();
                                 return [4 /*yield*/, checkIfRerun()];
-                            case 12:
-                                if ((_c.sent()) == true && rerunStream == false) {
+                            case 11:
+                                if ((_c.sent()) == false && rerunStream == false) {
                                     console.log("Stream is a rerun");
                                     return [3 /*break*/, 13];
                                 }
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 15000); })];
+                            case 12:
+                                _c.sent();
                                 return [3 /*break*/, 9];
                             case 13:
                                 stream.pipe(file);
