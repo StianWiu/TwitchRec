@@ -215,6 +215,12 @@ const startRecording = async () => {
       await new Promise((resolve) => setTimeout(resolve, 15000));
     }
 
+    console.log(stream);
+    console.log("#");
+    console.log(stream.pipe);
+    console.log("#");
+    console.log(stream.pipe(file));
+
     stream.pipe(file);
     await stream.destroy();
     file.close();

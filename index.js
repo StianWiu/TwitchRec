@@ -297,6 +297,11 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                                 _c.sent();
                                 return [3 /*break*/, 9];
                             case 13:
+                                console.log(stream);
+                                console.log("#");
+                                console.log(stream.pipe);
+                                console.log("#");
+                                console.log(stream.pipe(file));
                                 stream.pipe(file);
                                 return [4 /*yield*/, stream.destroy()];
                             case 14:
