@@ -73,15 +73,15 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
             if (options.windows == "true" || options.windows == "false") {
                 if (options.windows == "true") {
                     windows = true;
-                    if (options.frames) {
-                        fps = options.frames;
-                    }
-                    else {
-                        fps = 24;
-                    }
                 }
                 else {
                     windows = false;
+                }
+                if (options.frames) {
+                    fps = options.frames;
+                }
+                else {
+                    fps = 24;
                 }
                 if (options.output) {
                     if (options.output == "true") {
