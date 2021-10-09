@@ -181,10 +181,15 @@ const startRecording = async () => {
       `Starting to render live video to ${options.user}-${filename}-export.mp4 \n\nPress enter in console to finish recording or wait until stream is over`
     );
     if (output == true) {
-      ffmpeg.stderr.on("data", (chunk) => {
-        console.log(chunk.toString());
-        progress = chunk;
-      });
+      ffmpeg.stderr
+        .on("data", (chunk) => {
+          console.log(chunk.toString());
+          progress = chunk;
+        })
+        .on("error", function (err, stdout, stderr) {
+          console.log("ffmpeg stdout:\n" + stdout);
+          console.log("ffmpeg stderr:\n" + stderr);
+        });
     }
     stream.pipe(ffmpeg.stdin);
     rl.question("", function (stringFromConsole) {
