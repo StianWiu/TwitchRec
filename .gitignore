@@ -86,4 +86,6 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Avoid pushing video files generated
 *.mp4
