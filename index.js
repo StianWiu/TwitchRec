@@ -44,16 +44,23 @@ var randomstring = require("randomstring");
 var fs = require("fs");
 var exec = require("child_process").exec;
 var stopWhileLoop = false;
+var rerunStream = undefined;
+var windows = undefined;
 var readline = require("readline");
 var rl = readline.createInterface({
     input: process.stdin,
     output: process.stdout
 });
-var noLinkSpecified = function () {
-    console.log("Missing argument -l or --link");
+var noUserSpecified = function () {
+    console.log("Missing argument -u or --user");
     process.exit();
 };
-program.option("-l, --link <link>", "link to webscrape");
+var noOsSpecified = function () {
+    console.log("Missing argument -w or --windows");
+    process.exit();
+};
+program.option("-u, --user <username>", "twitch user to record");
+program.option("-w, --windows <windows>", "using windows true or false");
 program.parse(process.argv);
 var options = program.opts();
 // make sure provided link actually opens
@@ -62,7 +69,14 @@ var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, f
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                if (!options.link) return [3 /*break*/, 7];
+                if (!options.user) return [3 /*break*/, 9];
+                if (!(options.windows == "true" || options.windows == "false")) return [3 /*break*/, 7];
+                if (options.windows == "true") {
+                    windows = true;
+                }
+                else {
+                    windows = false;
+                }
                 _a.label = 1;
             case 1:
                 _a.trys.push([1, 5, , 6]);
@@ -75,22 +89,29 @@ var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, f
                 return [4 /*yield*/, browser.newPage()];
             case 3:
                 page = _a.sent();
-                return [4 /*yield*/, page.goto(options.link, { waitUntil: "load", timeout: 0 })];
+                return [4 /*yield*/, page.goto("https://twitch.tv/" + options.user, {
+                        waitUntil: "load",
+                        timeout: 0
+                    })];
             case 4:
                 _a.sent();
-                console.log("Link is valid");
+                console.log("Username is valid");
                 startRecording();
                 return [3 /*break*/, 6];
             case 5:
                 e_1 = _a.sent();
-                console.log("Link could not be resloved.");
+                console.log("Username could not be resloved.");
                 process.exit();
                 return [3 /*break*/, 6];
             case 6: return [3 /*break*/, 8];
             case 7:
-                noLinkSpecified();
+                noOsSpecified();
                 _a.label = 8;
-            case 8: return [2 /*return*/];
+            case 8: return [3 /*break*/, 10];
+            case 9:
+                noUserSpecified();
+                _a.label = 10;
+            case 10: return [2 /*return*/];
         }
     });
 }); };
@@ -99,163 +120,219 @@ var filename = randomstring.generate({
     length: 10,
     charset: "hex"
 });
-var file = fs.createWriteStream(__dirname + ("/videos/" + filename + ".mp4"));
-function startRecording() {
-    return __awaiter(this, void 0, void 0, function () {
-        var browser, checkIfLive, page, record;
-        var _this = this;
-        return __generator(this, function (_a) {
-            switch (_a.label) {
-                case 0: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
-                        // if using windows change to this
-                        // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-                        // if using ubuntu linux change to this
-                        executablePath: "/usr/bin/google-chrome-stable",
+var startRecording = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var browser, checkIfLive, checkIfRerun, page, originalUrl, record;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                browser = undefined;
+                if (!(windows == true)) return [3 /*break*/, 2];
+                return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
+                        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
                         // change to appropriate resolution
                         defaultViewport: {
-                            width: 1024,
-                            height: 768
+                            width: 1920,
+                            height: 1080
                         },
                         args: ["--start-maximized"]
                     })];
-                case 1:
-                    browser = _a.sent();
-                    checkIfLive = function () { return __awaiter(_this, void 0, void 0, function () {
-                        return __generator(this, function (_a) {
-                            switch (_a.label) {
-                                case 0: return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div")];
-                                case 1:
-                                    if ((_a.sent()) !== null)
-                                        return [2 /*return*/, true];
-                                    else
-                                        return [2 /*return*/, false];
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); };
-                    return [4 /*yield*/, browser.newPage()];
-                case 2:
-                    page = _a.sent();
-                    return [4 /*yield*/, page.setDefaultNavigationTimeout(0)];
-                case 3:
-                    _a.sent();
-                    return [4 /*yield*/, page.goto(options.link)];
-                case 4:
-                    _a.sent();
-                    record = function () { return __awaiter(_this, void 0, void 0, function () {
-                        var _a, _b, err_1, stream, ffmpeg, progress, test1, test2;
-                        return __generator(this, function (_c) {
-                            switch (_c.label) {
-                                case 0: return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-                                case 1:
-                                    _c.sent();
-                                    return [4 /*yield*/, page.keyboard.press("f")];
-                                case 2:
-                                    _c.sent();
-                                    _c.label = 3;
-                                case 3:
-                                    _c.trys.push([3, 6, , 7]);
-                                    _b = (_a = Promise).all;
-                                    return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button")];
-                                case 4: return [4 /*yield*/, _b.apply(_a, [[
-                                            _c.sent()
-                                        ]])];
-                                case 5:
-                                    _c.sent();
-                                    console.log("Stream is agerestricted");
-                                    console.log("\"Clicked \"Start Watching\" button");
-                                    return [3 /*break*/, 7];
-                                case 6:
-                                    err_1 = _c.sent();
-                                    console.log("Stream is not agerestricted");
-                                    return [3 /*break*/, 7];
-                                case 7: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
-                                case 8:
-                                    stream = _c.sent();
-                                    console.log("Starting to record");
+            case 1:
+                browser = _a.sent();
+                return [3 /*break*/, 4];
+            case 2: return [4 /*yield*/, (0, puppeteer_stream_1.launch)({
+                    executablePath: "/usr/bin/google-chrome-stable",
+                    // change to appropriate resolution
+                    defaultViewport: {
+                        width: 1024,
+                        height: 768
+                    },
+                    args: ["--start-maximized"]
+                })];
+            case 3:
+                browser = _a.sent();
+                _a.label = 4;
+            case 4:
+                checkIfLive = function () { return __awaiter(void 0, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div")];
+                            case 1:
+                                if ((_a.sent()) !== null)
+                                    return [2 /*return*/, true];
+                                else
+                                    return [2 /*return*/, false];
+                                return [2 /*return*/];
+                        }
+                    });
+                }); };
+                checkIfRerun = function () { return __awaiter(void 0, void 0, void 0, function () {
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
+                            case 0: return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMexhI > div.Layout-sc-nxg1ff-0.dglwHV > div.Layout-sc-nxg1ff-0.kBOtQI > div > div:nth-child(2) > div > div > div.Layout-sc-nxg1ff-0.ftYIWt > a > span")];
+                            case 1:
+                                if ((_a.sent()) !== null)
+                                    return [2 /*return*/, true];
+                                else
+                                    return [2 /*return*/, false];
+                                return [2 /*return*/];
+                        }
+                    });
+                }); };
+                return [4 /*yield*/, browser.newPage()];
+            case 5:
+                page = _a.sent();
+                return [4 /*yield*/, page.setDefaultNavigationTimeout(0)];
+            case 6:
+                _a.sent();
+                return [4 /*yield*/, page.goto("https://twitch.tv/" + options.user)];
+            case 7:
+                _a.sent();
+                originalUrl = page.url();
+                record = function () { return __awaiter(void 0, void 0, void 0, function () {
+                    var file, _a, _b, err_1, stream, ffmpeg, progress, test1, test2, pages;
+                    return __generator(this, function (_c) {
+                        switch (_c.label) {
+                            case 0:
+                                file = fs.createWriteStream(__dirname + ("/videos/" + filename + "-stream.mp4"));
+                                return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
+                            case 1:
+                                _c.sent();
+                                return [4 /*yield*/, page.keyboard.press("f")];
+                            case 2:
+                                _c.sent();
+                                _c.label = 3;
+                            case 3:
+                                _c.trys.push([3, 6, , 7]);
+                                _b = (_a = Promise).all;
+                                return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button")];
+                            case 4: return [4 /*yield*/, _b.apply(_a, [[
+                                        _c.sent()
+                                    ]])];
+                            case 5:
+                                _c.sent();
+                                console.log("Stream is agerestricted");
+                                console.log("\"Clicked \"Start Watching\" button");
+                                return [3 /*break*/, 7];
+                            case 6:
+                                err_1 = _c.sent();
+                                console.log("Stream is not agerestricted");
+                                return [3 /*break*/, 7];
+                            case 7: return [4 /*yield*/, (0, puppeteer_stream_1.getStream)(page, { audio: true, video: true })];
+                            case 8:
+                                stream = _c.sent();
+                                console.log("Starting to record");
+                                ffmpeg = undefined;
+                                // -r specifies what the wanted fps is
+                                if (windows == true) {
+                                    ffmpeg = exec("ffmpeg.exe -y -re -i - -r 24 ./videos/" + filename + "-export.mp4 -threads 1");
+                                }
+                                else {
                                     ffmpeg = exec("ffmpeg -y -i - -r 24 ./videos/" + filename + "-export.mp4 -threads 1");
-                                    progress = undefined;
-                                    // outputs rendering data
-                                    ffmpeg.stderr.on("data", function (chunk) {
-                                        console.log(chunk.toString());
-                                        progress = chunk;
-                                    });
-                                    stream.pipe(ffmpeg.stdin);
-                                    rl.question("", function (stringFromConsole) {
-                                        if (stringFromConsole == "") {
-                                            stopWhileLoop = true;
-                                        }
-                                        rl.close();
-                                    });
-                                    _c.label = 9;
-                                case 9: return [4 /*yield*/, checkIfLive()];
-                                case 10:
-                                    if (!((_c.sent()) == true)) return [3 /*break*/, 12];
-                                    if (stopWhileLoop) {
-                                        return [3 /*break*/, 12];
+                                }
+                                progress = undefined;
+                                // outputs rendering data
+                                ffmpeg.stderr.on("data", function (chunk) {
+                                    console.log(chunk.toString());
+                                    console.log("#"); // To make sure that something is happening when oputput seems to freeze
+                                    progress = chunk;
+                                });
+                                stream.pipe(ffmpeg.stdin);
+                                rl.question("", function (stringFromConsole) {
+                                    if (stringFromConsole == "") {
+                                        stopWhileLoop = true;
                                     }
-                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
-                                case 11:
-                                    _c.sent();
-                                    return [3 /*break*/, 9];
-                                case 12:
-                                    stream.pipe(file);
-                                    return [4 /*yield*/, stream.destroy()];
-                                case 13:
-                                    _c.sent();
-                                    file.close();
-                                    console.log("Recording finished");
-                                    console.log("Waiting for render to finish");
-                                    test1 = 0;
-                                    test2 = 1;
-                                    return [4 /*yield*/, browser.close()];
-                                case 14:
-                                    _c.sent();
-                                    _c.label = 15;
-                                case 15:
-                                    if (!(test1 != test2)) return [3 /*break*/, 17];
-                                    test1 = progress;
-                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-                                case 16:
-                                    _c.sent();
-                                    test2 = progress;
-                                    return [3 /*break*/, 15];
-                                case 17:
-                                    console.log("Render finished");
-                                    ffmpeg.stdin.setEncoding("utf8");
-                                    ffmpeg.stdin.write("q");
-                                    ffmpeg.stdin.end();
-                                    ffmpeg.kill();
-                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-                                case 18:
-                                    _c.sent();
-                                    console.log("Deleting stream file");
-                                    fs.unlinkSync("./videos/" + filename + ".mp4");
-                                    process.exit();
-                                    return [2 /*return*/];
-                            }
-                        });
-                    }); };
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-                case 5:
-                    _a.sent();
-                    _a.label = 6;
-                case 6: return [4 /*yield*/, checkIfLive()];
-                case 7:
-                    if (!((_a.sent()) == false)) return [3 /*break*/, 10];
-                    console.log("Streamer is not live");
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
-                case 8:
-                    _a.sent();
-                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-                case 9:
-                    _a.sent();
-                    return [3 /*break*/, 6];
-                case 10:
-                    record();
-                    return [2 /*return*/];
-            }
-        });
+                                    rl.close();
+                                });
+                                _c.label = 9;
+                            case 9: return [4 /*yield*/, checkIfLive()];
+                            case 10:
+                                if (!((_c.sent()) == true)) return [3 /*break*/, 12];
+                                if (stopWhileLoop) {
+                                    return [3 /*break*/, 12];
+                                }
+                                if (originalUrl != page.url()) {
+                                    console.log("Stopping recording because streamer raided someone else");
+                                    return [3 /*break*/, 12];
+                                }
+                                if (checkIfRerun && rerunStream == false) {
+                                    console.log("Stream is a rerun");
+                                    return [3 /*break*/, 12];
+                                }
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 15000); })];
+                            case 11:
+                                _c.sent();
+                                return [3 /*break*/, 9];
+                            case 12:
+                                stream.pipe(file);
+                                return [4 /*yield*/, stream.destroy()];
+                            case 13:
+                                _c.sent();
+                                file.close();
+                                console.log("Recording finished");
+                                console.log("Waiting for render to finish");
+                                test1 = 0;
+                                test2 = 1;
+                                return [4 /*yield*/, browser.pages()];
+                            case 14:
+                                pages = _c.sent();
+                                return [4 /*yield*/, Promise.all(pages.map(function (page) { return page.close(); }))];
+                            case 15:
+                                _c.sent();
+                                return [4 /*yield*/, browser.close()];
+                            case 16:
+                                _c.sent();
+                                _c.label = 17;
+                            case 17:
+                                if (!(test1 != test2)) return [3 /*break*/, 19];
+                                test1 = progress;
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                            case 18:
+                                _c.sent();
+                                test2 = progress;
+                                return [3 /*break*/, 17];
+                            case 19:
+                                console.log("Render finished");
+                                ffmpeg.stdin.setEncoding("utf8");
+                                ffmpeg.stdin.write("q");
+                                ffmpeg.stdin.end();
+                                ffmpeg.kill();
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                            case 20:
+                                _c.sent();
+                                console.log("Deleting stream file");
+                                fs.unlinkSync("./videos/" + filename + "-stream.mp4");
+                                process.exit();
+                                return [2 /*return*/];
+                        }
+                    });
+                }); };
+                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+            case 8:
+                _a.sent();
+                _a.label = 9;
+            case 9: return [4 /*yield*/, checkIfLive()];
+            case 10:
+                if (!((_a.sent()) == false)) return [3 /*break*/, 13];
+                console.log("Streamer is not live");
+                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
+            case 11:
+                _a.sent();
+                return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
+            case 12:
+                _a.sent();
+                return [3 /*break*/, 9];
+            case 13: return [4 /*yield*/, checkIfRerun()];
+            case 14:
+                if ((_a.sent()) == false) {
+                    console.log("This stream is a rerun");
+                    rerunStream = true;
+                }
+                else {
+                    rerunStream = false;
+                }
+                record();
+                return [2 /*return*/];
+        }
     });
-}
+}); };
 checkIfUrlIsValid();
