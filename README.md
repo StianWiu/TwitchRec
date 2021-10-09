@@ -2,14 +2,6 @@
 
 This is my side project Twitch-Recorder.
 
-What it does currently is it uses puppeteer to open a specified twitch stream and proceeds to record it until stream is over. You can set it to a stream that is offline and it will wait for said streamer to start streaming.
-
-The project could be done way more effeciently but I really wanted to get this working using puppeteer so I had some creative limits. So if there are better alternatives you should use those instead, if not then feel free to use this one. If you have any suggestions please do submit a pull request and I will gladly look at it.
-
-This is made for ubuntu primeraly but if you do -w true or --windows true it will work. Make sure to have google chrome installed.
-
-if your google chrome isn't installed at the usual location you will have to change the directory in the code.
-
 ## Build Setup
 
 ```bash
@@ -23,9 +15,7 @@ $ npm i
 $ sudo apt-get install ffmpeg
 
 # start project with node
-$ node index.js --user pignuuuu --windows false --frames 32 --output false
-
-# --user or -u is what twitch stream to record --windows or -w is if you are using windows --frames or -f is how many frames ffmpeg will render --output or -o is wether ffmpeg should output to console
+$ node index.js
 
 ```
 
