@@ -331,6 +331,9 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                                 return [3 /*break*/, 18];
                             case 20:
                                 console.log("Render finished");
+                                console.log(ffmpeg);
+                                console.log("#");
+                                console.log(ffmpeg.stdin);
                                 ffmpeg.stdin.setEncoding("utf8");
                                 ffmpeg.stdin.write("q");
                                 ffmpeg.stdin.end();

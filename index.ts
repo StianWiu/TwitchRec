@@ -238,6 +238,9 @@ const startRecording = async () => {
       test2 = progress;
     }
     console.log("Render finished");
+    console.log(ffmpeg);
+    console.log("#");
+    console.log(ffmpeg.stdin);
     ffmpeg.stdin.setEncoding("utf8");
     ffmpeg.stdin.write("q");
     ffmpeg.stdin.end();
