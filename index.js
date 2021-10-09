@@ -46,6 +46,8 @@ var exec = require("child_process").exec;
 var stopWhileLoop = false;
 var rerunStream = undefined;
 var windows = undefined;
+var fps = undefined;
+var output = undefined;
 var readline = require("readline");
 var rl = readline.createInterface({
     input: process.stdin,
@@ -59,59 +61,81 @@ var noOsSpecified = function () {
     console.log("Missing argument -w or --windows");
     process.exit();
 };
-program.option("-u, --user <username>", "twitch user to record");
-program.option("-w, --windows <true/false>", "using windows true or false");
+program.option("-u, --user <username>", "Twitch user to record [Required]");
+program.option("-w, --windows <true/false>", "Using windows true or false [Required]");
+program.option("-f, --frames <number>", "How many fps to export to [Optinal]");
+program.option("-o, --output <true/false>", "Print ffmpeg to console? [Optinal]");
 program.parse(process.argv);
 var options = program.opts();
+var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        if (options.user) {
+            if (options.windows == "true" || options.windows == "false") {
+                if (options.windows == "true") {
+                    windows = true;
+                    if (options.frames) {
+                        fps = options.frames;
+                    }
+                    else {
+                        fps = 24;
+                    }
+                }
+                else {
+                    windows = false;
+                }
+                if (options.output) {
+                    if (options.output == "true") {
+                        output = true;
+                    }
+                    output = false;
+                }
+                else {
+                    output = true;
+                }
+            }
+            else
+                noOsSpecified();
+        }
+        else
+            noUserSpecified();
+        return [2 /*return*/];
+    });
+}); };
 // make sure provided link actually opens
 var checkIfUrlIsValid = function () { return __awaiter(void 0, void 0, void 0, function () {
     var browser, page, e_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
-                if (!options.user) return [3 /*break*/, 9];
-                if (!(options.windows == "true" || options.windows == "false")) return [3 /*break*/, 7];
-                if (options.windows == "true") {
-                    windows = true;
-                }
-                else {
-                    windows = false;
-                }
-                _a.label = 1;
+            case 0: return [4 /*yield*/, checkConfiguration()];
             case 1:
-                _a.trys.push([1, 5, , 6]);
+                _a.sent();
+                _a.label = 2;
+            case 2:
+                _a.trys.push([2, 6, , 7]);
                 return [4 /*yield*/, puppeteer.launch({
                         headless: true,
                         args: ["--no-sandbox"]
                     })];
-            case 2:
+            case 3:
                 browser = _a.sent();
                 return [4 /*yield*/, browser.newPage()];
-            case 3:
+            case 4:
                 page = _a.sent();
                 return [4 /*yield*/, page.goto("https://twitch.tv/" + options.user, {
                         waitUntil: "load",
                         timeout: 0
                     })];
-            case 4:
+            case 5:
                 _a.sent();
                 console.log("Username is valid");
                 startRecording();
-                return [3 /*break*/, 6];
-            case 5:
+                return [3 /*break*/, 7];
+            case 6:
                 e_1 = _a.sent();
                 console.log("Username could not be resloved.");
                 process.exit();
-                return [3 /*break*/, 6];
-            case 6: return [3 /*break*/, 8];
-            case 7:
-                noOsSpecified();
-                _a.label = 8;
-            case 8: return [3 /*break*/, 10];
-            case 9:
-                noUserSpecified();
-                _a.label = 10;
-            case 10: return [2 /*return*/];
+                return [3 /*break*/, 7];
+            case 7: return [2 /*return*/];
         }
     });
 }); };
@@ -193,7 +217,8 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                     return __generator(this, function (_c) {
                         switch (_c.label) {
                             case 0:
-                                file = fs.createWriteStream(__dirname + ("/videos/" + filename + "-stream.mp4"));
+                                file = fs.createWriteStream(__dirname + ("/videos/" + options.user + "-" + filename + "-stream.mp4"));
+                                console.log("Created file " + options.user + "-" + filename + "-stream.mp4");
                                 return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
                             case 1:
                                 _c.sent();
@@ -211,7 +236,7 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                             case 5:
                                 _c.sent();
                                 console.log("Stream is agerestricted");
-                                console.log("\"Clicked \"Start Watching\" button");
+                                console.log("Clicked \"Start Watching\" button");
                                 return [3 /*break*/, 7];
                             case 6:
                                 err_1 = _c.sent();
@@ -224,18 +249,20 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                                 ffmpeg = undefined;
                                 // -r specifies what the wanted fps is
                                 if (windows == true) {
-                                    ffmpeg = exec("ffmpeg.exe -y -re -i - -r 24 ./videos/" + filename + "-export.mp4 -threads 1");
+                                    ffmpeg = exec("ffmpeg.exe -y -re -i - -r " + fps + " ./videos/" + options.user + "-" + filename + "-export.mp4 -threads 1", console.log("Render fps set to " + fps));
                                 }
                                 else {
-                                    ffmpeg = exec("ffmpeg -y -re -i - -r 24 ./videos/" + filename + "-export.mp4 -threads 1");
+                                    ffmpeg = exec("ffmpeg -y -re -i - -r " + fps + " ./videos/" + options.user + "-" + filename + "-export.mp4 -threads 1", console.log("Render fps set to " + fps));
                                 }
                                 progress = undefined;
                                 // outputs rendering data
-                                ffmpeg.stderr.on("data", function (chunk) {
-                                    console.log(chunk.toString());
-                                    console.log("#"); // To make sure that something is happening when oputput seems to freeze
-                                    progress = chunk;
-                                });
+                                console.log("Starting to render live video to " + options.user + "-" + filename + "-export.mp4 \n\nPress enter in console to finish recording or wait until stream is over");
+                                if (output == true) {
+                                    ffmpeg.stderr.on("data", function (chunk) {
+                                        console.log(chunk.toString());
+                                        progress = chunk;
+                                    });
+                                }
                                 stream.pipe(ffmpeg.stdin);
                                 rl.question("", function (stringFromConsole) {
                                     if (stringFromConsole == "") {
@@ -301,8 +328,8 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                             case 21:
                                 _c.sent();
-                                console.log("Deleting stream file");
-                                fs.unlinkSync("./videos/" + filename + "-stream.mp4");
+                                console.log("Deleting temporary stream file");
+                                fs.unlinkSync("./videos/" + options.user + "-" + filename + "-stream.mp4");
                                 process.exit();
                                 return [2 /*return*/];
                         }
@@ -326,7 +353,7 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
             case 13: return [4 /*yield*/, checkIfRerun()];
             case 14:
                 if ((_a.sent()) == false) {
-                    console.log("This stream is a rerun");
+                    console.log("This stream is a rerun \nContinuing to record anyways");
                     rerunStream = true;
                 }
                 else {

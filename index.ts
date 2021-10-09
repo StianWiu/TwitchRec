@@ -9,6 +9,8 @@ const { exec } = require("child_process");
 let stopWhileLoop = false;
 var rerunStream = undefined;
 var windows = undefined;
+var fps = undefined;
+var output = undefined;
 const readline = require("readline");
 const rl = readline.createInterface({
   input: process.stdin,
@@ -24,38 +26,63 @@ const noOsSpecified = () => {
   process.exit();
 };
 
-program.option("-u, --user <username>", "twitch user to record");
-program.option("-w, --windows <true/false>", "using windows true or false");
+program.option("-u, --user <username>", "Twitch user to record [Required]");
+program.option(
+  "-w, --windows <true/false>",
+  "Using windows true or false [Required]"
+);
+program.option("-f, --frames <number>", "How many fps to export to [Optinal]");
+program.option(
+  "-o, --output <true/false>",
+  "Print ffmpeg to console? [Optinal]"
+);
 program.parse(process.argv);
 const options = program.opts();
 
-// make sure provided link actually opens
-const checkIfUrlIsValid = async () => {
+const checkConfiguration = async () => {
   if (options.user) {
     if (options.windows == "true" || options.windows == "false") {
       if (options.windows == "true") {
         windows = true;
+        if (options.frames) {
+          fps = options.frames;
+        } else {
+          fps = 24;
+        }
       } else {
         windows = false;
       }
-      try {
-        const browser = await puppeteer.launch({
-          headless: true,
-          args: ["--no-sandbox"],
-        });
-        const page = await browser.newPage();
-        await page.goto(`https://twitch.tv/${options.user}`, {
-          waitUntil: "load",
-          timeout: 0,
-        });
-        console.log("Username is valid");
-        startRecording();
-      } catch (e: any) {
-        console.log("Username could not be resloved.");
-        process.exit();
+      if (options.output) {
+        if (options.output == "true") {
+          output = true;
+        }
+        output = false;
+      } else {
+        output = true;
       }
     } else noOsSpecified();
   } else noUserSpecified();
+};
+
+// make sure provided link actually opens
+const checkIfUrlIsValid = async () => {
+  await checkConfiguration();
+  try {
+    const browser = await puppeteer.launch({
+      headless: true,
+      args: ["--no-sandbox"],
+    });
+    const page = await browser.newPage();
+    await page.goto(`https://twitch.tv/${options.user}`, {
+      waitUntil: "load",
+      timeout: 0,
+    });
+    console.log("Username is valid");
+    startRecording();
+  } catch (e: any) {
+    console.log("Username could not be resloved.");
+    process.exit();
+  }
 };
 
 // generate random hex string to use for filename
@@ -114,8 +141,9 @@ const startRecording = async () => {
 
   const record = async () => {
     const file = fs.createWriteStream(
-      __dirname + `/videos/${filename}-stream.mp4`
+      __dirname + `/videos/${options.user}-${filename}-stream.mp4`
     );
+    console.log(`Created file ${options.user}-${filename}-stream.mp4`);
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
     await page.keyboard.press("f");
     try {
@@ -125,7 +153,7 @@ const startRecording = async () => {
         ),
       ]);
       console.log("Stream is agerestricted");
-      console.log(`"Clicked "Start Watching" button`);
+      console.log(`Clicked "Start Watching" button`);
     } catch (err) {
       console.log("Stream is not agerestricted");
     }
@@ -137,21 +165,27 @@ const startRecording = async () => {
     // -r specifies what the wanted fps is
     if (windows == true) {
       ffmpeg = exec(
-        `ffmpeg.exe -y -re -i - -r 24 ./videos/${filename}-export.mp4 -threads 1`
+        `ffmpeg.exe -y -re -i - -r ${fps} ./videos/${options.user}-${filename}-export.mp4 -threads 1`,
+        console.log(`Render fps set to ${fps}`)
       );
     } else {
       ffmpeg = exec(
-        `ffmpeg -y -re -i - -r 24 ./videos/${filename}-export.mp4 -threads 1`
+        `ffmpeg -y -re -i - -r ${fps} ./videos/${options.user}-${filename}-export.mp4 -threads 1`,
+        console.log(`Render fps set to ${fps}`)
       );
     }
 
     var progress = undefined;
     // outputs rendering data
-    ffmpeg.stderr.on("data", (chunk) => {
-      console.log(chunk.toString());
-      console.log("#"); // To make sure that something is happening when oputput seems to freeze
-      progress = chunk;
-    });
+    console.log(
+      `Starting to render live video to ${options.user}-${filename}-export.mp4 \n\nPress enter in console to finish recording or wait until stream is over`
+    );
+    if (output == true) {
+      ffmpeg.stderr.on("data", (chunk) => {
+        console.log(chunk.toString());
+        progress = chunk;
+      });
+    }
     stream.pipe(ffmpeg.stdin);
     rl.question("", function (stringFromConsole) {
       if (stringFromConsole == "") {
@@ -198,8 +232,8 @@ const startRecording = async () => {
     ffmpeg.stdin.end();
     ffmpeg.kill();
     await new Promise((resolve) => setTimeout(resolve, 5000));
-    console.log("Deleting stream file");
-    fs.unlinkSync(`./videos/${filename}-stream.mp4`);
+    console.log("Deleting temporary stream file");
+    fs.unlinkSync(`./videos/${options.user}-${filename}-stream.mp4`);
     process.exit();
   };
   await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -209,7 +243,7 @@ const startRecording = async () => {
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   }
   if ((await checkIfRerun()) == false) {
-    console.log("This stream is a rerun");
+    console.log("This stream is a rerun \nContinuing to record anyways");
     rerunStream = true;
   } else {
     rerunStream = false;
