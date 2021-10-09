@@ -141,7 +141,7 @@ const startRecording = async () => {
       );
     } else {
       ffmpeg = exec(
-        `ffmpeg -y -i - -r 24 ./videos/${filename}-export.mp4 -threads 1`
+        `ffmpeg -y -re -i - -r 24 ./videos/${filename}-export.mp4 -threads 1`
       );
     }
 

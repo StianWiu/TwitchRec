@@ -227,7 +227,7 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                                     ffmpeg = exec("ffmpeg.exe -y -re -i - -r 24 ./videos/" + filename + "-export.mp4 -threads 1");
                                 }
                                 else {
-                                    ffmpeg = exec("ffmpeg -y -i - -r 24 ./videos/" + filename + "-export.mp4 -threads 1");
+                                    ffmpeg = exec("ffmpeg -y -re -i - -r 24 ./videos/" + filename + "-export.mp4 -threads 1");
                                 }
                                 progress = undefined;
                                 // outputs rendering data
