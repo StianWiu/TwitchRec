@@ -13,11 +13,11 @@ const { exec } = require("child_process");
 
 async function test() {
   const browser = await launch({
-    executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-    // executablePath: "/usr/bin/google-chrome-stable",
+    // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+    executablePath: "/usr/bin/google-chrome-stable",
     defaultViewport: {
-      width: 1920,
-      height: 1080,
+      width: 1024,
+      height: 768,
     },
   });
 
@@ -46,7 +46,7 @@ async function test() {
     ffmpeg.kill();
 
     console.log("finished");
-  }, 30000);
+  }, 60 * 60000 * 3);
 }
 
 test();

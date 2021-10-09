@@ -51,11 +51,11 @@ function test() {
         return __generator(this, function (_a) {
             switch (_a.label) {
                 case 0: return [4 /*yield*/, launch({
-                        executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
-                        // executablePath: "/usr/bin/google-chrome-stable",
+                        // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
+                        executablePath: "/usr/bin/google-chrome-stable",
                         defaultViewport: {
-                            width: 1920,
-                            height: 1080
+                            width: 1024,
+                            height: 768
                         }
                     })];
                 case 1:
@@ -94,7 +94,7 @@ function test() {
                                     return [2 /*return*/];
                             }
                         });
-                    }); }, 30000);
+                    }); }, 60 * 60000 * 3);
                     return [2 /*return*/];
             }
         });
