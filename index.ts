@@ -169,11 +169,11 @@ const startRecording = async () => {
         console.log("Stopping recording because streamer raided someone else");
         break;
       }
-      if (checkIfRerun && rerunStream == false) {
+      await new Promise((resolve) => setTimeout(resolve, 15000));
+      if ((await checkIfRerun()) == true && rerunStream == false) {
         console.log("Stream is a rerun");
         break;
       }
-      await new Promise((resolve) => setTimeout(resolve, 15000));
     }
 
     stream.pipe(file);

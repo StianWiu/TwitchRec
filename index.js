@@ -246,26 +246,28 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                                 _c.label = 9;
                             case 9: return [4 /*yield*/, checkIfLive()];
                             case 10:
-                                if (!((_c.sent()) == true)) return [3 /*break*/, 12];
+                                if (!((_c.sent()) == true)) return [3 /*break*/, 13];
                                 if (stopWhileLoop) {
-                                    return [3 /*break*/, 12];
+                                    return [3 /*break*/, 13];
                                 }
                                 if (originalUrl != page.url()) {
                                     console.log("Stopping recording because streamer raided someone else");
-                                    return [3 /*break*/, 12];
-                                }
-                                if (checkIfRerun && rerunStream == false) {
-                                    console.log("Stream is a rerun");
-                                    return [3 /*break*/, 12];
+                                    return [3 /*break*/, 13];
                                 }
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 15000); })];
                             case 11:
                                 _c.sent();
-                                return [3 /*break*/, 9];
+                                return [4 /*yield*/, checkIfRerun()];
                             case 12:
+                                if ((_c.sent()) == true && rerunStream == false) {
+                                    console.log("Stream is a rerun");
+                                    return [3 /*break*/, 13];
+                                }
+                                return [3 /*break*/, 9];
+                            case 13:
                                 stream.pipe(file);
                                 return [4 /*yield*/, stream.destroy()];
-                            case 13:
+                            case 14:
                                 _c.sent();
                                 file.close();
                                 console.log("Recording finished");
@@ -273,31 +275,31 @@ var startRecording = function () { return __awaiter(void 0, void 0, void 0, func
                                 test1 = 0;
                                 test2 = 1;
                                 return [4 /*yield*/, browser.pages()];
-                            case 14:
+                            case 15:
                                 pages = _c.sent();
                                 return [4 /*yield*/, Promise.all(pages.map(function (page) { return page.close(); }))];
-                            case 15:
-                                _c.sent();
-                                return [4 /*yield*/, browser.close()];
                             case 16:
                                 _c.sent();
-                                _c.label = 17;
+                                return [4 /*yield*/, browser.close()];
                             case 17:
-                                if (!(test1 != test2)) return [3 /*break*/, 19];
+                                _c.sent();
+                                _c.label = 18;
+                            case 18:
+                                if (!(test1 != test2)) return [3 /*break*/, 20];
                                 test1 = progress;
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-                            case 18:
+                            case 19:
                                 _c.sent();
                                 test2 = progress;
-                                return [3 /*break*/, 17];
-                            case 19:
+                                return [3 /*break*/, 18];
+                            case 20:
                                 console.log("Render finished");
                                 ffmpeg.stdin.setEncoding("utf8");
                                 ffmpeg.stdin.write("q");
                                 ffmpeg.stdin.end();
                                 ffmpeg.kill();
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-                            case 20:
+                            case 21:
                                 _c.sent();
                                 console.log("Deleting stream file");
                                 fs.unlinkSync("./videos/" + filename + "-stream.mp4");
