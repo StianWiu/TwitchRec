@@ -16,13 +16,15 @@ async function test() {
     // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
     executablePath: "/usr/bin/google-chrome-stable",
     defaultViewport: {
-      width: 1024,
+      width: 1924,
       height: 768,
+      // width: 1920,
+      // height: 1080,
     },
   });
 
   const page = await browser.newPage();
-  await page.goto("https://www.twitch.tv/aboedmxtest");
+  await page.goto("https://www.twitch.tv/foxenkin");
   const stream = await getStream(page, {
     audio: true,
     video: true,
@@ -30,7 +32,7 @@ async function test() {
   });
   console.log("recording");
   // this will pipe the stream to ffmpeg and convert the webm to mp4 format
-  const ffmpeg = exec(`ffmpeg -y -r 25 -i - videos/output.mp4`);
+  const ffmpeg = exec(`ffmpeg -async 1 -y -re -i - -r 25 videos/output.mp4`);
   ffmpeg.stderr.on("data", (chunk) => {
     console.log(chunk.toString());
   });
@@ -46,7 +48,7 @@ async function test() {
     ffmpeg.kill();
 
     console.log("finished");
-  }, 60 * 60000 * 3);
+  }, 60000 * 1);
 }
 
 test();

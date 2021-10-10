@@ -54,7 +54,7 @@ function test() {
                         // executablePath: "C:/Program Files/Google/Chrome/Application/chrome.exe ",
                         executablePath: "/usr/bin/google-chrome-stable",
                         defaultViewport: {
-                            width: 1024,
+                            width: 1924,
                             height: 768
                         }
                     })];
@@ -63,7 +63,7 @@ function test() {
                     return [4 /*yield*/, browser.newPage()];
                 case 2:
                     page = _a.sent();
-                    return [4 /*yield*/, page.goto("https://www.twitch.tv/aboedmxtest")];
+                    return [4 /*yield*/, page.goto("https://www.twitch.tv/foxenkin")];
                 case 3:
                     _a.sent();
                     return [4 /*yield*/, getStream(page, {
@@ -74,7 +74,7 @@ function test() {
                 case 4:
                     stream = _a.sent();
                     console.log("recording");
-                    ffmpeg = exec("ffmpeg -y -r 25 -i - videos/output.mp4");
+                    ffmpeg = exec("ffmpeg -async 1 -y -re -i - -r 25 videos/output.mp4");
                     ffmpeg.stderr.on("data", function (chunk) {
                         console.log(chunk.toString());
                     });
@@ -94,7 +94,7 @@ function test() {
                                     return [2 /*return*/];
                             }
                         });
-                    }); }, 60 * 60000 * 3);
+                    }); }, 60000 * 1);
                     return [2 /*return*/];
             }
         });
