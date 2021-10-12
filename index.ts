@@ -1,7 +1,29 @@
+const logo = require("asciiart-logo");
+const printLogo = () => {
+  console.log(
+    logo({
+      name: "Pignuuu",
+      font: "Chunky",
+      lineChars: 10,
+      padding: 2,
+      margin: 3,
+    })
+      .emptyLine()
+      .right("V1.0.0")
+      .emptyLine()
+      .center(
+        'Twitch recording software. Developed by Pignuuu :) "--help" for options'
+      )
+      .render()
+  );
+};
+printLogo();
+
 import { Command } from "commander";
+import { Timer } from "timer-node";
 const program = new Command();
 const randomstring = require("randomstring");
-const { exec } = require("child_process");
+var nrc = require("node-run-cmd");
 const { launch, getStream } = require("puppeteer-stream");
 const fs = require("fs");
 
@@ -17,13 +39,13 @@ const noOsSpecified = () => {
 
 program.option("-u, --user <username>", "Twitch user to record [Required]");
 program.option(
-  "-w, --windows <true/false>",
+  "-w, --windows <boolean>",
   "Using windows true or false [Required]"
 );
-program.option("-f, --frames <number>", "How many fps to export to [Optinal]");
+program.option("-f, --frames <num>", "How many fps to export to [Optinal]");
 program.option(
-  "-o, --output <true/false>",
-  "Print ffmpeg to console? [Optinal]"
+  "-t, --threads <num>",
+  "How many threads to use when encoding [Optinal]"
 );
 
 program.parse(process.argv);
@@ -31,7 +53,7 @@ const options = program.opts();
 
 let windows = undefined;
 let fps = undefined;
-let output = undefined;
+let threads = undefined;
 let rerunStream = undefined;
 
 const checkConfiguration = () => {
@@ -47,13 +69,10 @@ const checkConfiguration = () => {
       } else {
         fps = 24;
       }
-      if (options.output) {
-        if (options.output == "true") {
-          output = true;
-        }
-        output = false;
+      if (options.threads) {
+        threads = options.threads;
       } else {
-        output = true;
+        threads = 1;
       }
     } else noOsSpecified();
   } else noUserSpecified();
@@ -66,6 +85,8 @@ const filename = randomstring.generate({
 });
 
 async function startRecording() {
+  const timer = new Timer({ label: "test-timer" });
+  timer.start();
   let browser = undefined;
   if (windows == true) {
     browser = await launch({
@@ -84,8 +105,9 @@ async function startRecording() {
       },
     });
   }
-
+  console.log("Opening browser.");
   const page = await browser.newPage();
+  console.log("Opening twitch stream");
   await page.goto(`https://www.twitch.tv/${options.user}`);
   const originalUrl = page.url();
 
@@ -108,13 +130,16 @@ async function startRecording() {
     else return false;
   };
 
+  console.log("Waiting for page to load");
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
+  console.log("Checking if streamer is live");
   while ((await checkIfLive()) == false) {
     console.log("Streamer is not live");
     await new Promise((resolve) => setTimeout(resolve, 60000));
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   }
+  console.log("Checking if stream is a rerun");
   if ((await checkIfRerun()) == false) {
     console.log("This stream is a rerun \nContinuing to record anyways");
     rerunStream = true;
@@ -122,8 +147,11 @@ async function startRecording() {
     rerunStream = false;
   }
 
+  console.log("Reloading webpage");
   await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+  console.log("Fullscreening stream");
   await page.keyboard.press("f");
+  console.log("Checking if stream is agerestricted");
   try {
     await Promise.all([
       await page.click(
@@ -134,31 +162,16 @@ async function startRecording() {
   } catch (err) {
     console.log("Stream is not agerestricted");
   }
+  const file = fs.createWriteStream(
+    `./videos/${options.user}-${filename}.webm`
+  );
+  const stream = await getStream(page, { audio: true, video: true });
+  console.log("Now recording");
+  console.log(
+    "Recording will stop when:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun"
+  );
 
-  const stream = await getStream(page, {
-    audio: true,
-    video: true,
-    frameSize: 1000,
-  });
-  // this will pipe the stream to ffmpeg and convert the webm to mp4 format
-  let ffmpeg = undefined;
-  if (windows == true) {
-    ffmpeg = exec(
-      `ffmpeg.exe -async 1 -y -i - -r ${fps} videos/${options.user}-${filename}.mp4`
-    );
-  } else {
-    ffmpeg = exec(
-      `ffmpeg -async 1 -y -i - -r ${fps} videos/${options.user}-${filename}.mp4`
-    );
-  }
-  // console logs output from ffmpeg
-  if (output == true) {
-    ffmpeg.stderr.on("data", (chunk) => {
-      console.log(chunk.toString());
-    });
-  }
-
-  stream.pipe(ffmpeg.stdin);
+  stream.pipe(file);
 
   while ((await checkIfLive()) == true) {
     if (originalUrl != page.url()) {
@@ -174,12 +187,31 @@ async function startRecording() {
 
   await stream.destroy();
   stream.on("end", () => {});
-  ffmpeg.stdin.setEncoding("utf8");
-  ffmpeg.stdin.write("q");
-  ffmpeg.stdin.end();
-  ffmpeg.kill();
-
-  console.log("finished");
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+  console.log(
+    `FFmpeg encoding starting now.\nFps set to ${fps}\nEncoding using ${threads} threads\n`
+  );
+  if (windows == true) {
+    await nrc.run(
+      `ffmpeg.exe -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}.mp4`
+    );
+  } else {
+    await nrc.run(
+      `ffmpeg. -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}.mp4`
+    );
+  }
+  console.log("Encoding has finished.\nDeleting temporary stream file.");
+  await fs.unlinkSync(`./videos/${options.user}-${filename}.webm`);
+  await new Promise((resolve) => setTimeout(resolve, 2500));
+  console.clear();
+  await printLogo();
+  console.log(`\n\n Your file is ready.\n`);
+  timer.stop();
+  console.log(
+    timer.format(
+      "Entire process took [%d] Days, [%h] hours, [%m] Minutes, [%s] Seconds"
+    )
+  );
   process.exit();
 }
 

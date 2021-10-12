@@ -36,10 +36,27 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
     }
 };
 exports.__esModule = true;
+var logo = require("asciiart-logo");
+var printLogo = function () {
+    console.log(logo({
+        name: "Pignuuu",
+        font: "Chunky",
+        lineChars: 10,
+        padding: 2,
+        margin: 3
+    })
+        .emptyLine()
+        .right("V1.0.0")
+        .emptyLine()
+        .center('Twitch recording software. Developed by Pignuuu :) "--help" for options')
+        .render());
+};
+printLogo();
 var commander_1 = require("commander");
+var timer_node_1 = require("timer-node");
 var program = new commander_1.Command();
 var randomstring = require("randomstring");
-var exec = require("child_process").exec;
+var nrc = require("node-run-cmd");
 var _a = require("puppeteer-stream"), launch = _a.launch, getStream = _a.getStream;
 var fs = require("fs");
 // Add options for command
@@ -52,14 +69,14 @@ var noOsSpecified = function () {
     process.exit();
 };
 program.option("-u, --user <username>", "Twitch user to record [Required]");
-program.option("-w, --windows <true/false>", "Using windows true or false [Required]");
-program.option("-f, --frames <number>", "How many fps to export to [Optinal]");
-program.option("-o, --output <true/false>", "Print ffmpeg to console? [Optinal]");
+program.option("-w, --windows <boolean>", "Using windows true or false [Required]");
+program.option("-f, --frames <num>", "How many fps to export to [Optinal]");
+program.option("-t, --threads <num>", "How many threads to use when encoding [Optinal]");
 program.parse(process.argv);
 var options = program.opts();
 var windows = undefined;
 var fps = undefined;
-var output = undefined;
+var threads = undefined;
 var rerunStream = undefined;
 var checkConfiguration = function () {
     if (options.user) {
@@ -76,14 +93,11 @@ var checkConfiguration = function () {
             else {
                 fps = 24;
             }
-            if (options.output) {
-                if (options.output == "true") {
-                    output = true;
-                }
-                output = false;
+            if (options.threads) {
+                threads = options.threads;
             }
             else {
-                output = true;
+                threads = 1;
             }
         }
         else
@@ -99,11 +113,13 @@ var filename = randomstring.generate({
 });
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var browser, page, originalUrl, checkIfLive, checkIfRerun, _a, _b, err_1, stream, ffmpeg;
+        var timer, browser, page, originalUrl, checkIfLive, checkIfRerun, _a, _b, err_1, file, stream;
         var _this = this;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
+                    timer = new timer_node_1.Timer({ label: "test-timer" });
+                    timer.start();
                     browser = undefined;
                     if (!(windows == true)) return [3 /*break*/, 2];
                     return [4 /*yield*/, launch({
@@ -126,9 +142,12 @@ function startRecording() {
                 case 3:
                     browser = _c.sent();
                     _c.label = 4;
-                case 4: return [4 /*yield*/, browser.newPage()];
+                case 4:
+                    console.log("Opening browser.");
+                    return [4 /*yield*/, browser.newPage()];
                 case 5:
                     page = _c.sent();
+                    console.log("Opening twitch stream");
                     return [4 /*yield*/, page.goto("https://www.twitch.tv/" + options.user)];
                 case 6:
                     _c.sent();
@@ -159,9 +178,11 @@ function startRecording() {
                             }
                         });
                     }); };
+                    console.log("Waiting for page to load");
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                 case 7:
                     _c.sent();
+                    console.log("Checking if streamer is live");
                     _c.label = 8;
                 case 8: return [4 /*yield*/, checkIfLive()];
                 case 9:
@@ -174,7 +195,9 @@ function startRecording() {
                 case 11:
                     _c.sent();
                     return [3 /*break*/, 8];
-                case 12: return [4 /*yield*/, checkIfRerun()];
+                case 12:
+                    console.log("Checking if stream is a rerun");
+                    return [4 /*yield*/, checkIfRerun()];
                 case 13:
                     if ((_c.sent()) == false) {
                         console.log("This stream is a rerun \nContinuing to record anyways");
@@ -183,12 +206,15 @@ function startRecording() {
                     else {
                         rerunStream = false;
                     }
+                    console.log("Reloading webpage");
                     return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
                 case 14:
                     _c.sent();
+                    console.log("Fullscreening stream");
                     return [4 /*yield*/, page.keyboard.press("f")];
                 case 15:
                     _c.sent();
+                    console.log("Checking if stream is agerestricted");
                     _c.label = 16;
                 case 16:
                     _c.trys.push([16, 19, , 20]);
@@ -205,27 +231,14 @@ function startRecording() {
                     err_1 = _c.sent();
                     console.log("Stream is not agerestricted");
                     return [3 /*break*/, 20];
-                case 20: return [4 /*yield*/, getStream(page, {
-                        audio: true,
-                        video: true,
-                        frameSize: 1000
-                    })];
+                case 20:
+                    file = fs.createWriteStream("./videos/" + options.user + "-" + filename + ".webm");
+                    return [4 /*yield*/, getStream(page, { audio: true, video: true })];
                 case 21:
                     stream = _c.sent();
-                    ffmpeg = undefined;
-                    if (windows == true) {
-                        ffmpeg = exec("ffmpeg.exe -async 1 -y -i - -r " + fps + " videos/" + options.user + "-" + filename + ".mp4");
-                    }
-                    else {
-                        ffmpeg = exec("ffmpeg -async 1 -y -i - -r " + fps + " videos/" + options.user + "-" + filename + ".mp4");
-                    }
-                    // console logs output from ffmpeg
-                    if (output == true) {
-                        ffmpeg.stderr.on("data", function (chunk) {
-                            console.log(chunk.toString());
-                        });
-                    }
-                    stream.pipe(ffmpeg.stdin);
+                    console.log("Now recording");
+                    console.log("Recording will stop when:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun");
+                    stream.pipe(file);
                     _c.label = 22;
                 case 22: return [4 /*yield*/, checkIfLive()];
                 case 23:
@@ -248,11 +261,34 @@ function startRecording() {
                 case 27:
                     _c.sent();
                     stream.on("end", function () { });
-                    ffmpeg.stdin.setEncoding("utf8");
-                    ffmpeg.stdin.write("q");
-                    ffmpeg.stdin.end();
-                    ffmpeg.kill();
-                    console.log("finished");
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
+                case 28:
+                    _c.sent();
+                    console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
+                    if (!(windows == true)) return [3 /*break*/, 30];
+                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + ".mp4")];
+                case 29:
+                    _c.sent();
+                    return [3 /*break*/, 32];
+                case 30: return [4 /*yield*/, nrc.run("ffmpeg. -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + ".mp4")];
+                case 31:
+                    _c.sent();
+                    _c.label = 32;
+                case 32:
+                    console.log("Encoding has finished.\nDeleting temporary stream file.");
+                    return [4 /*yield*/, fs.unlinkSync("./videos/" + options.user + "-" + filename + ".webm")];
+                case 33:
+                    _c.sent();
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
+                case 34:
+                    _c.sent();
+                    console.clear();
+                    return [4 /*yield*/, printLogo()];
+                case 35:
+                    _c.sent();
+                    console.log("\n\n Your file is ready.\n");
+                    timer.stop();
+                    console.log(timer.format("Entire process took [%d] Days, [%h] hours, [%m] Minutes, [%s] Seconds"));
                     process.exit();
                     return [2 /*return*/];
             }
