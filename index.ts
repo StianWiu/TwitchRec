@@ -12,7 +12,7 @@ const printLogo = () => {
       .right("V1.0.0")
       .emptyLine()
       .center(
-        'Twitch recording software. Developed by Pignuuu :) "--help" for options'
+        'Twitch recording software. Developed by Pignuuu. "--help" for options'
       )
       .render()
   );
@@ -85,7 +85,8 @@ const filename = randomstring.generate({
 });
 
 async function startRecording() {
-  const timer = new Timer({ label: "test-timer" });
+  const timer = new Timer({ label: "main-timer" });
+  const recording_timer = new Timer({ label: "recording-timer" });
   timer.start();
   let browser = undefined;
   if (windows == true) {
@@ -166,6 +167,7 @@ async function startRecording() {
     `./videos/${options.user}-${filename}.webm`
   );
   const stream = await getStream(page, { audio: true, video: true });
+  recording_timer.start();
   console.log("Now recording");
   console.log(
     "Recording will stop when:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun"
@@ -187,6 +189,9 @@ async function startRecording() {
 
   await stream.destroy();
   stream.on("end", () => {});
+  recording_timer.stop();
+  console.log("Closing browser");
+  await browser.close();
   await new Promise((resolve) => setTimeout(resolve, 2500));
   console.log(
     `FFmpeg encoding starting now.\nFps set to ${fps}\nEncoding using ${threads} threads\n`
@@ -197,7 +202,7 @@ async function startRecording() {
     );
   } else {
     await nrc.run(
-      `ffmpeg. -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}.mp4`
+      `ffmpeg -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}.mp4`
     );
   }
   console.log("Encoding has finished.\nDeleting temporary stream file.");
@@ -205,13 +210,12 @@ async function startRecording() {
   await new Promise((resolve) => setTimeout(resolve, 2500));
   console.clear();
   await printLogo();
-  console.log(`\n\n Your file is ready.\n`);
-  timer.stop();
   console.log(
-    timer.format(
-      "Entire process took [%d] Days, [%h] hours, [%m] Minutes, [%s] Seconds"
-    )
+    `\n\nYour file is ready. File:${options.user}-${filename}.mp4\n `
   );
+  timer.stop();
+  console.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"));
+  console.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"));
   process.exit();
 }
 

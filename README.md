@@ -37,7 +37,7 @@ $ node index.js -h # View all specifications available
 
 In order to edit the code you will need to go into the [index.ts](https://github.com/Pignuuu/twitch-recorder/blob/main/index.ts) file and code there.
 
-Then to compile it into javascript run
+Then to compile it into javascript
 
 ```bash
 $ npm run tsc

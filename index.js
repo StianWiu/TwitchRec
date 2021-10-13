@@ -48,7 +48,7 @@ var printLogo = function () {
         .emptyLine()
         .right("V1.0.0")
         .emptyLine()
-        .center('Twitch recording software. Developed by Pignuuu :) "--help" for options')
+        .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
 };
 printLogo();
@@ -113,12 +113,13 @@ var filename = randomstring.generate({
 });
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var timer, browser, page, originalUrl, checkIfLive, checkIfRerun, _a, _b, err_1, file, stream;
+        var timer, recording_timer, browser, page, originalUrl, checkIfLive, checkIfRerun, _a, _b, err_1, file, stream;
         var _this = this;
         return __generator(this, function (_c) {
             switch (_c.label) {
                 case 0:
-                    timer = new timer_node_1.Timer({ label: "test-timer" });
+                    timer = new timer_node_1.Timer({ label: "main-timer" });
+                    recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
                     timer.start();
                     browser = undefined;
                     if (!(windows == true)) return [3 /*break*/, 2];
@@ -236,6 +237,7 @@ function startRecording() {
                     return [4 /*yield*/, getStream(page, { audio: true, video: true })];
                 case 21:
                     stream = _c.sent();
+                    recording_timer.start();
                     console.log("Now recording");
                     console.log("Recording will stop when:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun");
                     stream.pipe(file);
@@ -261,34 +263,40 @@ function startRecording() {
                 case 27:
                     _c.sent();
                     stream.on("end", function () { });
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
+                    recording_timer.stop();
+                    console.log("Closing browser");
+                    return [4 /*yield*/, browser.close()];
                 case 28:
                     _c.sent();
-                    console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
-                    if (!(windows == true)) return [3 /*break*/, 30];
-                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + ".mp4")];
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
                 case 29:
                     _c.sent();
-                    return [3 /*break*/, 32];
-                case 30: return [4 /*yield*/, nrc.run("ffmpeg. -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + ".mp4")];
-                case 31:
+                    console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
+                    if (!(windows == true)) return [3 /*break*/, 31];
+                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + ".mp4")];
+                case 30:
                     _c.sent();
-                    _c.label = 32;
+                    return [3 /*break*/, 33];
+                case 31: return [4 /*yield*/, nrc.run("ffmpeg -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + ".mp4")];
                 case 32:
+                    _c.sent();
+                    _c.label = 33;
+                case 33:
                     console.log("Encoding has finished.\nDeleting temporary stream file.");
                     return [4 /*yield*/, fs.unlinkSync("./videos/" + options.user + "-" + filename + ".webm")];
-                case 33:
+                case 34:
                     _c.sent();
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
-                case 34:
+                case 35:
                     _c.sent();
                     console.clear();
                     return [4 /*yield*/, printLogo()];
-                case 35:
+                case 36:
                     _c.sent();
-                    console.log("\n\n Your file is ready.\n");
+                    console.log("\n\nYour file is ready. File:" + options.user + "-" + filename + ".mp4\n ");
                     timer.stop();
-                    console.log(timer.format("Entire process took [%d] Days, [%h] hours, [%m] Minutes, [%s] Seconds"));
+                    console.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"));
+                    console.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"));
                     process.exit();
                     return [2 /*return*/];
             }
