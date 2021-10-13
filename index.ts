@@ -9,7 +9,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.0.0")
+      .right("V1.0.1")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -135,8 +135,10 @@ async function startRecording() {
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
   console.log("Checking if streamer is live");
-  while ((await checkIfLive()) == false) {
+  if ((await checkIfLive()) == false) {
     console.log("Streamer is not live");
+  }
+  while ((await checkIfLive()) == false) {
     await new Promise((resolve) => setTimeout(resolve, 60000));
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   }
