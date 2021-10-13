@@ -23,7 +23,7 @@ $ npm i
 $ sudo apt-get install ffmpeg
 
 # start project with node
-$ node index.js --user pignuuuu --windows false --frames 32 --output false
+$ node index.js --user pignuuuu --windows false --frames 32 --threads 4
 
 # --user or -u is what twitch stream to record --windows or -w is if you are using windows --frames or -f is how many frames ffmpeg will render --threads or -t is how many threads ffmpeg should use when encoding.
 
