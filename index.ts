@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.2.1")
+      .right("V1.2.2")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -160,6 +160,7 @@ async function startRecording() {
   console.log("Opening twitch stream");
   await page.goto(`https://www.twitch.tv/${options.user}`);
   const originalUrl = page.url();
+  await new Promise((resolve) => setTimeout(resolve, 2000));
 
   const checkIfLive = async () => {
     if (
