@@ -1,3 +1,4 @@
+console.clear();
 const logo = require("asciiart-logo");
 const printLogo = () => {
   console.log(
@@ -47,6 +48,7 @@ program.option(
   "-t, --threads <num>",
   "How many threads to use when encoding [Optinal]"
 );
+program.option("-r, --rerun <boolean>", "Record reruns [Optinal]");
 
 program.parse(process.argv);
 const options = program.opts();
@@ -55,6 +57,41 @@ let windows = undefined;
 let fps = undefined;
 let threads = undefined;
 let rerunStream = undefined;
+let rerunEnable = undefined;
+
+const getTime = () => {
+  let date_ob = new Date();
+
+  let date = ("0" + date_ob.getDate()).slice(-2);
+
+  // current month
+  let month = ("0" + (date_ob.getMonth() + 1)).slice(-2);
+
+  // current year
+  let year = date_ob.getFullYear();
+
+  // current hours
+  let hours = date_ob.getHours();
+
+  // current minutes
+  let minutes = date_ob.getMinutes();
+
+  // current seconds
+  let seconds = date_ob.getSeconds();
+  console.log(
+    year +
+      "-" +
+      month +
+      "-" +
+      date +
+      " " +
+      hours +
+      ":" +
+      minutes +
+      ":" +
+      seconds
+  );
+};
 
 const checkConfiguration = () => {
   if (options.user) {
@@ -63,6 +100,11 @@ const checkConfiguration = () => {
         windows = true;
       } else {
         windows = false;
+      }
+      if (options.rerun == "false") {
+        rerunEnable = false;
+      } else {
+        rerunEnable = true;
       }
       if (options.frames) {
         fps = options.frames;
@@ -127,8 +169,8 @@ async function startRecording() {
         `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMexhI > div.Layout-sc-nxg1ff-0.dglwHV > div.Layout-sc-nxg1ff-0.kBOtQI > div > div:nth-child(2) > div > div > div.Layout-sc-nxg1ff-0.ftYIWt > a > span`
       )) !== null
     )
-      return true;
-    else return false;
+      return false;
+    else return true;
   };
 
   console.log("Waiting for page to load");
@@ -138,13 +180,26 @@ async function startRecording() {
   if ((await checkIfLive()) == false) {
     console.log("Streamer is not live");
   }
-  while ((await checkIfLive()) == false) {
+
+  const checkContinueWithRerun = async () => {
+    if (rerunEnable == false && (await checkIfRerun()) == true) {
+      return false;
+    } else {
+      return true;
+    }
+  };
+
+  while (
+    (await checkIfLive()) == false ||
+    (await checkContinueWithRerun()) == false
+  ) {
     await new Promise((resolve) => setTimeout(resolve, 60000));
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   }
+
   console.log("Checking if stream is a rerun");
-  if ((await checkIfRerun()) == false) {
-    console.log("This stream is a rerun \nContinuing to record anyways");
+  if ((await checkIfRerun()) == true) {
+    console.log("This stream is a rerun");
     rerunStream = true;
   } else {
     rerunStream = false;
@@ -171,6 +226,7 @@ async function startRecording() {
   const stream = await getStream(page, { audio: true, video: true });
   recording_timer.start();
   console.log("Now recording");
+  getTime();
   console.log(
     "Recording will stop when:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun"
   );
@@ -182,7 +238,7 @@ async function startRecording() {
       console.log("Stopping recording because streamer raided someone else");
       break;
     }
-    if ((await checkIfRerun()) == false && rerunStream == false) {
+    if ((await checkIfRerun()) == true && rerunStream == false) {
       console.log("Stream is a rerun");
       break;
     }
