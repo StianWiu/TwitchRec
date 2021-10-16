@@ -47,7 +47,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.0.1")
+        .right("V1.2.0")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
