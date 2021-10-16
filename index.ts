@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.2.0")
+      .right("V1.2.1")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -49,6 +49,7 @@ program.option(
   "How many threads to use when encoding [Optinal]"
 );
 program.option("-r, --rerun <boolean>", "Record reruns [Optinal]");
+program.option("-d, --delete <boolean>", "Delete temp file [Optinal]");
 
 program.parse(process.argv);
 const options = program.opts();
@@ -58,6 +59,7 @@ let fps = undefined;
 let threads = undefined;
 let rerunStream = undefined;
 let rerunEnable = undefined;
+let tempDelete = undefined;
 
 const getTime = () => {
   let date_ob = new Date();
@@ -105,6 +107,11 @@ const checkConfiguration = () => {
         rerunEnable = false;
       } else {
         rerunEnable = true;
+      }
+      if (options.delete == "false") {
+        tempDelete = false;
+      } else {
+        tempDelete = true;
       }
       if (options.frames) {
         fps = options.frames;
@@ -263,8 +270,10 @@ async function startRecording() {
       `ffmpeg -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}.mp4`
     );
   }
-  console.log("Encoding has finished.\nDeleting temporary stream file.");
-  await fs.unlinkSync(`./videos/${options.user}-${filename}.webm`);
+  if (tempDelete == true) {
+    console.log("Encoding has finished.\nDeleting temporary stream file.");
+    await fs.unlinkSync(`./videos/${options.user}-${filename}.webm`);
+  }
   await new Promise((resolve) => setTimeout(resolve, 2500));
   console.clear();
   await printLogo();

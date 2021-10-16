@@ -47,7 +47,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.2.0")
+        .right("V1.2.1")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -74,6 +74,7 @@ program.option("-w, --windows <boolean>", "Using windows true or false [Required
 program.option("-f, --frames <num>", "How many fps to export to [Optinal]");
 program.option("-t, --threads <num>", "How many threads to use when encoding [Optinal]");
 program.option("-r, --rerun <boolean>", "Record reruns [Optinal]");
+program.option("-d, --delete <boolean>", "Delete temp file [Optinal]");
 program.parse(process.argv);
 var options = program.opts();
 var windows = undefined;
@@ -81,6 +82,7 @@ var fps = undefined;
 var threads = undefined;
 var rerunStream = undefined;
 var rerunEnable = undefined;
+var tempDelete = undefined;
 var getTime = function () {
     var date_ob = new Date();
     var date = ("0" + date_ob.getDate()).slice(-2);
@@ -120,6 +122,12 @@ var checkConfiguration = function () {
             }
             else {
                 rerunEnable = true;
+            }
+            if (options["delete"] == "false") {
+                tempDelete = false;
+            }
+            else {
+                tempDelete = true;
             }
             if (options.frames) {
                 fps = options.frames;
@@ -350,16 +358,18 @@ function startRecording() {
                     _d.sent();
                     _d.label = 36;
                 case 36:
+                    if (!(tempDelete == true)) return [3 /*break*/, 38];
                     console.log("Encoding has finished.\nDeleting temporary stream file.");
                     return [4 /*yield*/, fs.unlinkSync("./videos/" + options.user + "-" + filename + ".webm")];
                 case 37:
                     _d.sent();
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
-                case 38:
+                    _d.label = 38;
+                case 38: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
+                case 39:
                     _d.sent();
                     console.clear();
                     return [4 /*yield*/, printLogo()];
-                case 39:
+                case 40:
                     _d.sent();
                     console.log("\n\nYour file is ready. File:" + options.user + "-" + filename + ".mp4\n ");
                     timer.stop();
