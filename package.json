@@ -1,7 +1,7 @@
 {
-  "name": "puppeteer-webscraping",
-  "version": "1.2.2",
-  "description": "puppeteer-webscraping",
+  "name": "twitchrec",
+  "version": "1.2.3",
+  "description": "TwitchRec",
   "main": "index.js",
   "scripts": {
     "tsc": "tsc index.ts -w --skipLibCheck --downlevelIteration",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/Pignuuu/puppeteer-webscraping.git"
+    "url": "git+https://github.com/StianWiu/TwitchRec.git"
   },
   "keywords": [
     "puppeteer",
@@ -21,9 +21,9 @@
   "author": "Pignuuu (Stian Wiu)",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/Pignuuu/puppeteer-webscraping/issues"
+    "url": "https://github.com/StianWiu/TwitchRec/issues"
   },
-  "homepage": "https://github.com/Pignuuu/puppeteer-webscraping#readme",
+  "homepage": "https://github.com/StianWiu/TwitchRec#readme",
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "asciiart-logo": "^0.2.6",

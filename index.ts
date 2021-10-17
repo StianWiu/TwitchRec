@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.2.2")
+      .right("V1.2.3")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -50,6 +50,10 @@ program.option(
 );
 program.option("-r, --rerun <boolean>", "Record reruns [Optinal]");
 program.option("-d, --delete <boolean>", "Delete temp file [Optinal]");
+program.option(
+  "-l, --loop <boolean>",
+  "Automatically wait for next stream [Optinal]"
+);
 
 program.parse(process.argv);
 const options = program.opts();
@@ -60,6 +64,7 @@ let threads = undefined;
 let rerunStream = undefined;
 let rerunEnable = undefined;
 let tempDelete = undefined;
+let loopRecording = undefined;
 
 const getTime = () => {
   let date_ob = new Date();
@@ -113,6 +118,11 @@ const checkConfiguration = () => {
       } else {
         tempDelete = true;
       }
+      if (options.loop == "true") {
+        loopRecording = true;
+      } else {
+        loopRecording = false;
+      }
       if (options.frames) {
         fps = options.frames;
       } else {
@@ -128,12 +138,11 @@ const checkConfiguration = () => {
 };
 checkConfiguration();
 
-const filename = randomstring.generate({
-  length: 10,
-  charset: "hex",
-});
-
 async function startRecording() {
+  const filename = randomstring.generate({
+    length: 10,
+    charset: "hex",
+  });
   const timer = new Timer({ label: "main-timer" });
   const recording_timer = new Timer({ label: "recording-timer" });
   timer.start();
@@ -284,7 +293,19 @@ async function startRecording() {
   timer.stop();
   console.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"));
   console.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"));
-  process.exit();
+  if (loopRecording == false) {
+    process.exit();
+  }
 }
 
-startRecording();
+const checkIfLoop = async () => {
+  if (loopRecording == true) {
+    await startRecording();
+    await new Promise((resolve) => setTimeout(resolve, 7000));
+    return checkIfLoop();
+  } else {
+    startRecording();
+    return;
+  }
+};
+checkIfLoop();

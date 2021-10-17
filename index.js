@@ -47,7 +47,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.2.2")
+        .right("V1.2.3")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -75,6 +75,7 @@ program.option("-f, --frames <num>", "How many fps to export to [Optinal]");
 program.option("-t, --threads <num>", "How many threads to use when encoding [Optinal]");
 program.option("-r, --rerun <boolean>", "Record reruns [Optinal]");
 program.option("-d, --delete <boolean>", "Delete temp file [Optinal]");
+program.option("-l, --loop <boolean>", "Automatically wait for next stream [Optinal]");
 program.parse(process.argv);
 var options = program.opts();
 var windows = undefined;
@@ -83,6 +84,7 @@ var threads = undefined;
 var rerunStream = undefined;
 var rerunEnable = undefined;
 var tempDelete = undefined;
+var loopRecording = undefined;
 var getTime = function () {
     var date_ob = new Date();
     var date = ("0" + date_ob.getDate()).slice(-2);
@@ -129,6 +131,12 @@ var checkConfiguration = function () {
             else {
                 tempDelete = true;
             }
+            if (options.loop == "true") {
+                loopRecording = true;
+            }
+            else {
+                loopRecording = false;
+            }
             if (options.frames) {
                 fps = options.frames;
             }
@@ -149,17 +157,17 @@ var checkConfiguration = function () {
         noUserSpecified();
 };
 checkConfiguration();
-var filename = randomstring.generate({
-    length: 10,
-    charset: "hex"
-});
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var timer, recording_timer, browser, page, originalUrl, checkIfLive, checkIfRerun, checkContinueWithRerun, _a, _b, _c, err_1, file, stream;
+        var filename, timer, recording_timer, browser, page, originalUrl, checkIfLive, checkIfRerun, checkContinueWithRerun, _a, _b, _c, err_1, file, stream;
         var _this = this;
         return __generator(this, function (_d) {
             switch (_d.label) {
                 case 0:
+                    filename = randomstring.generate({
+                        length: 10,
+                        charset: "hex"
+                    });
                     timer = new timer_node_1.Timer({ label: "main-timer" });
                     recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
                     timer.start();
@@ -378,10 +386,30 @@ function startRecording() {
                     timer.stop();
                     console.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"));
                     console.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"));
-                    process.exit();
+                    if (loopRecording == false) {
+                        process.exit();
+                    }
                     return [2 /*return*/];
             }
         });
     });
 }
-startRecording();
+var checkIfLoop = function () { return __awaiter(void 0, void 0, void 0, function () {
+    return __generator(this, function (_a) {
+        switch (_a.label) {
+            case 0:
+                if (!(loopRecording == true)) return [3 /*break*/, 3];
+                return [4 /*yield*/, startRecording()];
+            case 1:
+                _a.sent();
+                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 7000); })];
+            case 2:
+                _a.sent();
+                return [2 /*return*/, checkIfLoop()];
+            case 3:
+                startRecording();
+                return [2 /*return*/];
+        }
+    });
+}); };
+checkIfLoop();
