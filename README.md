@@ -2,19 +2,25 @@
 
 This is my side project Twitch-Recorder.
 
-What it does currently is it uses puppeteer to open the specified twitch stream then it will use puppeteer-stream to record it until stream is over. You can set it to a stream that is offline and it will wait for said streamer to start streaming.
+What it does currently is it uses [puppeteer](https://github.com/puppeteer/puppeteer) to open the specified twitch stream then it will use [puppeteer-stream](https://github.com/Flam3rboy/puppeteer-stream) to record it until stream is over. You can set it to a stream that is offline and it will wait for said streamer to start streaming.
 
-The project could be done way more effeciently but I really wanted to get this working using puppeteer so I had some creative limits. So if there are better alternatives you should use those instead, if not then feel free to use this one. If you have any suggestions please do submit a pull request and I will gladly look at it.
+This was made for windows and ubuntu so it has not been tested in any other operating system. Though it will most likely still work.
 
-This is made for ubuntu primeraly but if you do -w true or --windows true it will work. Make sure to have google chrome installed.
+I made this program out of spite. There is a twitch streamer I like that only streams at 4am my time and their VOD's are sub only. So I just leave this program running on my server so I have the stream saved for later.
 
-if your google chrome isn't installed at the usual location you will have to change the directory in the code.
+# Required
 
-## Build Setup
+This project requires that you have google chrome installed on the machine. [How to install chrome on ubuntu.](https://askubuntu.com/questions/510056/how-to-install-google-chrome) Chromium doesn't work because it has issues with watching streams. Make sure that chrome is installed in the correct directory. If it isn't you have to install it correctly or edit the code. See [Extra](https://github.com/stianwiu/twitchrec#extra) on how to do that.
+
+If you are on ubuntu or any linux machine it is required that you install ffmpeg. For windows there is a exe included.
+
+For both windows and Linux you need [Node.js](https://nodejs.org/) and [npm](https://nodejs.org/) installed.
+
+# Build Setup
 
 ```bash
 # clone repo
-$ git clone https://github.com/Pignuuu/twitch-recorder/
+$ git clone https://github.com/StianWiu/TwitchRec/
 
 # install dependencies
 $ npm i
@@ -25,15 +31,11 @@ $ sudo apt-get install ffmpeg
 # start project with node
 $ node index.js --user pignuuuu --windows false --frames 32 --threads 4
 
-# --user or -u is what twitch stream to record --windows or -w is if you are using windows --frames or -f is how many frames ffmpeg will render --threads or -t is how many threads ffmpeg should use when encoding.
-
+# To see all options run
+$ node index.js --help
 ```
 
 # Extra
-
-```bash
-$ node index.js -h # View all specifications available
-```
 
 In order to edit the code you will need to go into the [index.ts](https://github.com/Pignuuu/twitch-recorder/blob/main/index.ts) file and code there.
 
