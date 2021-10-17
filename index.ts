@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.3.0")
+      .right("V1.3.1")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -160,9 +160,20 @@ const checkConfiguration = () => {
     } else noOsSpecified();
   } else noUserSpecified();
 };
+
 checkConfiguration();
 
 async function startRecording() {
+  console.log(`Twitch Streamer: ${options.user}`);
+  console.log(`Using windows: ${windows}`);
+  console.log(`Frames Per Second: ${fps}`);
+  console.log(`Threads: ${threads}`);
+  console.log(`Record reruns: ${rerunEnable}`);
+  console.log(`Delete temp file : ${tempDelete}`);
+  console.log(`Wait for next stream: ${loopRecording}`);
+  console.log(`Record aduio: ${recordAudio}`);
+  console.log(`Record Video: ${recordVideo}`);
+
   const filename = randomstring.generate({
     length: 10,
     charset: "hex",
