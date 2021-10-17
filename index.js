@@ -198,7 +198,7 @@ function startRecording() {
                     console.log("Record reruns: " + rerunEnable);
                     console.log("Delete temp file : " + tempDelete);
                     console.log("Wait for next stream: " + loopRecording);
-                    console.log("Record aduio: " + recordAudio);
+                    console.log("Record audio: " + recordAudio);
                     console.log("Record Video: " + recordVideo + "\n");
                     filename = randomstring.generate({
                         length: 10,
