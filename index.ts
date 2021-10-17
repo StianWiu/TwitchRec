@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.2.3")
+      .right("V1.3.0")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -37,6 +37,10 @@ const noOsSpecified = () => {
   console.log("Missing argument -w or --windows");
   process.exit();
 };
+const noRecordingSelected = () => {
+  console.log("Both audio and video can't be disabled");
+  process.exit();
+};
 
 program.option("-u, --user <username>", "Twitch user to record [Required]");
 program.option(
@@ -54,6 +58,8 @@ program.option(
   "-l, --loop <boolean>",
   "Automatically wait for next stream [Optinal]"
 );
+program.option("-a, --audio <boolean>", "Record audio [Optinal]");
+program.option("-v, --video <boolean>", "Record video [Optinal]");
 
 program.parse(process.argv);
 const options = program.opts();
@@ -65,6 +71,9 @@ let rerunStream = undefined;
 let rerunEnable = undefined;
 let tempDelete = undefined;
 let loopRecording = undefined;
+let recordAudio = undefined;
+let recordVideo = undefined;
+let fileExtenstion = ".mp4";
 
 const getTime = () => {
   let date_ob = new Date();
@@ -122,6 +131,21 @@ const checkConfiguration = () => {
         loopRecording = true;
       } else {
         loopRecording = false;
+      }
+      if (options.audio == options.video && options.audio == "false") {
+        noRecordingSelected();
+      } else {
+        if (options.audio == "false") {
+          recordAudio = false;
+        } else {
+          recordAudio = true;
+        }
+        if (options.video == "false") {
+          recordVideo = false;
+          fileExtenstion = ".mp3";
+        } else {
+          recordVideo = true;
+        }
       }
       if (options.frames) {
         fps = options.frames;
@@ -240,7 +264,10 @@ async function startRecording() {
   const file = fs.createWriteStream(
     `./videos/${options.user}-${filename}.webm`
   );
-  const stream = await getStream(page, { audio: true, video: true });
+  const stream = await getStream(page, {
+    audio: recordAudio,
+    video: recordVideo,
+  });
   recording_timer.start();
   console.log("Now recording");
   getTime();
@@ -273,11 +300,11 @@ async function startRecording() {
   );
   if (windows == true) {
     await nrc.run(
-      `ffmpeg.exe -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}.mp4`
+      `ffmpeg.exe -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}${fileExtenstion}`
     );
   } else {
     await nrc.run(
-      `ffmpeg -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}.mp4`
+      `ffmpeg -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}${fileExtenstion}`
     );
   }
   if (tempDelete == true) {

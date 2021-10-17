@@ -47,7 +47,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.2.3")
+        .right("V1.3.0")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -69,6 +69,10 @@ var noOsSpecified = function () {
     console.log("Missing argument -w or --windows");
     process.exit();
 };
+var noRecordingSelected = function () {
+    console.log("Both audio and video can't be disabled");
+    process.exit();
+};
 program.option("-u, --user <username>", "Twitch user to record [Required]");
 program.option("-w, --windows <boolean>", "Using windows true or false [Required]");
 program.option("-f, --frames <num>", "How many fps to export to [Optinal]");
@@ -76,6 +80,8 @@ program.option("-t, --threads <num>", "How many threads to use when encoding [Op
 program.option("-r, --rerun <boolean>", "Record reruns [Optinal]");
 program.option("-d, --delete <boolean>", "Delete temp file [Optinal]");
 program.option("-l, --loop <boolean>", "Automatically wait for next stream [Optinal]");
+program.option("-a, --audio <boolean>", "Record audio [Optinal]");
+program.option("-v, --video <boolean>", "Record video [Optinal]");
 program.parse(process.argv);
 var options = program.opts();
 var windows = undefined;
@@ -85,6 +91,9 @@ var rerunStream = undefined;
 var rerunEnable = undefined;
 var tempDelete = undefined;
 var loopRecording = undefined;
+var recordAudio = undefined;
+var recordVideo = undefined;
+var fileExtenstion = ".mp4";
 var getTime = function () {
     var date_ob = new Date();
     var date = ("0" + date_ob.getDate()).slice(-2);
@@ -136,6 +145,24 @@ var checkConfiguration = function () {
             }
             else {
                 loopRecording = false;
+            }
+            if (options.audio == options.video && options.audio == "false") {
+                noRecordingSelected();
+            }
+            else {
+                if (options.audio == "false") {
+                    recordAudio = false;
+                }
+                else {
+                    recordAudio = true;
+                }
+                if (options.video == "false") {
+                    recordVideo = false;
+                    fileExtenstion = ".mp3";
+                }
+                else {
+                    recordVideo = true;
+                }
             }
             if (options.frames) {
                 fps = options.frames;
@@ -320,7 +347,10 @@ function startRecording() {
                     return [3 /*break*/, 24];
                 case 24:
                     file = fs.createWriteStream("./videos/" + options.user + "-" + filename + ".webm");
-                    return [4 /*yield*/, getStream(page, { audio: true, video: true })];
+                    return [4 /*yield*/, getStream(page, {
+                            audio: recordAudio,
+                            video: recordVideo
+                        })];
                 case 25:
                     stream = _d.sent();
                     recording_timer.start();
@@ -360,11 +390,11 @@ function startRecording() {
                     _d.sent();
                     console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
                     if (!(windows == true)) return [3 /*break*/, 35];
-                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + ".mp4")];
+                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
                 case 34:
                     _d.sent();
                     return [3 /*break*/, 37];
-                case 35: return [4 /*yield*/, nrc.run("ffmpeg -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + ".mp4")];
+                case 35: return [4 /*yield*/, nrc.run("ffmpeg -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
                 case 36:
                     _d.sent();
                     _d.label = 37;
