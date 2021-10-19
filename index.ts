@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.4.0")
+      .right("V1.5.0")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -42,7 +42,7 @@ const noRecordingSelected = () => {
   process.exit();
 };
 
-program.option("-u, --user <username>", "Twitch user to record [Required]");
+program.option("-u, --user <string>", "Twitch user to record [Required]");
 program.option(
   "-w, --windows <boolean>",
   "Using windows true or false [Required]"
@@ -60,6 +60,10 @@ program.option(
 );
 program.option("-a, --audio <boolean>", "Record audio [Optinal]");
 program.option("-v, --video <boolean>", "Record video [Optinal]");
+program.option(
+  "-c, --category <string>",
+  "Only record certain category [Optinal]"
+);
 
 program.parse(process.argv);
 const options = program.opts();
@@ -74,6 +78,7 @@ let loopRecording = undefined;
 let recordAudio = undefined;
 let recordVideo = undefined;
 let fileExtenstion = ".mp4";
+let category = undefined;
 
 const getTime = () => {
   let date_ob = new Date();
@@ -131,6 +136,9 @@ const checkConfiguration = () => {
         loopRecording = true;
       } else {
         loopRecording = false;
+      }
+      if (options.category) {
+        category = options.category.toLowerCase();
       }
       if (options.audio == options.video && options.audio == "false") {
         noRecordingSelected();
@@ -252,15 +260,42 @@ async function startRecording() {
     }
   };
 
+  const checkCategory = async () => {
+    let value1 = undefined;
+    let value2 = undefined;
+    try {
+      let element1 = await page.$(
+        "#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMexhI > div.Layout-sc-nxg1ff-0.dglwHV > div.Layout-sc-nxg1ff-0.kBOtQI > div > div:nth-child(2) > div > div > div.Layout-sc-nxg1ff-0.ftYIWt > a > span"
+      );
+      value1 = await page.evaluate((el) => el.textContent, element1);
+      value1 = value1.toLowerCase();
+    } catch (err) {}
+    if (value1 == category) {
+      return true;
+    }
+    try {
+      let element2 = await page.$(
+        "#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div.Layout-sc-nxg1ff-0.hMFNaU.metadata-layout__split-top > div.Layout-sc-nxg1ff-0 > div > div > div > div > div > a > span"
+      );
+      value2 = await page.evaluate((el) => el.textContent, element2);
+      value2 = value2.toLowerCase();
+    } catch (err) {}
+    if (value2 == category) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   while (
     (await checkIfLive()) == false ||
-    (await checkContinueWithRerun()) == false
+    (await checkContinueWithRerun()) == false ||
+    (await checkCategory()) == false
   ) {
-    await new Promise((resolve) => setTimeout(resolve, 60000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
     await checkIfCorrect();
   }
-
   console.log("Checking if stream is a rerun");
   if ((await checkIfRerun()) == true) {
     console.log("This stream is a rerun");
