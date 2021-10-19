@@ -47,7 +47,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.5.0")
+        .right("V1.5.1")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -430,7 +430,7 @@ function startRecording() {
                     console.log("Checking if stream is agerestricted");
                     _e.label = 24;
                 case 24:
-                    _e.trys.push([24, 27, , 28]);
+                    _e.trys.push([24, 28, , 29]);
                     _d = (_c = Promise).all;
                     return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button")];
                 case 25: return [4 /*yield*/, _d.apply(_c, [[
@@ -438,78 +438,81 @@ function startRecording() {
                         ]])];
                 case 26:
                     _e.sent();
-                    console.log('Stream is agerestricted\nClicked "Start Watching" button');
-                    return [3 /*break*/, 28];
+                    console.log('Stream is agerestricted\nClicked "Start Watching" button\nReloading webpage');
+                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
                 case 27:
+                    _e.sent();
+                    return [3 /*break*/, 29];
+                case 28:
                     err_1 = _e.sent();
                     console.log("Stream is not agerestricted");
-                    return [3 /*break*/, 28];
-                case 28:
+                    return [3 /*break*/, 29];
+                case 29:
                     file = fs.createWriteStream("./videos/" + options.user + "-" + filename + ".webm");
                     return [4 /*yield*/, getStream(page, {
                             audio: recordAudio,
                             video: recordVideo
                         })];
-                case 29:
+                case 30:
                     stream = _e.sent();
                     recording_timer.start();
                     console.log("Now recording");
                     getTime();
                     console.log("Recording will stop when:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun");
                     stream.pipe(file);
-                    _e.label = 30;
-                case 30: return [4 /*yield*/, checkIfLive()];
-                case 31:
-                    if (!((_e.sent()) == true)) return [3 /*break*/, 34];
+                    _e.label = 31;
+                case 31: return [4 /*yield*/, checkIfLive()];
+                case 32:
+                    if (!((_e.sent()) == true)) return [3 /*break*/, 35];
                     if (originalUrl != page.url()) {
                         console.log("Stopping recording because streamer raided someone else");
-                        return [3 /*break*/, 34];
+                        return [3 /*break*/, 35];
                     }
                     return [4 /*yield*/, checkIfRerun()];
-                case 32:
+                case 33:
                     if ((_e.sent()) == true && rerunStream == false) {
                         console.log("Stream is a rerun");
-                        return [3 /*break*/, 34];
+                        return [3 /*break*/, 35];
                     }
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 15000); })];
-                case 33:
+                case 34:
                     _e.sent();
-                    return [3 /*break*/, 30];
-                case 34: return [4 /*yield*/, stream.destroy()];
-                case 35:
+                    return [3 /*break*/, 31];
+                case 35: return [4 /*yield*/, stream.destroy()];
+                case 36:
                     _e.sent();
                     stream.on("end", function () { });
                     recording_timer.stop();
                     console.log("Closing browser");
                     return [4 /*yield*/, browser.close()];
-                case 36:
-                    _e.sent();
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
                 case 37:
                     _e.sent();
-                    console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
-                    if (!(windows == true)) return [3 /*break*/, 39];
-                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
                 case 38:
                     _e.sent();
-                    return [3 /*break*/, 41];
-                case 39: return [4 /*yield*/, nrc.run("ffmpeg -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
-                case 40:
+                    console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
+                    if (!(windows == true)) return [3 /*break*/, 40];
+                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
+                case 39:
                     _e.sent();
-                    _e.label = 41;
+                    return [3 /*break*/, 42];
+                case 40: return [4 /*yield*/, nrc.run("ffmpeg -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
                 case 41:
-                    if (!(tempDelete == true)) return [3 /*break*/, 43];
+                    _e.sent();
+                    _e.label = 42;
+                case 42:
+                    if (!(tempDelete == true)) return [3 /*break*/, 44];
                     console.log("Encoding has finished.\nDeleting temporary stream file.");
                     return [4 /*yield*/, fs.unlinkSync("./videos/" + options.user + "-" + filename + ".webm")];
-                case 42:
+                case 43:
                     _e.sent();
-                    _e.label = 43;
-                case 43: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
-                case 44:
+                    _e.label = 44;
+                case 44: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
+                case 45:
                     _e.sent();
                     console.clear();
                     return [4 /*yield*/, printLogo()];
-                case 45:
+                case 46:
                     _e.sent();
                     console.log("\n\nYour file is ready. File:" + options.user + "-" + filename + ".mp4\n ");
                     timer.stop();
