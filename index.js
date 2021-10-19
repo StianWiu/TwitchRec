@@ -47,7 +47,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.5.3")
+        .right("V1.5.4")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -151,6 +151,9 @@ var checkConfiguration = function () {
             if (options.category) {
                 category = options.category.toLowerCase();
             }
+            else {
+                category = "undefined";
+            }
             if (options.audio == options.video && options.audio == "false") {
                 noRecordingSelected();
             }
@@ -204,7 +207,8 @@ function startRecording() {
                     console.log("Delete temp file : " + tempDelete);
                     console.log("Wait for next stream: " + loopRecording);
                     console.log("Record audio: " + recordAudio);
-                    console.log("Record Video: " + recordVideo + "\n");
+                    console.log("Record Video: " + recordVideo);
+                    console.log("Category: " + category + "\n");
                     filename = randomstring.generate({
                         length: 10,
                         charset: "hex"
