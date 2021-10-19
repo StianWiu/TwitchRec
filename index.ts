@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.5.1")
+      .right("V1.5.2")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -306,8 +306,6 @@ async function startRecording() {
 
   console.log("Reloading webpage");
   await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
-  console.log("Fullscreening stream");
-  await page.keyboard.press("f");
   console.log("Checking if stream is agerestricted");
   try {
     await Promise.all([
@@ -319,6 +317,8 @@ async function startRecording() {
       'Stream is agerestricted\nClicked "Start Watching" button\nReloading webpage'
     );
     await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+    console.log("Fullscreening stream");
+    await page.keyboard.press("f");
   } catch (err) {
     console.log("Stream is not agerestricted");
   }

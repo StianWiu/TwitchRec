@@ -47,7 +47,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.5.1")
+        .right("V1.5.2")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -423,23 +423,23 @@ function startRecording() {
                     return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
                 case 22:
                     _e.sent();
-                    console.log("Fullscreening stream");
-                    return [4 /*yield*/, page.keyboard.press("f")];
-                case 23:
-                    _e.sent();
                     console.log("Checking if stream is agerestricted");
-                    _e.label = 24;
-                case 24:
-                    _e.trys.push([24, 28, , 29]);
+                    _e.label = 23;
+                case 23:
+                    _e.trys.push([23, 28, , 29]);
                     _d = (_c = Promise).all;
                     return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button")];
-                case 25: return [4 /*yield*/, _d.apply(_c, [[
+                case 24: return [4 /*yield*/, _d.apply(_c, [[
                             _e.sent()
                         ]])];
-                case 26:
+                case 25:
                     _e.sent();
                     console.log('Stream is agerestricted\nClicked "Start Watching" button\nReloading webpage');
                     return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
+                case 26:
+                    _e.sent();
+                    console.log("Fullscreening stream");
+                    return [4 /*yield*/, page.keyboard.press("f")];
                 case 27:
                     _e.sent();
                     return [3 /*break*/, 29];
