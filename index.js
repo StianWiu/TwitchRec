@@ -47,7 +47,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.5.2")
+        .right("V1.5.3")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -74,15 +74,15 @@ var noRecordingSelected = function () {
     process.exit();
 };
 program.option("-u, --user <string>", "Twitch user to record [Required]");
-program.option("-w, --windows <boolean>", "Using windows true or false [Required]");
-program.option("-f, --frames <num>", "How many fps to export to [Optinal]");
-program.option("-t, --threads <num>", "How many threads to use when encoding [Optinal]");
-program.option("-r, --rerun <boolean>", "Record reruns [Optinal]");
-program.option("-d, --delete <boolean>", "Delete temp file [Optinal]");
-program.option("-l, --loop <boolean>", "Automatically wait for next stream [Optinal]");
-program.option("-a, --audio <boolean>", "Record audio [Optinal]");
-program.option("-v, --video <boolean>", "Record video [Optinal]");
-program.option("-c, --category <string>", "Only record certain category [Optinal]");
+program.option("-w, --windows <boolean>", "Using Windows true or false [Required]");
+program.option("-f, --frames <num>", "How many fps to export to [Optional]");
+program.option("-t, --threads <num>", "How many threads to use when encoding [Optional]");
+program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
+program.option("-d, --delete <boolean>", "Delete temp file [Optional]");
+program.option("-l, --loop <boolean>", "Automatically wait for next stream [Optional]");
+program.option("-a, --audio <boolean>", "Record audio [Optional]");
+program.option("-v, --video <boolean>", "Record video [Optional]");
+program.option("-c, --category <string>", "Only record certain category [Optional]");
 program.parse(process.argv);
 var options = program.opts();
 var windows = undefined;
@@ -191,7 +191,7 @@ var checkConfiguration = function () {
 checkConfiguration();
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var filename, timer, recording_timer, browser, page, originalUrl, checkIfCorrect, checkIfLive, checkIfRerun, checkContinueWithRerun, checkCategory, _a, _b, _c, _d, err_1, file, stream;
+        var filename, timer, recording_timer, encoding_timer, browser, page, originalUrl, checkIfCorrect, checkIfLive, checkIfRerun, checkContinueWithRerun, checkCategory, _a, _b, _c, _d, err_1, file, stream;
         var _this = this;
         return __generator(this, function (_e) {
             switch (_e.label) {
@@ -211,6 +211,7 @@ function startRecording() {
                     });
                     timer = new timer_node_1.Timer({ label: "main-timer" });
                     recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
+                    encoding_timer = new timer_node_1.Timer({ label: "encoding-timer" });
                     timer.start();
                     browser = undefined;
                     if (!(windows == true)) return [3 /*break*/, 2];
@@ -458,7 +459,7 @@ function startRecording() {
                     recording_timer.start();
                     console.log("Now recording");
                     getTime();
-                    console.log("Recording will stop when:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun");
+                    console.log("Recording until:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun");
                     stream.pipe(file);
                     _e.label = 31;
                 case 31: return [4 /*yield*/, checkIfLive()];
@@ -491,6 +492,7 @@ function startRecording() {
                 case 38:
                     _e.sent();
                     console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
+                    encoding_timer.start();
                     if (!(windows == true)) return [3 /*break*/, 40];
                     return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
                 case 39:
@@ -516,8 +518,10 @@ function startRecording() {
                     _e.sent();
                     console.log("\n\nYour file is ready. File:" + options.user + "-" + filename + ".mp4\n ");
                     timer.stop();
+                    encoding_timer.stop();
                     console.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"));
                     console.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"));
+                    console.log(encoding_timer.format("Encoded for D:%d H:%h M:%m S:%s"));
                     if (loopRecording == false) {
                         process.exit();
                     }
