@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.5.5")
+      .right("V1.5.6")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -324,15 +324,15 @@ async function startRecording() {
         `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button`
       ),
     ]);
+    await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
     console.log(
       'Stream is agerestricted\nClicked "Start Watching" button\nReloading webpage'
     );
-    await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
-    console.log("Fullscreening stream");
-    await page.keyboard.press("f");
   } catch (err) {
     console.log("Stream is not agerestricted");
   }
+  console.log("Fullscreening stream");
+  await page.keyboard.press("f");
   const file = fs.createWriteStream(
     `./videos/${options.user}-${filename}.webm`
   );
