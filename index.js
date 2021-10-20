@@ -47,7 +47,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.5.4")
+        .right("V1.5.5")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -60,6 +60,7 @@ var randomstring = require("randomstring");
 var nrc = require("node-run-cmd");
 var _a = require("puppeteer-stream"), launch = _a.launch, getStream = _a.getStream;
 var fs = require("fs");
+var Spinner = require("cli-spinner").Spinner;
 // Add options for command
 var noUserSpecified = function () {
     console.log("Missing argument -u or --user");
@@ -194,7 +195,7 @@ var checkConfiguration = function () {
 checkConfiguration();
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var filename, timer, recording_timer, encoding_timer, browser, page, originalUrl, checkIfCorrect, checkIfLive, checkIfRerun, checkContinueWithRerun, checkCategory, _a, _b, _c, _d, err_1, file, stream;
+        var filename, timer, recording_timer, encoding_timer, spinner, browser, page, originalUrl, checkIfCorrect, checkIfLive, checkIfRerun, checkContinueWithRerun, checkCategory, _a, _b, _c, _d, err_1, file, stream;
         var _this = this;
         return __generator(this, function (_e) {
             switch (_e.label) {
@@ -217,6 +218,9 @@ function startRecording() {
                     recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
                     encoding_timer = new timer_node_1.Timer({ label: "encoding-timer" });
                     timer.start();
+                    spinner = new Spinner("%s ");
+                    spinner.setSpinnerString("|/-\\");
+                    spinner.setSpinnerDelay(400);
                     browser = undefined;
                     if (!(windows == true)) return [3 /*break*/, 2];
                     return [4 /*yield*/, launch({
@@ -340,6 +344,9 @@ function startRecording() {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
+                                    if (category == "undefined") {
+                                        return [2 /*return*/, true];
+                                    }
                                     value1 = undefined;
                                     value2 = undefined;
                                     _a.label = 1;
@@ -464,6 +471,7 @@ function startRecording() {
                     console.log("Now recording");
                     getTime();
                     console.log("Recording until:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun");
+                    spinner.start();
                     stream.pipe(file);
                     _e.label = 31;
                 case 31: return [4 /*yield*/, checkIfLive()];
@@ -483,7 +491,9 @@ function startRecording() {
                 case 34:
                     _e.sent();
                     return [3 /*break*/, 31];
-                case 35: return [4 /*yield*/, stream.destroy()];
+                case 35:
+                    spinner.stop();
+                    return [4 /*yield*/, stream.destroy()];
                 case 36:
                     _e.sent();
                     stream.on("end", function () { });
@@ -497,6 +507,7 @@ function startRecording() {
                     _e.sent();
                     console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
                     encoding_timer.start();
+                    spinner.start();
                     if (!(windows == true)) return [3 /*break*/, 40];
                     return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
                 case 39:
@@ -507,6 +518,7 @@ function startRecording() {
                     _e.sent();
                     _e.label = 42;
                 case 42:
+                    spinner.stop();
                     if (!(tempDelete == true)) return [3 /*break*/, 44];
                     console.log("Encoding has finished.\nDeleting temporary stream file.");
                     return [4 /*yield*/, fs.unlinkSync("./videos/" + options.user + "-" + filename + ".webm")];

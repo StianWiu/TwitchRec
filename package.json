@@ -1,6 +1,6 @@
 {
   "name": "twitchrec",
-  "version": "1.5.4",
+  "version": "1.5.5",
   "description": "TwitchRec",
   "main": "index.js",
   "scripts": {
@@ -27,6 +27,7 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "asciiart-logo": "^0.2.6",
+    "cli-spinner": "^0.2.10",
     "commander": "^8.2.0",
     "node-run-cmd": "^1.0.1",
     "nodemon": "^2.0.12",

@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.5.4")
+      .right("V1.5.5")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -27,6 +27,7 @@ const randomstring = require("randomstring");
 var nrc = require("node-run-cmd");
 const { launch, getStream } = require("puppeteer-stream");
 const fs = require("fs");
+var Spinner = require("cli-spinner").Spinner;
 
 // Add options for command
 const noUserSpecified = () => {
@@ -193,6 +194,9 @@ async function startRecording() {
   const recording_timer = new Timer({ label: "recording-timer" });
   const encoding_timer = new Timer({ label: "encoding-timer" });
   timer.start();
+  var spinner = new Spinner("%s ");
+  spinner.setSpinnerString("|/-\\");
+  spinner.setSpinnerDelay(400);
   let browser = undefined;
   if (windows == true) {
     browser = await launch({
@@ -265,6 +269,9 @@ async function startRecording() {
   };
 
   const checkCategory = async () => {
+    if (category == "undefined") {
+      return true;
+    }
     let value1 = undefined;
     let value2 = undefined;
     try {
@@ -339,6 +346,7 @@ async function startRecording() {
   console.log(
     "Recording until:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun"
   );
+  spinner.start();
 
   stream.pipe(file);
 
@@ -353,6 +361,7 @@ async function startRecording() {
     }
     await new Promise((resolve) => setTimeout(resolve, 15000));
   }
+  spinner.stop();
 
   await stream.destroy();
   stream.on("end", () => {});
@@ -364,6 +373,7 @@ async function startRecording() {
     `FFmpeg encoding starting now.\nFps set to ${fps}\nEncoding using ${threads} threads\n`
   );
   encoding_timer.start();
+  spinner.start();
   if (windows == true) {
     await nrc.run(
       `ffmpeg.exe -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}${fileExtenstion}`
@@ -373,6 +383,7 @@ async function startRecording() {
       `ffmpeg -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}${fileExtenstion}`
     );
   }
+  spinner.stop();
   if (tempDelete == true) {
     console.log("Encoding has finished.\nDeleting temporary stream file.");
     await fs.unlinkSync(`./videos/${options.user}-${filename}.webm`);
