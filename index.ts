@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.5.8")
+      .right("V1.5.9")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -220,7 +220,6 @@ async function startRecording() {
   console.log("Opening twitch stream");
   await page.goto(`https://www.twitch.tv/${options.user}`);
   const originalUrl = page.url();
-  await page.setDefaultNavigationTimeout(0);
   await new Promise((resolve) => setTimeout(resolve, 2000));
   const checkIfCorrect = async () => {
     try {
@@ -304,8 +303,19 @@ async function startRecording() {
     (await checkContinueWithRerun()) == false ||
     (await checkCategory()) == false
   ) {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
-    await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+    await new Promise((resolve) => setTimeout(resolve, 60000));
+    try {
+      await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+    } catch (err) {
+      console.log("Timedout reopening browser");
+      browser.close();
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+      console.log("Opening browser.");
+      const page = await browser.newPage();
+      console.log("Opening twitch stream");
+      await page.goto(`https://www.twitch.tv/${options.user}`);
+      await new Promise((resolve) => setTimeout(resolve, 5000));
+    }
     await checkIfCorrect();
   }
   console.log("Checking if stream is a rerun");
