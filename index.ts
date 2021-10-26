@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.5.9")
+      .right("V1.5.10")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -69,17 +69,17 @@ program.option(
 program.parse(process.argv);
 const options = program.opts();
 
-let windows = undefined;
-let fps = undefined;
-let threads = undefined;
-let rerunStream = undefined;
-let rerunEnable = undefined;
-let tempDelete = undefined;
-let loopRecording = undefined;
-let recordAudio = undefined;
-let recordVideo = undefined;
+let windows;
+let fps;
+let threads;
+let rerunStream;
+let rerunEnable;
+let tempDelete;
+let loopRecording;
+let recordAudio;
+let recordVideo;
 let fileExtenstion = ".mp4";
-let category = undefined;
+let category;
 
 const getTime = () => {
   let date_ob = new Date();
