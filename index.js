@@ -92,7 +92,7 @@ program.option("-l, --loop <boolean>", "Automatically wait for next stream [Opti
 program.option("-a, --audio <boolean>", "Record audio [Optional]");
 program.option("-v, --video <boolean>", "Record video [Optional]");
 program.option("-c, --category <string>", "Only record certain category [Optional]");
-program.option("-s, --silence <string>", "Only record certain category [Optional]");
+program.option("-s, --silence <string>", "Cut out silence from final recording [Optional]");
 program.parse(process.argv);
 var options = program.opts();
 var windows;

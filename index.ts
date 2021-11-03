@@ -68,7 +68,7 @@ program.option(
 );
 program.option(
   "-s, --silence <string>",
-  "Only record certain category [Optional]"
+  "Cut out silence from final recording [Optional]"
 );
 
 program.parse(process.argv);
