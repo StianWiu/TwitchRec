@@ -35,6 +35,13 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
         if (op[0] & 5) throw op[1]; return { value: op[0] ? op[1] : void 0, done: true };
     }
 };
+var __asyncValues = (this && this.__asyncValues) || function (o) {
+    if (!Symbol.asyncIterator) throw new TypeError("Symbol.asyncIterator is not defined.");
+    var m = o[Symbol.asyncIterator], i;
+    return m ? m.call(o) : (o = typeof __values === "function" ? __values(o) : o[Symbol.iterator](), i = {}, verb("next"), verb("throw"), verb("return"), i[Symbol.asyncIterator] = function () { return this; }, i);
+    function verb(n) { i[n] = o[n] && function (v) { return new Promise(function (resolve, reject) { v = o[n](v), settle(resolve, reject, v.done, v.value); }); }; }
+    function settle(resolve, reject, d, v) { Promise.resolve(v).then(function(v) { resolve({ value: v, done: d }); }, reject); }
+};
 exports.__esModule = true;
 console.clear();
 var logo = require("asciiart-logo");
@@ -47,12 +54,13 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.5.9")
+        .right("V1.5.10")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
 };
 printLogo();
+var exec = require("child_process").exec;
 var commander_1 = require("commander");
 var timer_node_1 = require("timer-node");
 var program = new commander_1.Command();
@@ -84,19 +92,21 @@ program.option("-l, --loop <boolean>", "Automatically wait for next stream [Opti
 program.option("-a, --audio <boolean>", "Record audio [Optional]");
 program.option("-v, --video <boolean>", "Record video [Optional]");
 program.option("-c, --category <string>", "Only record certain category [Optional]");
+program.option("-s, --silence <string>", "Only record certain category [Optional]");
 program.parse(process.argv);
 var options = program.opts();
-var windows = undefined;
-var fps = undefined;
-var threads = undefined;
-var rerunStream = undefined;
-var rerunEnable = undefined;
-var tempDelete = undefined;
-var loopRecording = undefined;
-var recordAudio = undefined;
-var recordVideo = undefined;
+var windows;
+var fps;
+var threads;
+var rerunStream;
+var rerunEnable;
+var tempDelete;
+var loopRecording;
+var recordAudio;
+var recordVideo;
 var fileExtenstion = ".mp4";
-var category = undefined;
+var category;
+var silence;
 var getTime = function () {
     var date_ob = new Date();
     var date = ("0" + date_ob.getDate()).slice(-2);
@@ -149,6 +159,12 @@ var checkConfiguration = function () {
             else {
                 loopRecording = false;
             }
+            if (options.silence == "true") {
+                silence = true;
+            }
+            else {
+                silence = false;
+            }
             if (options.category) {
                 category = options.category.toLowerCase();
             }
@@ -195,7 +211,7 @@ var checkConfiguration = function () {
 checkConfiguration();
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var filename, timer, recording_timer, encoding_timer, spinner, browser, page, originalUrl, checkIfCorrect, checkIfLive, checkIfRerun, checkContinueWithRerun, checkCategory, _a, _b, err_1, page_1, _c, _d, err_2, file, stream;
+        var filename, timer, recording_timer, encoding_timer, spinner, browser, page, originalUrl, checkIfCorrect, checkIfLive, checkIfRerun, checkContinueWithRerun, checkCategory, _a, _b, err_1, page_1, _c, _d, err_2, file, stream, removeSilence;
         var _this = this;
         return __generator(this, function (_e) {
             switch (_e.label) {
@@ -554,12 +570,189 @@ function startRecording() {
                 case 51:
                     _e.sent();
                     _e.label = 52;
-                case 52: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
+                case 52:
+                    removeSilence = function () { return __awaiter(_this, void 0, void 0, function () {
+                        var getList;
+                        return __generator(this, function (_a) {
+                            switch (_a.label) {
+                                case 0:
+                                    console.log("Listing all silence in video");
+                                    return [4 /*yield*/, exec("ffmpeg -i videos/" + options.user + "-" + filename + fileExtenstion + " -af silencedetect=noise=0.0001 -f null - 2> silence.txt")];
+                                case 1:
+                                    getList = _a.sent();
+                                    return [4 /*yield*/, new Promise(function (resolve) {
+                                            getList.on("close", function () {
+                                                var e_1, _a;
+                                                return __awaiter(this, void 0, void 0, function () {
+                                                    var readline, readInterface, i, o, start, end, endtime, readInterface_1, readInterface_1_1, line, e_1_1, logger, d, continueCutting, cut, final;
+                                                    return __generator(this, function (_b) {
+                                                        switch (_b.label) {
+                                                            case 0:
+                                                                readline = require("readline");
+                                                                readInterface = readline.createInterface({
+                                                                    input: fs.createReadStream("silence.txt"),
+                                                                    console: false
+                                                                });
+                                                                i = 0;
+                                                                o = 1;
+                                                                start = [];
+                                                                end = [];
+                                                                end[0] = 0;
+                                                                _b.label = 1;
+                                                            case 1:
+                                                                _b.trys.push([1, 6, 7, 12]);
+                                                                readInterface_1 = __asyncValues(readInterface);
+                                                                _b.label = 2;
+                                                            case 2: return [4 /*yield*/, readInterface_1.next()];
+                                                            case 3:
+                                                                if (!(readInterface_1_1 = _b.sent(), !readInterface_1_1.done)) return [3 /*break*/, 5];
+                                                                line = readInterface_1_1.value;
+                                                                if (line.includes("silencedetect")) {
+                                                                    if (line.includes("start")) {
+                                                                        line = line.substring(line.indexOf(":") + 1).replace(" ", "");
+                                                                        line = line.split("|")[0];
+                                                                        start[i] = line;
+                                                                        i++;
+                                                                    }
+                                                                    else {
+                                                                        line = line.substring(line.indexOf(":") + 1).replace(" ", "");
+                                                                        line = line.split("|")[0];
+                                                                        end[o] = line;
+                                                                        o++;
+                                                                    }
+                                                                }
+                                                                else if (line.includes("Duration:")) {
+                                                                    line = line.substring(line.indexOf(":") + 1).replace(" ", "");
+                                                                    line = line.split(",")[0];
+                                                                    endtime = line;
+                                                                }
+                                                                _b.label = 4;
+                                                            case 4: return [3 /*break*/, 2];
+                                                            case 5: return [3 /*break*/, 12];
+                                                            case 6:
+                                                                e_1_1 = _b.sent();
+                                                                e_1 = { error: e_1_1 };
+                                                                return [3 /*break*/, 12];
+                                                            case 7:
+                                                                _b.trys.push([7, , 10, 11]);
+                                                                if (!(readInterface_1_1 && !readInterface_1_1.done && (_a = readInterface_1["return"]))) return [3 /*break*/, 9];
+                                                                return [4 /*yield*/, _a.call(readInterface_1)];
+                                                            case 8:
+                                                                _b.sent();
+                                                                _b.label = 9;
+                                                            case 9: return [3 /*break*/, 11];
+                                                            case 10:
+                                                                if (e_1) throw e_1.error;
+                                                                return [7 /*endfinally*/];
+                                                            case 11: return [7 /*endfinally*/];
+                                                            case 12:
+                                                                logger = fs.createWriteStream("pieces.txt", {
+                                                                    flags: "a"
+                                                                });
+                                                                start.push(endtime);
+                                                                d = 0;
+                                                                _b.label = 13;
+                                                            case 13:
+                                                                if (!(d < end.length)) return [3 /*break*/, 23];
+                                                                continueCutting = false;
+                                                                console.log("Cutting " + end[d] + " - " + start[d]);
+                                                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1000); })];
+                                                            case 14:
+                                                                _b.sent();
+                                                                cut = void 0;
+                                                                if (!(start[d] == 0)) return [3 /*break*/, 16];
+                                                                return [4 /*yield*/, exec("ffmpeg -t 1 -i videos/" + options.user + "-" + filename + fileExtenstion + " -r 30 -ss " + end[d] + " pieces/piece" + d + ".mp4")];
+                                                            case 15:
+                                                                cut = _b.sent();
+                                                                return [3 /*break*/, 18];
+                                                            case 16: return [4 /*yield*/, exec("ffmpeg -t " + start[d] + " -i videos/" + options.user + "-" + filename + fileExtenstion + " -r 30 -ss " + end[d] + " pieces/piece" + d + ".mp4")];
+                                                            case 17:
+                                                                cut = _b.sent();
+                                                                _b.label = 18;
+                                                            case 18:
+                                                                cut.on("close", function () {
+                                                                    return __awaiter(this, void 0, void 0, function () {
+                                                                        return __generator(this, function (_a) {
+                                                                            continueCutting = true;
+                                                                            return [2 /*return*/];
+                                                                        });
+                                                                    });
+                                                                });
+                                                                _b.label = 19;
+                                                            case 19:
+                                                                if (!(continueCutting == false)) return [3 /*break*/, 21];
+                                                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1000); })];
+                                                            case 20:
+                                                                _b.sent();
+                                                                return [3 /*break*/, 19];
+                                                            case 21:
+                                                                logger.write("file pieces/piece" + d + ".mp4\n");
+                                                                _b.label = 22;
+                                                            case 22:
+                                                                d++;
+                                                                return [3 /*break*/, 13];
+                                                            case 23: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2000); })];
+                                                            case 24:
+                                                                _b.sent();
+                                                                console.log("Piecing video together");
+                                                                return [4 /*yield*/, exec("ffmpeg -f concat -safe 0 -i pieces.txt -c copy videos/" + options.user + "-" + filename + "-cut" + fileExtenstion)];
+                                                            case 25:
+                                                                final = _b.sent();
+                                                                final.on("close", function () {
+                                                                    return __awaiter(this, void 0, void 0, function () {
+                                                                        var d;
+                                                                        return __generator(this, function (_a) {
+                                                                            switch (_a.label) {
+                                                                                case 0:
+                                                                                    console.log("Deleting cut up and temporary files");
+                                                                                    d = 0;
+                                                                                    _a.label = 1;
+                                                                                case 1:
+                                                                                    if (!(d < end.length)) return [3 /*break*/, 5];
+                                                                                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1000); })];
+                                                                                case 2:
+                                                                                    _a.sent();
+                                                                                    return [4 /*yield*/, fs.unlinkSync("pieces/piece" + d + ".mp4")];
+                                                                                case 3:
+                                                                                    _a.sent();
+                                                                                    _a.label = 4;
+                                                                                case 4:
+                                                                                    d++;
+                                                                                    return [3 /*break*/, 1];
+                                                                                case 5: return [4 /*yield*/, fs.unlinkSync("pieces.txt")];
+                                                                                case 6:
+                                                                                    _a.sent();
+                                                                                    return [4 /*yield*/, fs.unlinkSync("silence.txt")];
+                                                                                case 7:
+                                                                                    _a.sent();
+                                                                                    return [2 /*return*/];
+                                                                            }
+                                                                        });
+                                                                    });
+                                                                });
+                                                                return [2 /*return*/];
+                                                        }
+                                                    });
+                                                });
+                                            });
+                                        })];
+                                case 2:
+                                    _a.sent();
+                                    return [2 /*return*/];
+                            }
+                        });
+                    }); };
+                    if (!(silence == true)) return [3 /*break*/, 54];
+                    return [4 /*yield*/, removeSilence()];
                 case 53:
+                    _e.sent();
+                    _e.label = 54;
+                case 54: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
+                case 55:
                     _e.sent();
                     console.clear();
                     return [4 /*yield*/, printLogo()];
-                case 54:
+                case 56:
                     _e.sent();
                     console.log("\n\nYour file is ready. File:" + options.user + "-" + filename + ".mp4\n ");
                     timer.stop();
