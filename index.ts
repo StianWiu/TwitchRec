@@ -20,6 +20,7 @@ const printLogo = () => {
 };
 printLogo();
 
+const { exec } = require("child_process");
 import { Command } from "commander";
 import { Timer } from "timer-node";
 const program = new Command();
@@ -65,6 +66,10 @@ program.option(
   "-c, --category <string>",
   "Only record certain category [Optional]"
 );
+program.option(
+  "-s, --silence <string>",
+  "Only record certain category [Optional]"
+);
 
 program.parse(process.argv);
 const options = program.opts();
@@ -80,6 +85,7 @@ let recordAudio;
 let recordVideo;
 let fileExtenstion = ".mp4";
 let category;
+let silence;
 
 const getTime = () => {
   let date_ob = new Date();
@@ -137,6 +143,11 @@ const checkConfiguration = () => {
         loopRecording = true;
       } else {
         loopRecording = false;
+      }
+      if (options.silence == "true") {
+        silence = true;
+      } else {
+        silence = false;
       }
       if (options.category) {
         category = options.category.toLowerCase();
@@ -402,6 +413,93 @@ async function startRecording() {
   if (tempDelete == true) {
     console.log("Encoding has finished.\nDeleting temporary stream file.");
     await fs.unlinkSync(`./videos/${options.user}-${filename}.webm`);
+  }
+  const removeSilence = async () => {
+    console.log("Listing all silence in video");
+    const getList = await exec(
+      `ffmpeg -i videos/${options.user}-${filename}${fileExtenstion} -af silencedetect=noise=0.0001 -f null - 2> silence.txt`
+    );
+    await new Promise((resolve) => {
+      getList.on("close", async function () {
+        const readline = require("readline");
+
+        const readInterface = readline.createInterface({
+          input: fs.createReadStream("silence.txt"),
+          console: false,
+        });
+
+        let i = 0;
+        let o = 1;
+        let start = [];
+        let end = [];
+        end[0] = 0;
+        let endtime;
+
+        for await (var line of readInterface) {
+          if (line.includes("silencedetect")) {
+            if (line.includes("start")) {
+              line = line.substring(line.indexOf(":") + 1).replace(" ", "");
+              line = line.split("|")[0];
+              start[i] = line;
+              i++;
+            } else {
+              line = line.substring(line.indexOf(":") + 1).replace(" ", "");
+              line = line.split("|")[0];
+              end[o] = line;
+              o++;
+            }
+          } else if (line.includes("Duration:")) {
+            line = line.substring(line.indexOf(":") + 1).replace(" ", "");
+            line = line.split(",")[0];
+            endtime = line;
+          }
+        }
+        var logger = fs.createWriteStream("pieces.txt", {
+          flags: "a", // 'a' means appending (old data will be preserved)
+        });
+
+        start.push(endtime);
+        for (let d = 0; d < end.length; d++) {
+          var continueCutting = false;
+          console.log(`Cutting ${end[d]} - ${start[d]}`);
+          await new Promise((resolve) => setTimeout(resolve, 1000));
+          let cut;
+          if (start[d] == 0) {
+            cut = await exec(
+              `ffmpeg -t 1 -i videos/${options.user}-${filename}${fileExtenstion} -r 30 -ss ${end[d]} pieces/piece${d}.mp4`
+            );
+          } else {
+            cut = await exec(
+              `ffmpeg -t ${start[d]} -i videos/${options.user}-${filename}${fileExtenstion} -r 30 -ss ${end[d]} pieces/piece${d}.mp4`
+            );
+          }
+          cut.on("close", async function () {
+            continueCutting = true;
+          });
+          while (continueCutting == false) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+          }
+          logger.write(`file pieces/piece${d}.mp4\n`);
+        }
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+        console.log("Piecing video together");
+        const final = await exec(
+          `ffmpeg -f concat -safe 0 -i pieces.txt -c copy videos/${options.user}-${filename}-cut${fileExtenstion}`
+        );
+        final.on("close", async function () {
+          console.log("Deleting cut up and temporary files");
+          for (let d = 0; d < end.length; d++) {
+            await new Promise((resolve) => setTimeout(resolve, 1000));
+            await fs.unlinkSync(`pieces/piece${d}.mp4`);
+          }
+          await fs.unlinkSync(`pieces.txt`);
+          await fs.unlinkSync(`silence.txt`);
+        });
+      });
+    });
+  };
+  if (silence == true) {
+    await removeSilence();
   }
   await new Promise((resolve) => setTimeout(resolve, 2500));
   console.clear();
