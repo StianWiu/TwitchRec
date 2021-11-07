@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.6.0")
+      .right("V1.6.1")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -237,17 +237,6 @@ async function startRecording() {
   await page.goto(`https://www.twitch.tv/${options.user}`);
   const originalUrl = page.url();
   await new Promise((resolve) => setTimeout(resolve, 2000));
-  const checkIfCorrect = async () => {
-    try {
-      await Promise.all([
-        await page.click(
-          "#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--hold-chat.channel-root--live.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP > div.channel-root__info.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.bPMozh.home-header-sticky > div.Layout-sc-nxg1ff-0.Bza-dv > div > div > ul > li:nth-child(5) > a > div > div.ScTextWrapper-sc-18v7095-1.eFGtCR"
-        ),
-      ]);
-      console.log('Clicked "Chat" button');
-    } catch (err) {}
-  };
-  await checkIfCorrect();
 
   const checkIfLive = async () => {
     if (
@@ -270,6 +259,18 @@ async function startRecording() {
 
   console.log("Waiting for page to load");
   await new Promise((resolve) => setTimeout(resolve, 5000));
+
+  const checkIfCorrect = async () => {
+    try {
+      await Promise.all([
+        await page.click(
+          "#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--hold-chat.channel-root--live.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP > div.channel-root__info.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.bPMozh.home-header-sticky > div.Layout-sc-nxg1ff-0.Bza-dv > div > div > ul > li:nth-child(5) > a > div > div.ScTextWrapper-sc-18v7095-1.eFGtCR"
+        ),
+      ]);
+      console.log('Clicked "Chat" button');
+    } catch (err) {}
+  };
+  await checkIfCorrect();
 
   console.log("Checking if streamer is live");
   if ((await checkIfLive()) == false) {

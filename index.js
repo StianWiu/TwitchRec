@@ -54,7 +54,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.6.0")
+        .right("V1.6.1")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -211,7 +211,7 @@ var checkConfiguration = function () {
 checkConfiguration();
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var filename, timer, recording_timer, encoding_timer, spinner, browser, page, originalUrl, checkIfCorrect, checkIfLive, checkIfRerun, checkContinueWithRerun, checkCategory, _a, _b, err_1, page_1, _c, _d, err_2, file, stream, removeSilence;
+        var filename, timer, recording_timer, encoding_timer, spinner, browser, page, originalUrl, checkIfLive, checkIfRerun, checkIfCorrect, checkContinueWithRerun, checkCategory, _a, _b, err_1, page_1, _c, _d, err_2, file, stream, removeSilence;
         var _this = this;
         return __generator(this, function (_e) {
             switch (_e.label) {
@@ -277,31 +277,6 @@ function startRecording() {
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2000); })];
                 case 7:
                     _e.sent();
-                    checkIfCorrect = function () { return __awaiter(_this, void 0, void 0, function () {
-                        var _a, _b, err_3;
-                        return __generator(this, function (_c) {
-                            switch (_c.label) {
-                                case 0:
-                                    _c.trys.push([0, 3, , 4]);
-                                    _b = (_a = Promise).all;
-                                    return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--hold-chat.channel-root--live.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP > div.channel-root__info.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.bPMozh.home-header-sticky > div.Layout-sc-nxg1ff-0.Bza-dv > div > div > ul > li:nth-child(5) > a > div > div.ScTextWrapper-sc-18v7095-1.eFGtCR")];
-                                case 1: return [4 /*yield*/, _b.apply(_a, [[
-                                            _c.sent()
-                                        ]])];
-                                case 2:
-                                    _c.sent();
-                                    console.log('Clicked "Chat" button');
-                                    return [3 /*break*/, 4];
-                                case 3:
-                                    err_3 = _c.sent();
-                                    return [3 /*break*/, 4];
-                                case 4: return [2 /*return*/];
-                            }
-                        });
-                    }); };
-                    return [4 /*yield*/, checkIfCorrect()];
-                case 8:
-                    _e.sent();
                     checkIfLive = function () { return __awaiter(_this, void 0, void 0, function () {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
@@ -330,6 +305,31 @@ function startRecording() {
                     }); };
                     console.log("Waiting for page to load");
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                case 8:
+                    _e.sent();
+                    checkIfCorrect = function () { return __awaiter(_this, void 0, void 0, function () {
+                        var _a, _b, err_3;
+                        return __generator(this, function (_c) {
+                            switch (_c.label) {
+                                case 0:
+                                    _c.trys.push([0, 3, , 4]);
+                                    _b = (_a = Promise).all;
+                                    return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--hold-chat.channel-root--live.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP > div.channel-root__info.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.bPMozh.home-header-sticky > div.Layout-sc-nxg1ff-0.Bza-dv > div > div > ul > li:nth-child(5) > a > div > div.ScTextWrapper-sc-18v7095-1.eFGtCR")];
+                                case 1: return [4 /*yield*/, _b.apply(_a, [[
+                                            _c.sent()
+                                        ]])];
+                                case 2:
+                                    _c.sent();
+                                    console.log('Clicked "Chat" button');
+                                    return [3 /*break*/, 4];
+                                case 3:
+                                    err_3 = _c.sent();
+                                    return [3 /*break*/, 4];
+                                case 4: return [2 /*return*/];
+                            }
+                        });
+                    }); };
+                    return [4 /*yield*/, checkIfCorrect()];
                 case 9:
                     _e.sent();
                     console.log("Checking if streamer is live");
