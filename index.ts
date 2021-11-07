@@ -10,7 +10,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.5.10")
+      .right("V1.6.0")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -195,7 +195,8 @@ async function startRecording() {
   console.log(`Wait for next stream: ${loopRecording}`);
   console.log(`Record audio: ${recordAudio}`);
   console.log(`Record Video: ${recordVideo}`);
-  console.log(`Category: ${category}\n`);
+  console.log(`Category: ${category}`);
+  console.log(`Cut silence: ${silence}\n`);
 
   const filename = randomstring.generate({
     length: 10,
@@ -216,6 +217,8 @@ async function startRecording() {
         width: 1920,
         height: 1080,
       },
+      ignoreDefaultArgs: ["--enable-automation"],
+      args: ["--start-fullscreen", "--disable-infobars"],
     });
   } else {
     browser = await launch({
@@ -224,6 +227,8 @@ async function startRecording() {
         width: 1024,
         height: 768,
       },
+      ignoreDefaultArgs: ["--enable-automation"],
+      args: ["--start-fullscreen", "--disable-infobars"],
     });
   }
   console.log("Opening browser.");
@@ -353,6 +358,24 @@ async function startRecording() {
   } catch (err) {
     console.log("Stream is not agerestricted");
   }
+
+  console.log("Changing resolution");
+  await page.click(
+    ".Layout-sc-nxg1ff-0:nth-child(2) > .Layout-sc-nxg1ff-0:nth-child(1) > .ScCoreButton-sc-1qn4ixc-0 > .ScButtonIconFigure-sc-o7ndmn-1 > .ScIconLayout-sc-1bgeryd-0 > .ScAspectRatio-sc-1sw3lwy-1 > .ScIconSVG-sc-1bgeryd-1"
+  );
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  await page.click(
+    ".Layout-sc-nxg1ff-0 > .Layout-sc-nxg1ff-0:nth-child(3) > .ScIconLayout-sc-1bgeryd-0 > .ScAspectRatio-sc-1sw3lwy-1 > .ScIconSVG-sc-1bgeryd-1"
+  );
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  await page.keyboard.press("Tab");
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  await page.keyboard.press("Tab");
+  await new Promise((resolve) => setTimeout(resolve, 250));
+  await page.keyboard.press("ArrowDown");
+  await new Promise((resolve) => setTimeout(resolve, 1000));
+  console.log("Reloading webpage to make sure resolution changes");
+  await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   console.log("Fullscreening stream");
   await page.keyboard.press("f");
   const file = fs.createWriteStream(
@@ -385,12 +408,11 @@ async function startRecording() {
       console.log("Category was changed");
       break;
     }
-    await new Promise((resolve) => setTimeout(resolve, 15000));
+    await new Promise((resolve) => setTimeout(resolve, 2500));
   }
   spinner.stop();
 
   await stream.destroy();
-  stream.on("end", () => {});
   recording_timer.stop();
   console.log("Closing browser");
   await browser.close();
@@ -409,6 +431,7 @@ async function startRecording() {
       `ffmpeg -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}${fileExtenstion}`
     );
   }
+  encoding_timer.stop();
   spinner.stop();
   if (tempDelete == true) {
     console.log("Encoding has finished.\nDeleting temporary stream file.");
@@ -459,48 +482,67 @@ async function startRecording() {
         });
 
         start.push(endtime);
-        for (let d = 0; d < end.length; d++) {
-          var continueCutting = false;
-          console.log(`Cutting ${end[d]} - ${start[d]}`);
-          await new Promise((resolve) => setTimeout(resolve, 1000));
-          let cut;
-          if (start[d] == 0) {
-            cut = await exec(
-              `ffmpeg -t 1 -i videos/${options.user}-${filename}${fileExtenstion} -r 30 -ss ${end[d]} pieces/piece${d}.mp4`
-            );
-          } else {
-            cut = await exec(
-              `ffmpeg -t ${start[d]} -i videos/${options.user}-${filename}${fileExtenstion} -r 30 -ss ${end[d]} pieces/piece${d}.mp4`
-            );
-          }
-          cut.on("close", async function () {
-            continueCutting = true;
-          });
-          while (continueCutting == false) {
-            await new Promise((resolve) => setTimeout(resolve, 1000));
-          }
-          logger.write(`file pieces/piece${d}.mp4\n`);
+        let d;
+        let rounds;
+        for (let k = 0; k < end.length; k++) {
+          rounds = k;
         }
-        await new Promise((resolve) => setTimeout(resolve, 2000));
-        console.log("Piecing video together");
-        const final = await exec(
-          `ffmpeg -f concat -safe 0 -i pieces.txt -c copy videos/${options.user}-${filename}-cut${fileExtenstion}`
-        );
-        final.on("close", async function () {
-          console.log("Deleting cut up and temporary files");
-          for (let d = 0; d < end.length; d++) {
+        console.log("Cuts: " + rounds);
+        if (rounds > 1) {
+          for (d = 0; d < end.length; d++) {
+            var continueCutting = false;
+            console.log(`Cutting ${end[d]} - ${start[d]}`);
             await new Promise((resolve) => setTimeout(resolve, 1000));
-            await fs.unlinkSync(`pieces/piece${d}.mp4`);
+            let cut;
+            if (start[d] == 0) {
+              cut = await exec(
+                `ffmpeg -t 1 -i videos/${options.user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
+              );
+            } else {
+              cut = await exec(
+                `ffmpeg -t ${start[d]} -i videos/${options.user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
+              );
+            }
+            cut.on("close", async function () {
+              continueCutting = true;
+            });
+            while (continueCutting == false) {
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+            }
+            logger.write(`file pieces/piece${d}.mp4\n`);
           }
-          await fs.unlinkSync(`pieces.txt`);
-          await fs.unlinkSync(`silence.txt`);
-        });
+          await new Promise((resolve) => setTimeout(resolve, 2000));
+          console.log("Piecing video together");
+          const final = await exec(
+            `ffmpeg -f concat -safe 0 -i pieces.txt -c copy videos/${options.user}-${filename}-cut${fileExtenstion}`
+          );
+          final.on("close", async function () {
+            console.log("Deleting cut up and temporary files");
+            for (let d = 0; d < end.length; d++) {
+              await new Promise((resolve) => setTimeout(resolve, 1000));
+              await fs.unlinkSync(`pieces/piece${d}.mp4`);
+            }
+            await fs.unlinkSync(`pieces.txt`);
+            await fs.unlinkSync(`silence.txt`);
+            if (tempDelete == true) {
+              await fs.unlinkSync(
+                `./videos/${options.user}-${filename}${fileExtenstion}`
+              );
+            }
+            resolve(``);
+          });
+        } else {
+          console.log("Skipping all cuts since video has little to no silence");
+          resolve(``);
+        }
       });
     });
   };
+
   if (silence == true) {
     await removeSilence();
   }
+
   await new Promise((resolve) => setTimeout(resolve, 2500));
   console.clear();
   await printLogo();
@@ -508,7 +550,6 @@ async function startRecording() {
     `\n\nYour file is ready. File:${options.user}-${filename}.mp4\n `
   );
   timer.stop();
-  encoding_timer.stop();
   console.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"));
   console.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"));
   console.log(encoding_timer.format("Encoded for D:%d H:%h M:%m S:%s"));
