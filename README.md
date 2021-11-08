@@ -8,6 +8,17 @@ This was made for windows and ubuntu so it has not been tested in any other oper
 
 I made this program out of spite. There is a twitch streamer I like that only streams at 4am my time and their VOD's are sub only. So I just leave this program running on my server so I have the stream saved for later.
 
+# Features
+
+  - Record only audio
+  - Record only video
+  - Automatically cut out silence | Still work in progress as there still are some bugs needing to be fixed
+  - Set custom fps
+  - Record only certain categories
+  - Once done recording & encoding automatically wait for streamer to start streaming again
+  - Enable/Disable recording rerun streams
+
+
 # Required
 
 This project requires that you have google chrome installed on the machine. [How to install chrome on ubuntu.](https://askubuntu.com/questions/510056/how-to-install-google-chrome) Chromium doesn't work because it has issues with watching streams. Make sure that chrome is installed in the correct directory. If it isn't you have to install it correctly or edit the code. See [Extra](https://github.com/stianwiu/twitchrec#extra) on how to do that.
@@ -34,15 +45,6 @@ $ node index.js --user pignuuuu --windows false --frames 32 --threads 4
 # To see all options run
 $ node index.js --help
 ```
-# Features
-
-  - Record only audio
-  - Record only video
-  - Automatically cut out silence | Still work in progress as there still are some bugs needing to be fixed
-  - Set custom fps
-  - Record only certain categories
-  - Once done recording & encoding automatically wait for streamer to start streaming again
-  - Enable/Disable recording rerun streams
 
 # Extra
 
