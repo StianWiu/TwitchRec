@@ -43,7 +43,6 @@ $ node index.js --help
   - Record only certain categories
   - Once done recording & encoding automatically wait for streamer to start streaming again
   - Enable/Disable recording rerun streams
-  - 
 
 # Extra
 
