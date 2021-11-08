@@ -34,6 +34,16 @@ $ node index.js --user pignuuuu --windows false --frames 32 --threads 4
 # To see all options run
 $ node index.js --help
 ```
+# Features
+
+  - Record only audio
+  - Record only video
+  - Automatically cut out silence | Still work in progress as there still are some bugs needing to be fixed
+  - Set custom fps
+  - Record only certain categories
+  - Once done recording & encoding automatically wait for streamer to start streaming again
+  - Enable/Disable recording rerun streams
+  - 
 
 # Extra
 
