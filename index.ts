@@ -19,7 +19,6 @@ const printLogo = () => {
   );
 };
 printLogo();
-
 const { exec } = require("child_process");
 import { Command } from "commander";
 import { Timer } from "timer-node";
@@ -343,8 +342,6 @@ async function startRecording() {
     rerunStream = false;
   }
 
-  console.log("Reloading webpage");
-  await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   console.log("Checking if stream is agerestricted");
   try {
     await Promise.all([
@@ -352,7 +349,6 @@ async function startRecording() {
         `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button`
       ),
     ]);
-    await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
     console.log(
       'Stream is agerestricted\nClicked "Start Watching" button\nReloading webpage'
     );

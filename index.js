@@ -431,6 +431,7 @@ function startRecording() {
                     _e.label = 16;
                 case 16:
                     if (!_a) return [3 /*break*/, 27];
+                    console.log(12);
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
                 case 17:
                     _e.sent();
@@ -475,39 +476,38 @@ function startRecording() {
                     else {
                         rerunStream = false;
                     }
-                    console.log("Reloading webpage");
-                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-                case 29:
-                    _e.sent();
                     console.log("Checking if stream is agerestricted");
-                    _e.label = 30;
-                case 30:
-                    _e.trys.push([30, 34, , 35]);
+                    _e.label = 29;
+                case 29:
+                    _e.trys.push([29, 32, , 33]);
                     _d = (_c = Promise).all;
                     return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button")];
-                case 31: return [4 /*yield*/, _d.apply(_c, [[
+                case 30: return [4 /*yield*/, _d.apply(_c, [[
                             _e.sent()
                         ]])];
-                case 32:
-                    _e.sent();
-                    return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-                case 33:
+                case 31:
                     _e.sent();
                     console.log('Stream is agerestricted\nClicked "Start Watching" button\nReloading webpage');
-                    return [3 /*break*/, 35];
-                case 34:
+                    return [3 /*break*/, 33];
+                case 32:
                     err_2 = _e.sent();
                     console.log("Stream is not agerestricted");
-                    return [3 /*break*/, 35];
-                case 35:
+                    return [3 /*break*/, 33];
+                case 33:
                     console.log("Changing resolution");
                     return [4 /*yield*/, page.click(".Layout-sc-nxg1ff-0:nth-child(2) > .Layout-sc-nxg1ff-0:nth-child(1) > .ScCoreButton-sc-1qn4ixc-0 > .ScButtonIconFigure-sc-o7ndmn-1 > .ScIconLayout-sc-1bgeryd-0 > .ScAspectRatio-sc-1sw3lwy-1 > .ScIconSVG-sc-1bgeryd-1")];
+                case 34:
+                    _e.sent();
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 250); })];
+                case 35:
+                    _e.sent();
+                    return [4 /*yield*/, page.click(".Layout-sc-nxg1ff-0 > .Layout-sc-nxg1ff-0:nth-child(3) > .ScIconLayout-sc-1bgeryd-0 > .ScAspectRatio-sc-1sw3lwy-1 > .ScIconSVG-sc-1bgeryd-1")];
                 case 36:
                     _e.sent();
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 250); })];
                 case 37:
                     _e.sent();
-                    return [4 /*yield*/, page.click(".Layout-sc-nxg1ff-0 > .Layout-sc-nxg1ff-0:nth-child(3) > .ScIconLayout-sc-1bgeryd-0 > .ScAspectRatio-sc-1sw3lwy-1 > .ScIconSVG-sc-1bgeryd-1")];
+                    return [4 /*yield*/, page.keyboard.press("Tab")];
                 case 38:
                     _e.sent();
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 250); })];
@@ -519,32 +519,26 @@ function startRecording() {
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 250); })];
                 case 41:
                     _e.sent();
-                    return [4 /*yield*/, page.keyboard.press("Tab")];
+                    return [4 /*yield*/, page.keyboard.press("ArrowDown")];
                 case 42:
                     _e.sent();
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 250); })];
-                case 43:
-                    _e.sent();
-                    return [4 /*yield*/, page.keyboard.press("ArrowDown")];
-                case 44:
-                    _e.sent();
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1000); })];
-                case 45:
+                case 43:
                     _e.sent();
                     console.log("Reloading webpage to make sure resolution changes");
                     return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-                case 46:
+                case 44:
                     _e.sent();
                     console.log("Fullscreening stream");
                     return [4 /*yield*/, page.keyboard.press("f")];
-                case 47:
+                case 45:
                     _e.sent();
                     file = fs.createWriteStream("./videos/" + options.user + "-" + filename + ".webm");
                     return [4 /*yield*/, getStream(page, {
                             audio: recordAudio,
                             video: recordVideo
                         })];
-                case 48:
+                case 46:
                     stream = _e.sent();
                     recording_timer.start();
                     console.log("Now recording");
@@ -552,65 +546,65 @@ function startRecording() {
                     console.log("Recording until:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun");
                     spinner.start();
                     stream.pipe(file);
-                    _e.label = 49;
-                case 49: return [4 /*yield*/, checkIfLive()];
-                case 50:
-                    if (!((_e.sent()) == true)) return [3 /*break*/, 54];
+                    _e.label = 47;
+                case 47: return [4 /*yield*/, checkIfLive()];
+                case 48:
+                    if (!((_e.sent()) == true)) return [3 /*break*/, 52];
                     if (originalUrl != page.url()) {
                         console.log("Stopping recording because streamer raided someone else");
-                        return [3 /*break*/, 54];
+                        return [3 /*break*/, 52];
                     }
                     return [4 /*yield*/, checkIfRerun()];
-                case 51:
+                case 49:
                     if ((_e.sent()) == true && rerunStream == false) {
                         console.log("Stream is a rerun");
-                        return [3 /*break*/, 54];
+                        return [3 /*break*/, 52];
                     }
                     return [4 /*yield*/, checkCategory()];
-                case 52:
+                case 50:
                     if ((_e.sent()) != true) {
                         console.log("Category was changed");
-                        return [3 /*break*/, 54];
+                        return [3 /*break*/, 52];
                     }
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
-                case 53:
+                case 51:
                     _e.sent();
-                    return [3 /*break*/, 49];
-                case 54:
+                    return [3 /*break*/, 47];
+                case 52:
                     spinner.stop();
                     return [4 /*yield*/, stream.destroy()];
-                case 55:
+                case 53:
                     _e.sent();
                     recording_timer.stop();
                     console.log("Closing browser");
                     return [4 /*yield*/, browser.close()];
-                case 56:
+                case 54:
                     _e.sent();
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
-                case 57:
+                case 55:
                     _e.sent();
                     console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
                     encoding_timer.start();
                     spinner.start();
-                    if (!(windows == true)) return [3 /*break*/, 59];
+                    if (!(windows == true)) return [3 /*break*/, 57];
                     return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
+                case 56:
+                    _e.sent();
+                    return [3 /*break*/, 59];
+                case 57: return [4 /*yield*/, nrc.run("ffmpeg -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
                 case 58:
                     _e.sent();
-                    return [3 /*break*/, 61];
-                case 59: return [4 /*yield*/, nrc.run("ffmpeg -i videos/" + options.user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + options.user + "-" + filename + fileExtenstion)];
+                    _e.label = 59;
+                case 59:
+                    encoding_timer.stop();
+                    spinner.stop();
+                    if (!(tempDelete == true)) return [3 /*break*/, 61];
+                    console.log("Encoding has finished.\nDeleting temporary stream file.");
+                    return [4 /*yield*/, fs.unlinkSync("./videos/" + options.user + "-" + filename + ".webm")];
                 case 60:
                     _e.sent();
                     _e.label = 61;
                 case 61:
-                    encoding_timer.stop();
-                    spinner.stop();
-                    if (!(tempDelete == true)) return [3 /*break*/, 63];
-                    console.log("Encoding has finished.\nDeleting temporary stream file.");
-                    return [4 /*yield*/, fs.unlinkSync("./videos/" + options.user + "-" + filename + ".webm")];
-                case 62:
-                    _e.sent();
-                    _e.label = 63;
-                case 63:
                     removeSilence = function () { return __awaiter(_this, void 0, void 0, function () {
                         var getList;
                         return __generator(this, function (_a) {
@@ -799,17 +793,17 @@ function startRecording() {
                             }
                         });
                     }); };
-                    if (!(silence == true)) return [3 /*break*/, 65];
+                    if (!(silence == true)) return [3 /*break*/, 63];
                     return [4 /*yield*/, removeSilence()];
-                case 64:
+                case 62:
                     _e.sent();
-                    _e.label = 65;
-                case 65: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
-                case 66:
+                    _e.label = 63;
+                case 63: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
+                case 64:
                     _e.sent();
                     console.clear();
                     return [4 /*yield*/, printLogo()];
-                case 67:
+                case 65:
                     _e.sent();
                     console.log("\n\nYour file is ready. File:" + options.user + "-" + filename + ".mp4\n ");
                     timer.stop();

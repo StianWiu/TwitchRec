@@ -90,3 +90,4 @@ typings/
 # Avoid pushing video files generated
 *.mp4
 *.webm
+*.mp3
