@@ -2,15 +2,28 @@
 
 This is my side project Twitch-Recorder.
 
-What it does currently is it uses [puppeteer](https://github.com/puppeteer/puppeteer) to open the specified twitch stream then it will use [puppeteer-stream](https://github.com/Flam3rboy/puppeteer-stream) to record it until stream is over. You can set it to a stream that is offline and it will wait for said streamer to start streaming.
+What the program does is it uses [puppeteer](https://github.com/puppeteer/puppeteer) to open the a twitch stream in a chrome browser then it will use [puppeteer-stream](https://github.com/Flam3rboy/puppeteer-stream) to record it until stream is over. You can set it to a stream that is offline and it will wait for that streamer to start streaming.
 
-This was made for windows and ubuntu so it has not been tested in any other operating system. Though it will most likely still work.
+This was made for windows and ubuntu so it has not been tested in any other operating system. Though it will most likely still work. Please see Required section.
 
 I made this program out of spite. There is a twitch streamer I like that only streams at 4am my time and their VOD's are sub only. So I just leave this program running on my server so I have the stream saved for later.
 
+Feel free to take as much as you want from this project and use it on your own. No credits needed but much appreciated.
+
+# Features
+
+  - Record only audio
+  - Record only video
+  - Automatically cut out silence | Still work in progress as there still are some bugs needing to be fixed
+  - Set custom fps
+  - Record only certain categories
+  - Once done recording & encoding automatically wait for streamer to start streaming again
+  - Enable/Disable recording rerun streams
+
+
 # Required
 
-This project requires that you have google chrome installed on the machine. [How to install chrome on ubuntu.](https://askubuntu.com/questions/510056/how-to-install-google-chrome) Chromium doesn't work because it has issues with watching streams. Make sure that chrome is installed in the correct directory. If it isn't you have to install it correctly or edit the code. See [Extra](https://github.com/stianwiu/twitchrec#extra) on how to do that.
+This project requires that you have google chrome installed on the machine. [How to install chrome on ubuntu.](https://askubuntu.com/questions/510056/how-to-install-google-chrome) The built in Chromium doesn't work because it has issues with watching streams. Make sure that chrome is installed in the correct directory. If it isn't you have to install it correctly or edit the code. See [Extra](https://github.com/stianwiu/twitchrec#extra) on how to do that.
 
 If you are on ubuntu or any linux machine it is required that you install ffmpeg. For windows there is a exe included.
 
