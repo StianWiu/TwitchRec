@@ -1,4 +1,5 @@
 console.clear();
+
 const logo = require("asciiart-logo");
 const printLogo = () => {
   console.log(
@@ -10,7 +11,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.6.1")
+      .right("V1.7.0")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -27,7 +28,6 @@ const randomstring = require("randomstring");
 var nrc = require("node-run-cmd");
 const { launch, getStream } = require("puppeteer-stream");
 const fs = require("fs");
-var Spinner = require("cli-spinner").Spinner;
 
 // Add options for command
 const noUserSpecified = () => {
@@ -69,6 +69,10 @@ program.option(
   "-s, --silence <string>",
   "Cut out silence from final recording [Optional]"
 );
+program.option(
+  "-m, --max <num>",
+  "Choose what the maximum filesize can be specify in GB [Optional]"
+);
 
 program.parse(process.argv);
 const options = program.opts();
@@ -85,6 +89,8 @@ let recordVideo;
 let fileExtenstion = ".mp4";
 let category;
 let silence;
+let maxSize;
+let cutVideo;
 
 const getTime = () => {
   let date_ob = new Date();
@@ -178,6 +184,11 @@ const checkConfiguration = () => {
       } else {
         threads = 1;
       }
+      if (options.max) {
+        maxSize = options.max;
+      } else {
+        maxSize = undefined;
+      }
     } else noOsSpecified();
   } else noUserSpecified();
 };
@@ -195,7 +206,8 @@ async function startRecording() {
   console.log(`Record audio: ${recordAudio}`);
   console.log(`Record Video: ${recordVideo}`);
   console.log(`Category: ${category}`);
-  console.log(`Cut silence: ${silence}\n`);
+  console.log(`Cut silence: ${silence}`);
+  console.log(`Max filesize: ${maxSize} \n`);
 
   const filename = randomstring.generate({
     length: 10,
@@ -205,9 +217,6 @@ async function startRecording() {
   const recording_timer = new Timer({ label: "recording-timer" });
   const encoding_timer = new Timer({ label: "encoding-timer" });
   timer.start();
-  var spinner = new Spinner("%s ");
-  spinner.setSpinnerString("|/-\\");
-  spinner.setSpinnerDelay(400);
   let browser = undefined;
   if (windows == true) {
     browser = await launch({
@@ -314,6 +323,83 @@ async function startRecording() {
     }
   };
 
+  const checkFileSize = async () => {
+    try {
+      var stats = fs.statSync(`videos/${options.user}-${filename}.webm`);
+      var fileSizeInBytes = stats.size;
+      var fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
+      var fileSizeInGigabytes = fileSizeInMegabytes * 0.001;
+      return fileSizeInGigabytes.toString().substring(0, 6);
+    } catch (err) {}
+  };
+
+  const printProgress = async (status) => {
+    console.clear();
+    if (status == "recording") {
+      console.log(
+        logo({
+          name: "Pignuuu",
+          font: "Chunky",
+          lineChars: 10,
+          padding: 2,
+          margin: 3,
+        })
+          .emptyLine()
+          .left(`User: ${options.user}`)
+          .emptyLine()
+          .left(`Filesize: ${await checkFileSize()} GB`)
+          .left(`Running for: ${timer.format("D:%d H:%h M:%m S:%s")}`)
+          .left(`Recording: ${recording_timer.format("D:%d H:%h M:%m S:%s")}`)
+          .left(`Rerun: ${await checkIfRerun()}`)
+          .render()
+      );
+    } else if (status == "encoding") {
+      console.log(
+        logo({
+          name: "Pignuuu",
+          font: "Chunky",
+          lineChars: 10,
+          padding: 2,
+          margin: 3,
+        })
+          .emptyLine()
+          .left(`User: ${options.user}`)
+          .emptyLine()
+          .left(`Final filesize: ${await checkFileSize()} GB`)
+          .left(
+            `Final recording time: ${recording_timer.format(
+              "D:%d H:%h M:%m S:%s"
+            )}`
+          )
+          .emptyLine()
+          .center(`Encoding has started this can take a while`)
+          .left(`Threads: ${threads}`)
+          .render()
+      );
+    } else if (status == "slicing") {
+      console.log(
+        logo({
+          name: "Pignuuu",
+          font: "Chunky",
+          lineChars: 10,
+          padding: 2,
+          margin: 3,
+        })
+          .emptyLine()
+          .left(`User: ${options.user}`)
+          .emptyLine()
+          .left(`Final filesize: ${await checkFileSize()} GB`)
+          .left(
+            `Final recording time: ${recording_timer.format(
+              "D:%d H:%h M:%m S:%s"
+            )}`
+          )
+          .emptyLine()
+          .center(`Slicing has started this can take a while`)
+          .render()
+      );
+    }
+  };
   while (
     (await checkIfLive()) == false ||
     (await checkContinueWithRerun()) == false ||
@@ -388,7 +474,6 @@ async function startRecording() {
   console.log(
     "Recording until:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun"
   );
-  spinner.start();
 
   stream.pipe(file);
 
@@ -405,9 +490,13 @@ async function startRecording() {
       console.log("Category was changed");
       break;
     }
+    if (maxSize != undefined && (await checkFileSize()) >= maxSize) {
+      console.log("File size reached max size");
+      break;
+    }
+    printProgress("recording");
     await new Promise((resolve) => setTimeout(resolve, 2500));
   }
-  spinner.stop();
 
   await stream.destroy();
   recording_timer.stop();
@@ -418,7 +507,7 @@ async function startRecording() {
     `FFmpeg encoding starting now.\nFps set to ${fps}\nEncoding using ${threads} threads\n`
   );
   encoding_timer.start();
-  spinner.start();
+  printProgress("encoding");
   if (windows == true) {
     await nrc.run(
       `ffmpeg.exe -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}${fileExtenstion}`
@@ -429,7 +518,6 @@ async function startRecording() {
     );
   }
   encoding_timer.stop();
-  spinner.stop();
   if (tempDelete == true) {
     console.log("Encoding has finished.\nDeleting temporary stream file.");
     await fs.unlinkSync(`./videos/${options.user}-${filename}.webm`);
@@ -441,6 +529,7 @@ async function startRecording() {
     );
     await new Promise((resolve) => {
       getList.on("close", async function () {
+        printProgress("slicing");
         const readline = require("readline");
 
         const readInterface = readline.createInterface({
@@ -454,7 +543,6 @@ async function startRecording() {
         let end = [];
         end[0] = 0;
         let endtime;
-
         for await (var line of readInterface) {
           if (line.includes("silencedetect")) {
             if (line.includes("start")) {
@@ -485,7 +573,7 @@ async function startRecording() {
           rounds = k;
         }
         console.log("Cuts: " + rounds);
-        if (rounds > 1) {
+        if (rounds != 0) {
           for (d = 0; d < end.length; d++) {
             var continueCutting = false;
             console.log(`Cutting ${end[d]} - ${start[d]}`);
@@ -526,10 +614,16 @@ async function startRecording() {
                 `./videos/${options.user}-${filename}${fileExtenstion}`
               );
             }
+            cutVideo = true;
             resolve(``);
           });
         } else {
           console.log("Skipping all cuts since video has little to no silence");
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+          try {
+            await fs.unlinkSync(`pieces.txt`);
+            await fs.unlinkSync(`silence.txt`);
+          } catch (err) {}
           resolve(``);
         }
       });
@@ -543,9 +637,15 @@ async function startRecording() {
   await new Promise((resolve) => setTimeout(resolve, 2500));
   console.clear();
   await printLogo();
-  console.log(
-    `\n\nYour file is ready. File:${options.user}-${filename}.mp4\n `
-  );
+  if (cutVideo == true) {
+    console.log(
+      `\n\nYour file is ready. File:${options.user}-${filename}-cut.mp4\n`
+    );
+  } else {
+    console.log(
+      `\n\nYour file is ready. File:${options.user}-${filename}.mp4\n`
+    );
+  }
   timer.stop();
   console.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"));
   console.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"));
