@@ -11,7 +11,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.7.0")
+      .right("V1.8.0")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -24,24 +24,12 @@ const { exec } = require("child_process");
 import { Command } from "commander";
 import { Timer } from "timer-node";
 const program = new Command();
-const randomstring = require("randomstring");
 var nrc = require("node-run-cmd");
+const randomstring = require("randomstring");
 const { launch, getStream } = require("puppeteer-stream");
 const fs = require("fs");
 
 // Add options for command
-const noUserSpecified = () => {
-  console.log("Missing argument -u or --user");
-  process.exit();
-};
-const noOsSpecified = () => {
-  console.log("Missing argument -w or --windows");
-  process.exit();
-};
-const noRecordingSelected = () => {
-  console.log("Both audio and video can't be disabled");
-  process.exit();
-};
 
 program.option("-u, --user <string>", "Twitch user to record [Required]");
 program.option(
@@ -73,10 +61,19 @@ program.option(
   "-m, --max <num>",
   "Choose what the maximum filesize can be specify in GB [Optional]"
 );
+program.option(
+  "-o, --organize <boolean>",
+  "Choose if file should be automatically sorted into folders [Optional]"
+);
+program.option(
+  "-a, --ad <boolean>",
+  "If program should wait 1 minute to avoid recording ads [Optional]"
+);
 
 program.parse(process.argv);
 const options = program.opts();
 
+let user;
 let windows;
 let fps;
 let threads;
@@ -91,6 +88,8 @@ let category;
 let silence;
 let maxSize;
 let cutVideo;
+let organizeFiles;
+let skipAd;
 
 const getTime = () => {
   let date_ob = new Date();
@@ -127,76 +126,94 @@ const getTime = () => {
 };
 
 const checkConfiguration = () => {
-  if (options.user) {
-    if (options.windows == "true" || options.windows == "false") {
-      if (options.windows == "true") {
-        windows = true;
+  if (!options.user) {
+    console.log("Missing argument -u or --user");
+    process.exit();
+  } else {
+    user = options.user.toLowerCase();
+  }
+  if (options.windows == "true" || options.windows == "false") {
+    if (options.windows == "true") {
+      windows = true;
+    } else {
+      windows = false;
+    }
+    if (options.rerun == "false") {
+      rerunEnable = false;
+    } else {
+      rerunEnable = true;
+    }
+    if (options.delete == "false") {
+      tempDelete = false;
+    } else {
+      tempDelete = true;
+    }
+    if (options.loop == "true") {
+      loopRecording = true;
+    } else {
+      loopRecording = false;
+    }
+    if (options.silence == "true") {
+      silence = true;
+    } else {
+      silence = false;
+    }
+    if (options.category) {
+      category = options.category.toLowerCase();
+    } else {
+      category = "undefined";
+    }
+    if (options.audio == options.video && options.audio == "false") {
+      console.log("Both audio and video can't be disabled");
+      process.exit();
+    } else {
+      if (options.audio == "false") {
+        recordAudio = false;
       } else {
-        windows = false;
+        recordAudio = true;
       }
-      if (options.rerun == "false") {
-        rerunEnable = false;
+      if (options.video == "false") {
+        recordVideo = false;
+        fileExtenstion = ".mp3";
       } else {
-        rerunEnable = true;
+        recordVideo = true;
       }
-      if (options.delete == "false") {
-        tempDelete = false;
-      } else {
-        tempDelete = true;
-      }
-      if (options.loop == "true") {
-        loopRecording = true;
-      } else {
-        loopRecording = false;
-      }
-      if (options.silence == "true") {
-        silence = true;
-      } else {
-        silence = false;
-      }
-      if (options.category) {
-        category = options.category.toLowerCase();
-      } else {
-        category = "undefined";
-      }
-      if (options.audio == options.video && options.audio == "false") {
-        noRecordingSelected();
-      } else {
-        if (options.audio == "false") {
-          recordAudio = false;
-        } else {
-          recordAudio = true;
-        }
-        if (options.video == "false") {
-          recordVideo = false;
-          fileExtenstion = ".mp3";
-        } else {
-          recordVideo = true;
-        }
-      }
-      if (options.frames) {
-        fps = options.frames;
-      } else {
-        fps = 24;
-      }
-      if (options.threads) {
-        threads = options.threads;
-      } else {
-        threads = 1;
-      }
-      if (options.max) {
-        maxSize = options.max;
-      } else {
-        maxSize = undefined;
-      }
-    } else noOsSpecified();
-  } else noUserSpecified();
+    }
+    if (options.frames) {
+      fps = options.frames;
+    } else {
+      fps = 24;
+    }
+    if (options.threads) {
+      threads = options.threads;
+    } else {
+      threads = 1;
+    }
+    if (options.max) {
+      maxSize = options.max;
+    } else {
+      maxSize = undefined;
+    }
+    if (options.organize == "false") {
+      organizeFiles = false;
+    } else {
+      organizeFiles = true;
+    }
+    if (options.ad == "false") {
+      skipAd = false;
+    } else {
+      skipAd = true;
+    }
+  } else {
+    console.log("Missing argument -w or --windows");
+    process.exit();
+  }
 };
 
 checkConfiguration();
 
 async function startRecording() {
-  console.log(`Twitch Streamer: ${options.user}`);
+  console.log(`Twitch Streamer: ${user}`);
   console.log(`Using windows: ${windows}`);
   console.log(`Frames Per Second: ${fps}`);
   console.log(`Threads: ${threads}`);
@@ -207,6 +224,8 @@ async function startRecording() {
   console.log(`Record Video: ${recordVideo}`);
   console.log(`Category: ${category}`);
   console.log(`Cut silence: ${silence}`);
+  console.log(`Organize: ${organizeFiles}`);
+  console.log(`Skip ad: ${skipAd}`);
   console.log(`Max filesize: ${maxSize} \n`);
 
   const filename = randomstring.generate({
@@ -242,7 +261,7 @@ async function startRecording() {
   console.log("Opening browser.");
   const page = await browser.newPage();
   console.log("Opening twitch stream");
-  await page.goto(`https://www.twitch.tv/${options.user}`);
+  await page.goto(`https://www.twitch.tv/${user}`);
   const originalUrl = page.url();
   await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -325,7 +344,7 @@ async function startRecording() {
 
   const checkFileSize = async () => {
     try {
-      var stats = fs.statSync(`videos/${options.user}-${filename}.webm`);
+      var stats = fs.statSync(`videos/${user}-${filename}.webm`);
       var fileSizeInBytes = stats.size;
       var fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
       var fileSizeInGigabytes = fileSizeInMegabytes * 0.001;
@@ -345,7 +364,7 @@ async function startRecording() {
           margin: 3,
         })
           .emptyLine()
-          .left(`User: ${options.user}`)
+          .left(`User: ${user}`)
           .emptyLine()
           .left(`Filesize: ${await checkFileSize()} GB`)
           .left(`Running for: ${timer.format("D:%d H:%h M:%m S:%s")}`)
@@ -363,7 +382,7 @@ async function startRecording() {
           margin: 3,
         })
           .emptyLine()
-          .left(`User: ${options.user}`)
+          .left(`User: ${user}`)
           .emptyLine()
           .left(`Final filesize: ${await checkFileSize()} GB`)
           .left(
@@ -386,7 +405,7 @@ async function startRecording() {
           margin: 3,
         })
           .emptyLine()
-          .left(`User: ${options.user}`)
+          .left(`User: ${user}`)
           .emptyLine()
           .left(`Final filesize: ${await checkFileSize()} GB`)
           .left(
@@ -405,20 +424,8 @@ async function startRecording() {
     (await checkContinueWithRerun()) == false ||
     (await checkCategory()) == false
   ) {
-    await new Promise((resolve) => setTimeout(resolve, 60000));
-    try {
-      await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
-    } catch (err) {
-      console.log("Timedout reopening browser");
-      browser.close();
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-      console.log("Opening browser.");
-      const page = await browser.newPage();
-      console.log("Opening twitch stream");
-      await page.goto(`https://www.twitch.tv/${options.user}`);
-      await new Promise((resolve) => setTimeout(resolve, 5000));
-    }
     await checkIfCorrect();
+    await new Promise((resolve) => setTimeout(resolve, 60000));
   }
   console.log("Checking if stream is a rerun");
   if ((await checkIfRerun()) == true) {
@@ -461,9 +468,11 @@ async function startRecording() {
   await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
   console.log("Fullscreening stream");
   await page.keyboard.press("f");
-  const file = fs.createWriteStream(
-    `./videos/${options.user}-${filename}.webm`
-  );
+  const file = fs.createWriteStream(`./videos/${user}-${filename}.webm`);
+  if (skipAd == true) {
+    console.log("Waiting for 1 minute to avoid ads");
+    await new Promise((resolve) => setTimeout(resolve, 60000));
+  }
   const stream = await getStream(page, {
     audio: recordAudio,
     video: recordVideo,
@@ -510,22 +519,22 @@ async function startRecording() {
   printProgress("encoding");
   if (windows == true) {
     await nrc.run(
-      `ffmpeg.exe -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}${fileExtenstion}`
+      `ffmpeg.exe -i videos/${user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${user}-${filename}${fileExtenstion}`
     );
   } else {
     await nrc.run(
-      `ffmpeg -i videos/${options.user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${options.user}-${filename}${fileExtenstion}`
+      `ffmpeg -i videos/${user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${user}-${filename}${fileExtenstion}`
     );
   }
   encoding_timer.stop();
   if (tempDelete == true) {
     console.log("Encoding has finished.\nDeleting temporary stream file.");
-    await fs.unlinkSync(`./videos/${options.user}-${filename}.webm`);
+    await fs.unlinkSync(`./videos/${user}-${filename}.webm`);
   }
   const removeSilence = async () => {
     console.log("Listing all silence in video");
     const getList = await exec(
-      `ffmpeg -i videos/${options.user}-${filename}${fileExtenstion} -af silencedetect=noise=0.0001 -f null - 2> silence.txt`
+      `ffmpeg -i videos/${user}-${filename}${fileExtenstion} -af silencedetect=noise=0.0001 -f null - 2> silence.txt`
     );
     await new Promise((resolve) => {
       getList.on("close", async function () {
@@ -581,11 +590,11 @@ async function startRecording() {
             let cut;
             if (start[d] == 0) {
               cut = await exec(
-                `ffmpeg -t 1 -i videos/${options.user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
+                `ffmpeg -t 1 -i videos/${user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
               );
             } else {
               cut = await exec(
-                `ffmpeg -t ${start[d]} -i videos/${options.user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
+                `ffmpeg -t ${start[d]} -i videos/${user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
               );
             }
             cut.on("close", async function () {
@@ -599,7 +608,7 @@ async function startRecording() {
           await new Promise((resolve) => setTimeout(resolve, 2000));
           console.log("Piecing video together");
           const final = await exec(
-            `ffmpeg -f concat -safe 0 -i pieces.txt -c copy videos/${options.user}-${filename}-cut${fileExtenstion}`
+            `ffmpeg -f concat -safe 0 -i pieces.txt -c copy videos/${user}-${filename}-cut${fileExtenstion}`
           );
           final.on("close", async function () {
             console.log("Deleting cut up and temporary files");
@@ -611,7 +620,7 @@ async function startRecording() {
             await fs.unlinkSync(`silence.txt`);
             if (tempDelete == true) {
               await fs.unlinkSync(
-                `./videos/${options.user}-${filename}${fileExtenstion}`
+                `./videos/${user}-${filename}${fileExtenstion}`
               );
             }
             cutVideo = true;
@@ -630,21 +639,43 @@ async function startRecording() {
     });
   };
 
+  const organize = async () => {
+    if (!(await fs.existsSync(`./videos/${user}`))) {
+      await fs.mkdirSync(`./videos/${user}`);
+    }
+    let outputName;
+    if (silence == true) {
+      outputName = `${user}-${filename}-cut${fileExtenstion}`;
+    } else {
+      outputName = `${user}-${filename}${fileExtenstion}`;
+    }
+    console.log(outputName);
+    fs.rename(
+      `./videos/${outputName}`,
+      `./videos/${user}/${outputName}`,
+      function (err) {
+        if (err) {
+          throw err;
+        } else {
+        }
+      }
+    );
+  };
+
   if (silence == true) {
     await removeSilence();
+  }
+  if (organizeFiles == true) {
+    await organize();
   }
 
   await new Promise((resolve) => setTimeout(resolve, 2500));
   console.clear();
   await printLogo();
   if (cutVideo == true) {
-    console.log(
-      `\n\nYour file is ready. File:${options.user}-${filename}-cut.mp4\n`
-    );
+    console.log(`\n\nYour file is ready. File:${user}-${filename}-cut.mp4\n`);
   } else {
-    console.log(
-      `\n\nYour file is ready. File:${options.user}-${filename}.mp4\n`
-    );
+    console.log(`\n\nYour file is ready. File:${user}-${filename}.mp4\n`);
   }
   timer.stop();
   console.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"));
