@@ -54,7 +54,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.8.2")
+        .right("V1.8.3")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -69,8 +69,8 @@ var randomstring = require("randomstring");
 var _a = require("puppeteer-stream"), launch = _a.launch, getStream = _a.getStream;
 var fs = require("fs");
 // Add options for command
-program.option("-u, --user <string>", "Twitch user to record [Required]");
-program.option("-w, --windows <boolean>", "Using Windows true or false [Required]");
+program.requiredOption("-u, --user <string>", "Twitch user to record [Required]");
+program.requiredOption("-w, --windows <boolean>", "Using Windows true or false [Required]");
 program.option("-f, --frames <num>", "How many fps to export to [Optional]");
 program.option("-t, --threads <num>", "How many threads to use when encoding [Optional]");
 program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
@@ -131,109 +131,97 @@ var getTime = function () {
         seconds);
 };
 var checkConfiguration = function () {
-    if (!options.user) {
-        console.log("Missing argument -u or --user");
+    user = options.user.toLowerCase();
+    if (options.windows == "true") {
+        windows = true;
+    }
+    else {
+        windows = false;
+    }
+    if (options.rerun == "false") {
+        rerunEnable = false;
+    }
+    else {
+        rerunEnable = true;
+    }
+    if (options["delete"] == "false") {
+        tempDelete = false;
+    }
+    else {
+        tempDelete = true;
+    }
+    if (options.loop == "true") {
+        loopRecording = true;
+    }
+    else {
+        loopRecording = false;
+    }
+    if (options.silence == "true") {
+        silence = true;
+    }
+    else {
+        silence = false;
+    }
+    if (options.category) {
+        category = options.category.toLowerCase();
+    }
+    else {
+        category = "undefined";
+    }
+    if (options.audio == options.video && options.audio == "false") {
+        console.log("Both audio and video can't be disabled");
         process.exit();
     }
     else {
-        user = options.user.toLowerCase();
+        if (options.audio == "false") {
+            recordAudio = false;
+        }
+        else {
+            recordAudio = true;
+        }
+        if (options.video == "false") {
+            recordVideo = false;
+            fileExtenstion = ".mp3";
+        }
+        else {
+            recordVideo = true;
+        }
     }
-    if (options.windows == "true" || options.windows == "false") {
-        if (options.windows == "true") {
-            windows = true;
-        }
-        else {
-            windows = false;
-        }
-        if (options.rerun == "false") {
-            rerunEnable = false;
-        }
-        else {
-            rerunEnable = true;
-        }
-        if (options["delete"] == "false") {
-            tempDelete = false;
-        }
-        else {
-            tempDelete = true;
-        }
-        if (options.loop == "true") {
-            loopRecording = true;
-        }
-        else {
-            loopRecording = false;
-        }
-        if (options.silence == "true") {
-            silence = true;
-        }
-        else {
-            silence = false;
-        }
-        if (options.category) {
-            category = options.category.toLowerCase();
-        }
-        else {
-            category = "undefined";
-        }
-        if (options.audio == options.video && options.audio == "false") {
-            console.log("Both audio and video can't be disabled");
-            process.exit();
-        }
-        else {
-            if (options.audio == "false") {
-                recordAudio = false;
-            }
-            else {
-                recordAudio = true;
-            }
-            if (options.video == "false") {
-                recordVideo = false;
-                fileExtenstion = ".mp3";
-            }
-            else {
-                recordVideo = true;
-            }
-        }
-        if (options.frames) {
-            fps = options.frames;
-        }
-        else {
-            fps = 24;
-        }
-        if (options.threads) {
-            threads = options.threads;
-        }
-        else {
-            threads = 1;
-        }
-        if (options.max) {
-            maxSize = options.max;
-        }
-        else {
-            maxSize = undefined;
-        }
-        if (options.organize == "false") {
-            organizeFiles = false;
-        }
-        else {
-            organizeFiles = true;
-        }
-        if (options.skipAd == "false") {
-            skipAd = false;
-        }
-        else {
-            skipAd = true;
-        }
-        if (options.experimental == "true") {
-            experimental = true;
-        }
-        else {
-            experimental = false;
-        }
+    if (options.frames) {
+        fps = options.frames;
     }
     else {
-        console.log("Missing argument -w or --windows");
-        process.exit();
+        fps = 24;
+    }
+    if (options.threads) {
+        threads = options.threads;
+    }
+    else {
+        threads = 1;
+    }
+    if (options.max) {
+        maxSize = options.max;
+    }
+    else {
+        maxSize = undefined;
+    }
+    if (options.organize == "false") {
+        organizeFiles = false;
+    }
+    else {
+        organizeFiles = true;
+    }
+    if (options.skipAd == "false") {
+        skipAd = false;
+    }
+    else {
+        skipAd = true;
+    }
+    if (options.experimental == "true") {
+        experimental = true;
+    }
+    else {
+        experimental = false;
     }
 };
 checkConfiguration();
