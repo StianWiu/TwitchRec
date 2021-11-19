@@ -54,7 +54,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.8.0")
+        .right("V1.8.1")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -529,31 +529,31 @@ function startRecording() {
                             }
                         });
                     }); };
-                    _f.label = 11;
-                case 11: return [4 /*yield*/, checkIfLive()];
-                case 12:
-                    _b = (_f.sent()) == false;
-                    if (_b) return [3 /*break*/, 14];
-                    return [4 /*yield*/, checkContinueWithRerun()];
+                    return [4 /*yield*/, checkIfCorrect()];
+                case 11:
+                    _f.sent();
+                    _f.label = 12;
+                case 12: return [4 /*yield*/, checkIfLive()];
                 case 13:
                     _b = (_f.sent()) == false;
-                    _f.label = 14;
+                    if (_b) return [3 /*break*/, 15];
+                    return [4 /*yield*/, checkContinueWithRerun()];
                 case 14:
-                    _a = _b;
-                    if (_a) return [3 /*break*/, 16];
-                    return [4 /*yield*/, checkCategory()];
+                    _b = (_f.sent()) == false;
+                    _f.label = 15;
                 case 15:
-                    _a = (_f.sent()) == false;
-                    _f.label = 16;
+                    _a = _b;
+                    if (_a) return [3 /*break*/, 17];
+                    return [4 /*yield*/, checkCategory()];
                 case 16:
-                    if (!_a) return [3 /*break*/, 19];
-                    return [4 /*yield*/, checkIfCorrect()];
+                    _a = (_f.sent()) == false;
+                    _f.label = 17;
                 case 17:
-                    _f.sent();
-                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
+                    if (!_a) return [3 /*break*/, 19];
+                    return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                 case 18:
                     _f.sent();
-                    return [3 /*break*/, 11];
+                    return [3 /*break*/, 12];
                 case 19:
                     console.log("Checking if stream is a rerun");
                     return [4 /*yield*/, checkIfRerun()];

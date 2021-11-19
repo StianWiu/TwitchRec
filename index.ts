@@ -11,7 +11,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.8.0")
+      .right("V1.8.1")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -419,13 +419,13 @@ async function startRecording() {
       );
     }
   };
+  await checkIfCorrect();
   while (
     (await checkIfLive()) == false ||
     (await checkContinueWithRerun()) == false ||
     (await checkCategory()) == false
   ) {
-    await checkIfCorrect();
-    await new Promise((resolve) => setTimeout(resolve, 60000));
+    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
   console.log("Checking if stream is a rerun");
   if ((await checkIfRerun()) == true) {
