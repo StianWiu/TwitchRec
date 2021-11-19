@@ -254,7 +254,7 @@ async function startRecording() {
         height: 1080,
       },
       ignoreDefaultArgs: ["--enable-automation"],
-      args: [" --start-fullscreen", "--disable-infobars", "--no-sandbox"],
+      args: [" --start-fullscreen", "--disable-infobars"],
     });
   } else {
     browser = await launch({
@@ -264,7 +264,12 @@ async function startRecording() {
         height: 1080,
       },
       ignoreDefaultArgs: ["--enable-automation"],
-      args: ["--start-fullscreen", "--disable-infobars", "--no-sandbox"],
+      args: [
+        "--start-fullscreen",
+        "--disable-infobars",
+        "--no-sandbox",
+        "--disable-setuid-sandbox",
+      ],
     });
   }
   stdout.write("[ACTION] Opening browser\n");
