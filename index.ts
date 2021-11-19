@@ -260,8 +260,8 @@ async function startRecording() {
     browser = await launch({
       executablePath: "/usr/bin/google-chrome-stable",
       defaultViewport: {
-        width: 1024,
-        height: 768,
+        width: 1920,
+        height: 1080,
       },
       ignoreDefaultArgs: ["--enable-automation"],
       args: ["--start-fullscreen", "--disable-infobars", "--no-sandbox"],
