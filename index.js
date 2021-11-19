@@ -54,7 +54,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.8.4")
+        .right("V1.8.5")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -62,6 +62,7 @@ var printLogo = function () {
 printLogo();
 var exec = require("child_process").exec;
 var commander_1 = require("commander");
+var process_1 = require("process");
 var timer_node_1 = require("timer-node");
 var program = new commander_1.Command();
 var nrc = require("node-run-cmd");
@@ -118,7 +119,7 @@ var getTime = function () {
     var minutes = date_ob.getMinutes();
     // current seconds
     var seconds = date_ob.getSeconds();
-    console.log("[INFO] " +
+    process_1.stdout.write("[INFO] " +
         year +
         "-" +
         month +
@@ -129,7 +130,8 @@ var getTime = function () {
         ":" +
         minutes +
         ":" +
-        seconds);
+        seconds +
+        "\n");
 };
 var checkConfiguration = function () {
     user = options.user.toLowerCase();
@@ -170,7 +172,7 @@ var checkConfiguration = function () {
         category = "undefined";
     }
     if (options.audio == options.video && options.audio == "false") {
-        console.log("[ERROR] Both audio and video can't be disabled");
+        process_1.stdout.write("[ERROR] Both audio and video can't be disabled\n");
         process.exit();
     }
     else {
@@ -233,21 +235,21 @@ function startRecording() {
         return __generator(this, function (_f) {
             switch (_f.label) {
                 case 0:
-                    console.log("[SETTING] Twitch Streamer: " + user);
-                    console.log("[SETTING] Using windows: " + windows);
-                    console.log("[SETTING] Frames Per Second: " + fps);
-                    console.log("[SETTING] Threads: " + threads);
-                    console.log("[SETTING] Record reruns: " + rerunEnable);
-                    console.log("[SETTING] Delete temp file : " + tempDelete);
-                    console.log("[SETTING] Wait for next stream: " + loopRecording);
-                    console.log("[SETTING] Record audio: " + recordAudio);
-                    console.log("[SETTING] Record Video: " + recordVideo);
-                    console.log("[SETTING] Category: " + category);
-                    console.log("[SETTING] Cut silence: " + silence);
-                    console.log("[SETTING] Organize: " + organizeFiles);
-                    console.log("[SETTING] Skip ad: " + skipAd);
-                    console.log("[SETTING] Experimental encoding: " + experimental);
-                    console.log("[SETTING] Max filesize: " + maxSize + " \n");
+                    process_1.stdout.write("[SETTING] Twitch Streamer: " + user + "\n");
+                    process_1.stdout.write("[SETTING] Using windows: " + windows + "\n");
+                    process_1.stdout.write("[SETTING] Frames Per Second: " + fps + "\n");
+                    process_1.stdout.write("[SETTING] Threads: " + threads + "\n");
+                    process_1.stdout.write("[SETTING] Record reruns: " + rerunEnable + "\n");
+                    process_1.stdout.write("[SETTING] Delete temp file : " + tempDelete + "\n");
+                    process_1.stdout.write("[SETTING] Wait for next stream: " + loopRecording + "\n");
+                    process_1.stdout.write("[SETTING] Record audio: " + recordAudio + "\n");
+                    process_1.stdout.write("[SETTING] Record Video: " + recordVideo + "\n");
+                    process_1.stdout.write("[SETTING] Category: " + category + "\n");
+                    process_1.stdout.write("[SETTING] Cut silence: " + silence + "\n");
+                    process_1.stdout.write("[SETTING] Organize: " + organizeFiles + "\n");
+                    process_1.stdout.write("[SETTING] Skip ad: " + skipAd + "\n");
+                    process_1.stdout.write("[SETTING] Experimental encoding: " + experimental + "\n");
+                    process_1.stdout.write("[SETTING] Max filesize: " + maxSize + "\n\n");
                     filename = randomstring.generate({
                         length: 10,
                         charset: "hex"
@@ -265,7 +267,7 @@ function startRecording() {
                                 height: 1080
                             },
                             ignoreDefaultArgs: ["--enable-automation"],
-                            args: ["--start-fullscreen", "--disable-infobars"]
+                            args: [" --start-fullscreen", "--disable-infobars"]
                         })];
                 case 1:
                     browser = _f.sent();
@@ -283,11 +285,11 @@ function startRecording() {
                     browser = _f.sent();
                     _f.label = 4;
                 case 4:
-                    console.log("[ACTION] Opening browser.");
+                    process_1.stdout.write("[ACTION] Opening browser\n");
                     return [4 /*yield*/, browser.newPage()];
                 case 5:
                     page = _f.sent();
-                    console.log("[ACTION] Opening twitch stream");
+                    process_1.stdout.write("[ACTION] Opening twitch stream\n");
                     return [4 /*yield*/, page.goto("https://www.twitch.tv/" + user)];
                 case 6:
                     _f.sent();
@@ -311,7 +313,7 @@ function startRecording() {
                     return [4 /*yield*/, checkIfUserExists()];
                 case 8:
                     if (_f.sent()) {
-                        console.log("[ERROR] User does not exist");
+                        process_1.stdout.write("[ERROR] User does not exist\n");
                         process.exit();
                     }
                     checkIfLive = function () { return __awaiter(_this, void 0, void 0, function () {
@@ -340,7 +342,7 @@ function startRecording() {
                             }
                         });
                     }); };
-                    console.log("[INFO] Waiting for page to load");
+                    process_1.stdout.write("[INFO] Waiting for page to load\n");
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                 case 9:
                     _f.sent();
@@ -357,7 +359,7 @@ function startRecording() {
                                         ]])];
                                 case 2:
                                     _c.sent();
-                                    console.log('[ACTION] Clicked "Chat" button');
+                                    process_1.stdout.write('[ACTION] Clicked "Chat" button\n');
                                     return [3 /*break*/, 4];
                                 case 3:
                                     err_2 = _c.sent();
@@ -369,11 +371,11 @@ function startRecording() {
                     return [4 /*yield*/, checkIfCorrect()];
                 case 10:
                     _f.sent();
-                    console.log("[ACTION] Checking if streamer is live");
+                    process_1.stdout.write("[ACTION] Checking if streamer is live\n");
                     return [4 /*yield*/, checkIfLive()];
                 case 11:
                     if ((_f.sent()) == false) {
-                        console.log("[INFO] Streamer is not live");
+                        process_1.stdout.write("[INFO] Streamer is not live\n");
                     }
                     checkContinueWithRerun = function () { return __awaiter(_this, void 0, void 0, function () {
                         var _a;
@@ -573,17 +575,17 @@ function startRecording() {
                     _f.sent();
                     return [3 /*break*/, 13];
                 case 20:
-                    console.log("[ACTION] Checking if stream is a rerun");
+                    process_1.stdout.write("[ACTION] Checking if stream is a rerun\n");
                     return [4 /*yield*/, checkIfRerun()];
                 case 21:
                     if ((_f.sent()) == true) {
-                        console.log("[INFO] This stream is a rerun");
+                        process_1.stdout.write("[INFO] This stream is a rerun\n");
                         rerunStream = true;
                     }
                     else {
                         rerunStream = false;
                     }
-                    console.log("[ACTION] Checking if stream is agerestricted");
+                    process_1.stdout.write("[ACTION] Checking if stream is agerestricted\n");
                     _f.label = 22;
                 case 22:
                     _f.trys.push([22, 25, , 26]);
@@ -594,14 +596,14 @@ function startRecording() {
                         ]])];
                 case 24:
                     _f.sent();
-                    console.log('[INFO] Stream is agerestricted\n[ACTION]Clicked "Start Watching" button\n[ACTION] Reloading webpage');
+                    process_1.stdout.write('[INFO] Stream is agerestricted\n[ACTION]Clicked "Start Watching" button\n[ACTION] Reloading webpage\n');
                     return [3 /*break*/, 26];
                 case 25:
                     err_1 = _f.sent();
-                    console.log("[INFO] Stream is not agerestricted");
+                    process_1.stdout.write("[INFO] Stream is not agerestricted\n");
                     return [3 /*break*/, 26];
                 case 26:
-                    console.log("[ACTION] Changing resolution");
+                    process_1.stdout.write("[ACTION] Changing resolution\n");
                     return [4 /*yield*/, page.click(".Layout-sc-nxg1ff-0:nth-child(2) > .Layout-sc-nxg1ff-0:nth-child(1) > .ScCoreButton-sc-1qn4ixc-0 > .ScButtonIconFigure-sc-o7ndmn-1 > .ScIconLayout-sc-1bgeryd-0 > .ScAspectRatio-sc-1sw3lwy-1 > .ScIconSVG-sc-1bgeryd-1")];
                 case 27:
                     _f.sent();
@@ -632,17 +634,17 @@ function startRecording() {
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1000); })];
                 case 36:
                     _f.sent();
-                    console.log("[ACTION] Reloading webpage to make sure resolution changes");
+                    process_1.stdout.write("[ACTION] Reloading webpage to make sure resolution changes\n");
                     return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
                 case 37:
                     _f.sent();
-                    console.log("[ACTION] Fullscreening stream");
+                    process_1.stdout.write("[ACTION] Fullscreening stream\n");
                     return [4 /*yield*/, page.keyboard.press("f")];
                 case 38:
                     _f.sent();
                     file = fs.createWriteStream("./videos/" + user + "-" + filename + ".webm");
                     if (!(skipAd == true)) return [3 /*break*/, 40];
-                    console.log("[INFO] Waiting for 1 minute to avoid ads");
+                    process_1.stdout.write("[INFO] Waiting for 1 minute to avoid ads\n");
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 60000); })];
                 case 39:
                     _f.sent();
@@ -654,28 +656,28 @@ function startRecording() {
                 case 41:
                     stream = _f.sent();
                     recording_timer.start();
-                    console.log("[ACTION] Now recording");
+                    process_1.stdout.write("[ACTION] Now recording\n");
                     getTime();
-                    console.log("[INFO] Recording until:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun");
+                    process_1.stdout.write("[INFO] Recording until:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun\n");
                     stream.pipe(file);
                     _f.label = 42;
                 case 42: return [4 /*yield*/, checkIfLive()];
                 case 43:
                     if (!((_f.sent()) == true)) return [3 /*break*/, 49];
                     if (originalUrl != page.url()) {
-                        console.log("[INFO] Stopping recording because streamer raided someone else");
+                        process_1.stdout.write("[INFO] Stopping recording because streamer raided someone else\n");
                         return [3 /*break*/, 49];
                     }
                     return [4 /*yield*/, checkIfRerun()];
                 case 44:
                     if ((_f.sent()) == true && rerunStream == false) {
-                        console.log("[INFO] Stream is a rerun");
+                        process_1.stdout.write("[INFO] Stream is a rerun\n");
                         return [3 /*break*/, 49];
                     }
                     return [4 /*yield*/, checkCategory()];
                 case 45:
                     if ((_f.sent()) != true) {
-                        console.log("[INFO] Category was changed");
+                        process_1.stdout.write("[INFO] Category was changed\n");
                         return [3 /*break*/, 49];
                     }
                     _e = maxSize != undefined;
@@ -686,7 +688,7 @@ function startRecording() {
                     _f.label = 47;
                 case 47:
                     if (_e) {
-                        console.log("[INFO] File size reached max size");
+                        process_1.stdout.write("[INFO] File size reached max size\n");
                         return [3 /*break*/, 49];
                     }
                     printProgress("recording");
@@ -698,14 +700,14 @@ function startRecording() {
                 case 50:
                     _f.sent();
                     recording_timer.stop();
-                    console.log("[ACTION] Closing browser");
+                    process_1.stdout.write("[ACTION] Closing browser\n");
                     return [4 /*yield*/, browser.close()];
                 case 51:
                     _f.sent();
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
                 case 52:
                     _f.sent();
-                    console.log("[ACTION] FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
+                    process_1.stdout.write("[ACTION] FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
                     encoding_timer.start();
                     printProgress("encoding");
                     if (!(experimental == true)) return [3 /*break*/, 57];
@@ -732,7 +734,7 @@ function startRecording() {
                 case 61:
                     encoding_timer.stop();
                     if (!(tempDelete == true)) return [3 /*break*/, 63];
-                    console.log("[INFO] Encoding has finished.\n[ACTION] Deleting temporary stream file.");
+                    process_1.stdout.write("[INFO] Encoding has finished.\n[ACTION] Deleting temporary stream file\n");
                     return [4 /*yield*/, fs.unlinkSync("./videos/" + user + "-" + filename + ".webm")];
                 case 62:
                     _f.sent();
@@ -743,7 +745,7 @@ function startRecording() {
                         return __generator(this, function (_a) {
                             switch (_a.label) {
                                 case 0:
-                                    console.log("[ACTION] Listing all silence in video");
+                                    process_1.stdout.write("[ACTION] Listing all silence in video\n");
                                     return [4 /*yield*/, exec("ffmpeg -i videos/" + user + "-" + filename + fileExtenstion + " -af silencedetect=noise=0.0001 -f null - 2> silence.txt")];
                                 case 1:
                                     getList = _a.sent();
@@ -821,14 +823,14 @@ function startRecording() {
                                                                 for (k = 0; k < end.length; k++) {
                                                                     rounds = k;
                                                                 }
-                                                                console.log("[INFO] Cuts: " + rounds);
+                                                                process_1.stdout.write("[INFO] Cuts: " + rounds + "\n");
                                                                 if (!(rounds != 0)) return [3 /*break*/, 31];
                                                                 d = 0;
                                                                 _b.label = 13;
                                                             case 13:
                                                                 if (!(d < end.length)) return [3 /*break*/, 28];
                                                                 continueCutting = false;
-                                                                console.log("[ACTION] Cutting " + end[d] + " - " + start[d]);
+                                                                process_1.stdout.write("[ACTION] Cutting " + end[d] + " - " + start[d] + "\n");
                                                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1000); })];
                                                             case 14:
                                                                 _b.sent();
@@ -879,7 +881,7 @@ function startRecording() {
                                                             case 28: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2000); })];
                                                             case 29:
                                                                 _b.sent();
-                                                                console.log("[ACTION] Piecing video together");
+                                                                process_1.stdout.write("[ACTION] Piecing video together\n");
                                                                 return [4 /*yield*/, exec("ffmpeg -f concat -safe 0 -i pieces.txt -c copy videos/" + user + "-" + filename + "-cut" + fileExtenstion)];
                                                             case 30:
                                                                 final = _b.sent();
@@ -889,7 +891,7 @@ function startRecording() {
                                                                         return __generator(this, function (_a) {
                                                                             switch (_a.label) {
                                                                                 case 0:
-                                                                                    console.log("[ACTION] Deleting cut up and temporary files");
+                                                                                    process_1.stdout.write("[ACTION] Deleting cut up and temporary files\n");
                                                                                     d_1 = 0;
                                                                                     _a.label = 1;
                                                                                 case 1:
@@ -925,7 +927,7 @@ function startRecording() {
                                                                 });
                                                                 return [3 /*break*/, 38];
                                                             case 31:
-                                                                console.log("[INFO] Skipping all cuts since video has little to no silence");
+                                                                process_1.stdout.write("[INFO] Skipping all cuts since video has little to no silence\n");
                                                                 skipCutting = true;
                                                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                                                             case 32:
@@ -1006,15 +1008,15 @@ function startRecording() {
                 case 69:
                     _f.sent();
                     if (cutVideo == true) {
-                        console.log("\n\nYour file is ready. File:" + user + "-" + filename + "-cut.mp4\n");
+                        process_1.stdout.write("\n\nYour file is ready. File:" + user + "-" + filename + "-cut.mp4\n");
                     }
                     else {
-                        console.log("\n\nYour file is ready. File:" + user + "-" + filename + ".mp4\n");
+                        process_1.stdout.write("\n\nYour file is ready. File:" + user + "-" + filename + ".mp4\n");
                     }
                     timer.stop();
-                    console.log(timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s"));
-                    console.log(recording_timer.format("[INFO] Recorded for D:%d H:%h M:%m S:%s"));
-                    console.log(encoding_timer.format("[INFO] Encoded for D:%d H:%h M:%m S:%s"));
+                    process_1.stdout.write(timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s\n"));
+                    process_1.stdout.write(recording_timer.format("[INFO] Recorded for D:%d H:%h M:%m S:%s\n"));
+                    process_1.stdout.write(encoding_timer.format("[INFO] Encoded for D:%d H:%h M:%m S:%s\n"));
                     if (loopRecording == false) {
                         process.exit();
                     }

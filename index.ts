@@ -11,7 +11,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.8.4")
+      .right("V1.8.5")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -22,6 +22,7 @@ const printLogo = () => {
 printLogo();
 const { exec } = require("child_process");
 import { Command } from "commander";
+import { stdout } from "process";
 import { Timer } from "timer-node";
 const program = new Command();
 var nrc = require("node-run-cmd");
@@ -119,7 +120,7 @@ const getTime = () => {
 
   // current seconds
   let seconds = date_ob.getSeconds();
-  console.log(
+  stdout.write(
     "[INFO] " +
       year +
       "-" +
@@ -131,7 +132,8 @@ const getTime = () => {
       ":" +
       minutes +
       ":" +
-      seconds
+      seconds +
+      "\n"
   );
 };
 
@@ -168,7 +170,7 @@ const checkConfiguration = () => {
     category = "undefined";
   }
   if (options.audio == options.video && options.audio == "false") {
-    console.log("[ERROR] Both audio and video can't be disabled");
+    stdout.write("[ERROR] Both audio and video can't be disabled\n");
     process.exit();
   } else {
     if (options.audio == "false") {
@@ -218,21 +220,21 @@ const checkConfiguration = () => {
 checkConfiguration();
 
 async function startRecording() {
-  console.log(`[SETTING] Twitch Streamer: ${user}`);
-  console.log(`[SETTING] Using windows: ${windows}`);
-  console.log(`[SETTING] Frames Per Second: ${fps}`);
-  console.log(`[SETTING] Threads: ${threads}`);
-  console.log(`[SETTING] Record reruns: ${rerunEnable}`);
-  console.log(`[SETTING] Delete temp file : ${tempDelete}`);
-  console.log(`[SETTING] Wait for next stream: ${loopRecording}`);
-  console.log(`[SETTING] Record audio: ${recordAudio}`);
-  console.log(`[SETTING] Record Video: ${recordVideo}`);
-  console.log(`[SETTING] Category: ${category}`);
-  console.log(`[SETTING] Cut silence: ${silence}`);
-  console.log(`[SETTING] Organize: ${organizeFiles}`);
-  console.log(`[SETTING] Skip ad: ${skipAd}`);
-  console.log(`[SETTING] Experimental encoding: ${experimental}`);
-  console.log(`[SETTING] Max filesize: ${maxSize} \n`);
+  stdout.write(`[SETTING] Twitch Streamer: ${user}\n`);
+  stdout.write(`[SETTING] Using windows: ${windows}\n`);
+  stdout.write(`[SETTING] Frames Per Second: ${fps}\n`);
+  stdout.write(`[SETTING] Threads: ${threads}\n`);
+  stdout.write(`[SETTING] Record reruns: ${rerunEnable}\n`);
+  stdout.write(`[SETTING] Delete temp file : ${tempDelete}\n`);
+  stdout.write(`[SETTING] Wait for next stream: ${loopRecording}\n`);
+  stdout.write(`[SETTING] Record audio: ${recordAudio}\n`);
+  stdout.write(`[SETTING] Record Video: ${recordVideo}\n`);
+  stdout.write(`[SETTING] Category: ${category}\n`);
+  stdout.write(`[SETTING] Cut silence: ${silence}\n`);
+  stdout.write(`[SETTING] Organize: ${organizeFiles}\n`);
+  stdout.write(`[SETTING] Skip ad: ${skipAd}\n`);
+  stdout.write(`[SETTING] Experimental encoding: ${experimental}\n`);
+  stdout.write(`[SETTING] Max filesize: ${maxSize}\n\n`);
 
   const filename = randomstring.generate({
     length: 10,
@@ -252,7 +254,7 @@ async function startRecording() {
         height: 1080,
       },
       ignoreDefaultArgs: ["--enable-automation"],
-      args: ["--start-fullscreen", "--disable-infobars"],
+      args: [" --start-fullscreen", "--disable-infobars"],
     });
   } else {
     browser = await launch({
@@ -265,9 +267,9 @@ async function startRecording() {
       args: ["--start-fullscreen", "--disable-infobars"],
     });
   }
-  console.log("[ACTION] Opening browser.");
+  stdout.write("[ACTION] Opening browser\n");
   const page = await browser.newPage();
-  console.log("[ACTION] Opening twitch stream");
+  stdout.write("[ACTION] Opening twitch stream\n");
   await page.goto(`https://www.twitch.tv/${user}`);
   const originalUrl = page.url();
   await new Promise((resolve) => setTimeout(resolve, 2000));
@@ -282,7 +284,7 @@ async function startRecording() {
     else return false;
   };
   if (await checkIfUserExists()) {
-    console.log("[ERROR] User does not exist");
+    stdout.write("[ERROR] User does not exist\n");
     process.exit();
   }
   const checkIfLive = async () => {
@@ -305,7 +307,7 @@ async function startRecording() {
     else return true;
   };
 
-  console.log("[INFO] Waiting for page to load");
+  stdout.write("[INFO] Waiting for page to load\n");
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
   const checkIfCorrect = async () => {
@@ -315,14 +317,14 @@ async function startRecording() {
           "#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP > div.channel-root__info.channel-root__info--offline.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.bPMozh.home-header-sticky > div.Layout-sc-nxg1ff-0.Bza-dv > div > div > ul > li:nth-child(5) > a > div > div.ScTextWrapper-sc-18v7095-1.eFGtCR > div"
         ),
       ]);
-      console.log('[ACTION] Clicked "Chat" button');
+      stdout.write('[ACTION] Clicked "Chat" button\n');
     } catch (err) {}
   };
   await checkIfCorrect();
 
-  console.log("[ACTION] Checking if streamer is live");
+  stdout.write("[ACTION] Checking if streamer is live\n");
   if ((await checkIfLive()) == false) {
-    console.log("[INFO] Streamer is not live");
+    stdout.write("[INFO] Streamer is not live\n");
   }
 
   const checkContinueWithRerun = async () => {
@@ -448,29 +450,29 @@ async function startRecording() {
   ) {
     await new Promise((resolve) => setTimeout(resolve, 5000));
   }
-  console.log("[ACTION] Checking if stream is a rerun");
+  stdout.write("[ACTION] Checking if stream is a rerun\n");
   if ((await checkIfRerun()) == true) {
-    console.log("[INFO] This stream is a rerun");
+    stdout.write("[INFO] This stream is a rerun\n");
     rerunStream = true;
   } else {
     rerunStream = false;
   }
 
-  console.log("[ACTION] Checking if stream is agerestricted");
+  stdout.write("[ACTION] Checking if stream is agerestricted\n");
   try {
     await Promise.all([
       await page.click(
         `#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.InjectLayout-sc-588ddc-0.persistent-player > div > div.Layout-sc-nxg1ff-0.video-player > div > div > div > div > div.Layout-sc-nxg1ff-0.krOuYh.player-overlay-background.player-overlay-background--darkness-0.content-overlay-gate > div > div.Layout-sc-nxg1ff-0.bzQnIQ.content-overlay-gate__allow-pointers > button`
       ),
     ]);
-    console.log(
-      '[INFO] Stream is agerestricted\n[ACTION]Clicked "Start Watching" button\n[ACTION] Reloading webpage'
+    stdout.write(
+      '[INFO] Stream is agerestricted\n[ACTION]Clicked "Start Watching" button\n[ACTION] Reloading webpage\n'
     );
   } catch (err) {
-    console.log("[INFO] Stream is not agerestricted");
+    stdout.write("[INFO] Stream is not agerestricted\n");
   }
 
-  console.log("[ACTION] Changing resolution");
+  stdout.write("[ACTION] Changing resolution\n");
   await page.click(
     ".Layout-sc-nxg1ff-0:nth-child(2) > .Layout-sc-nxg1ff-0:nth-child(1) > .ScCoreButton-sc-1qn4ixc-0 > .ScButtonIconFigure-sc-o7ndmn-1 > .ScIconLayout-sc-1bgeryd-0 > .ScAspectRatio-sc-1sw3lwy-1 > .ScIconSVG-sc-1bgeryd-1"
   );
@@ -485,14 +487,14 @@ async function startRecording() {
   await new Promise((resolve) => setTimeout(resolve, 250));
   await page.keyboard.press("ArrowDown");
   await new Promise((resolve) => setTimeout(resolve, 1000));
-  console.log("[ACTION] Reloading webpage to make sure resolution changes");
+  stdout.write("[ACTION] Reloading webpage to make sure resolution changes\n");
   await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
-  console.log("[ACTION] Fullscreening stream");
+  stdout.write("[ACTION] Fullscreening stream\n");
   await page.keyboard.press("f");
   const file = fs.createWriteStream(`./videos/${user}-${filename}.webm`);
 
   if (skipAd == true) {
-    console.log("[INFO] Waiting for 1 minute to avoid ads");
+    stdout.write("[INFO] Waiting for 1 minute to avoid ads\n");
     await new Promise((resolve) => setTimeout(resolve, 60000));
   }
   const stream = await getStream(page, {
@@ -500,31 +502,31 @@ async function startRecording() {
     video: recordVideo,
   });
   recording_timer.start();
-  console.log("[ACTION] Now recording");
+  stdout.write("[ACTION] Now recording\n");
   getTime();
-  console.log(
-    "[INFO] Recording until:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun"
+  stdout.write(
+    "[INFO] Recording until:\nStreamer goes offline / Streamer raids different stream / Streamer starts a rerun\n"
   );
 
   stream.pipe(file);
 
   while ((await checkIfLive()) == true) {
     if (originalUrl != page.url()) {
-      console.log(
-        "[INFO] Stopping recording because streamer raided someone else"
+      stdout.write(
+        "[INFO] Stopping recording because streamer raided someone else\n"
       );
       break;
     }
     if ((await checkIfRerun()) == true && rerunStream == false) {
-      console.log("[INFO] Stream is a rerun");
+      stdout.write("[INFO] Stream is a rerun\n");
       break;
     }
     if ((await checkCategory()) != true) {
-      console.log("[INFO] Category was changed");
+      stdout.write("[INFO] Category was changed\n");
       break;
     }
     if (maxSize != undefined && (await checkFileSize()) >= maxSize) {
-      console.log("[INFO] File size reached max size");
+      stdout.write("[INFO] File size reached max size\n");
       break;
     }
     printProgress("recording");
@@ -533,10 +535,10 @@ async function startRecording() {
 
   await stream.destroy();
   recording_timer.stop();
-  console.log("[ACTION] Closing browser");
+  stdout.write("[ACTION] Closing browser\n");
   await browser.close();
   await new Promise((resolve) => setTimeout(resolve, 2500));
-  console.log(
+  stdout.write(
     `[ACTION] FFmpeg encoding starting now.\nFps set to ${fps}\nEncoding using ${threads} threads\n`
   );
   encoding_timer.start();
@@ -564,13 +566,13 @@ async function startRecording() {
   }
   encoding_timer.stop();
   if (tempDelete == true) {
-    console.log(
-      "[INFO] Encoding has finished.\n[ACTION] Deleting temporary stream file."
+    stdout.write(
+      "[INFO] Encoding has finished.\n[ACTION] Deleting temporary stream file\n"
     );
     await fs.unlinkSync(`./videos/${user}-${filename}.webm`);
   }
   const removeSilence = async () => {
-    console.log("[ACTION] Listing all silence in video");
+    stdout.write("[ACTION] Listing all silence in video\n");
     const getList = await exec(
       `ffmpeg -i videos/${user}-${filename}${fileExtenstion} -af silencedetect=noise=0.0001 -f null - 2> silence.txt`
     );
@@ -619,11 +621,11 @@ async function startRecording() {
         for (let k = 0; k < end.length; k++) {
           rounds = k;
         }
-        console.log("[INFO] Cuts: " + rounds);
+        stdout.write("[INFO] Cuts: " + rounds + "\n");
         if (rounds != 0) {
           for (d = 0; d < end.length; d++) {
             var continueCutting = false;
-            console.log(`[ACTION] Cutting ${end[d]} - ${start[d]}`);
+            stdout.write(`[ACTION] Cutting ${end[d]} - ${start[d]}\n`);
             await new Promise((resolve) => setTimeout(resolve, 1000));
             let cut;
             if (experimental == true) {
@@ -656,12 +658,12 @@ async function startRecording() {
             logger.write(`file pieces/piece${d}.mp4\n`);
           }
           await new Promise((resolve) => setTimeout(resolve, 2000));
-          console.log("[ACTION] Piecing video together");
+          stdout.write("[ACTION] Piecing video together\n");
           const final = await exec(
             `ffmpeg -f concat -safe 0 -i pieces.txt -c copy videos/${user}-${filename}-cut${fileExtenstion}`
           );
           final.on("close", async function () {
-            console.log("[ACTION] Deleting cut up and temporary files");
+            stdout.write("[ACTION] Deleting cut up and temporary files\n");
             for (let d = 0; d < end.length; d++) {
               await new Promise((resolve) => setTimeout(resolve, 1000));
               await fs.unlinkSync(`pieces/piece${d}.mp4`);
@@ -677,8 +679,8 @@ async function startRecording() {
             resolve(``);
           });
         } else {
-          console.log(
-            "[INFO] Skipping all cuts since video has little to no silence"
+          stdout.write(
+            "[INFO] Skipping all cuts since video has little to no silence\n"
           );
           skipCutting = true;
           await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -726,16 +728,20 @@ async function startRecording() {
   console.clear();
   await printLogo();
   if (cutVideo == true) {
-    console.log(`\n\nYour file is ready. File:${user}-${filename}-cut.mp4\n`);
+    stdout.write(`\n\nYour file is ready. File:${user}-${filename}-cut.mp4\n`);
   } else {
-    console.log(`\n\nYour file is ready. File:${user}-${filename}.mp4\n`);
+    stdout.write(`\n\nYour file is ready. File:${user}-${filename}.mp4\n`);
   }
   timer.stop();
-  console.log(timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s"));
-  console.log(
-    recording_timer.format("[INFO] Recorded for D:%d H:%h M:%m S:%s")
+  stdout.write(
+    timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s\n")
   );
-  console.log(encoding_timer.format("[INFO] Encoded for D:%d H:%h M:%m S:%s"));
+  stdout.write(
+    recording_timer.format("[INFO] Recorded for D:%d H:%h M:%m S:%s\n")
+  );
+  stdout.write(
+    encoding_timer.format("[INFO] Encoded for D:%d H:%h M:%m S:%s\n")
+  );
   if (loopRecording == false) {
     process.exit();
   }
