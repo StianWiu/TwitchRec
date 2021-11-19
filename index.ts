@@ -11,7 +11,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.8.5")
+      .right("V1.8.6")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -254,7 +254,7 @@ async function startRecording() {
         height: 1080,
       },
       ignoreDefaultArgs: ["--enable-automation"],
-      args: [" --start-fullscreen", "--disable-infobars"],
+      args: [" --start-fullscreen", "--disable-infobars", "--no-sandbox"],
     });
   } else {
     browser = await launch({
@@ -264,7 +264,7 @@ async function startRecording() {
         height: 768,
       },
       ignoreDefaultArgs: ["--enable-automation"],
-      args: ["--start-fullscreen", "--disable-infobars"],
+      args: ["--start-fullscreen", "--disable-infobars", "--no-sandbox"],
     });
   }
   stdout.write("[ACTION] Opening browser\n");
