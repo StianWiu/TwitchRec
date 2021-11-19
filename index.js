@@ -54,7 +54,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V1.8.1")
+        .right("V1.8.2")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -82,7 +82,8 @@ program.option("-c, --category <string>", "Only record certain category [Optiona
 program.option("-s, --silence <string>", "Cut out silence from final recording [Optional]");
 program.option("-m, --max <num>", "Choose what the maximum filesize can be specify in GB [Optional]");
 program.option("-o, --organize <boolean>", "Choose if file should be automatically sorted into folders [Optional]");
-program.option("-a, --ad <boolean>", "If program should wait 1 minute to avoid recording ads [Optional]");
+program.option("-ad, --skipAd <boolean>", "If program should wait 1 minute to avoid recording ads [Optional]");
+program.option("-x, --experimental <boolean>", "If program should use fast method for encoding. NOT RECCOMENDED possible loss in quality and desync between audio and video [Optional]");
 program.parse(process.argv);
 var options = program.opts();
 var user;
@@ -102,6 +103,8 @@ var maxSize;
 var cutVideo;
 var organizeFiles;
 var skipAd;
+var experimental;
+var skipCutting;
 var getTime = function () {
     var date_ob = new Date();
     var date = ("0" + date_ob.getDate()).slice(-2);
@@ -215,11 +218,17 @@ var checkConfiguration = function () {
         else {
             organizeFiles = true;
         }
-        if (options.ad == "false") {
+        if (options.skipAd == "false") {
             skipAd = false;
         }
         else {
             skipAd = true;
+        }
+        if (options.experimental == "true") {
+            experimental = true;
+        }
+        else {
+            experimental = false;
         }
     }
     else {
@@ -248,6 +257,7 @@ function startRecording() {
                     console.log("Cut silence: " + silence);
                     console.log("Organize: " + organizeFiles);
                     console.log("Skip ad: " + skipAd);
+                    console.log("Experimental encoding: " + experimental);
                     console.log("Max filesize: " + maxSize + " \n");
                     filename = randomstring.generate({
                         length: 10,
@@ -690,24 +700,36 @@ function startRecording() {
                     console.log("FFmpeg encoding starting now.\nFps set to " + fps + "\nEncoding using " + threads + " threads\n");
                     encoding_timer.start();
                     printProgress("encoding");
+                    if (!(experimental == true)) return [3 /*break*/, 56];
                     if (!(windows == true)) return [3 /*break*/, 53];
-                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + user + "-" + filename + fileExtenstion)];
+                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + user + "-" + filename + ".webm -c:v copy -c:a aac -strict experimental videos/" + user + "-" + filename + fileExtenstion)];
                 case 52:
                     _f.sent();
                     return [3 /*break*/, 55];
-                case 53: return [4 /*yield*/, nrc.run("ffmpeg -i videos/" + user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + user + "-" + filename + fileExtenstion)];
+                case 53: return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + user + "-" + filename + ".webm -c:v copy -c:a aac -strict experimental videos/" + user + "-" + filename + fileExtenstion)];
                 case 54:
                     _f.sent();
                     _f.label = 55;
-                case 55:
+                case 55: return [3 /*break*/, 60];
+                case 56:
+                    if (!(windows == true)) return [3 /*break*/, 58];
+                    return [4 /*yield*/, nrc.run("ffmpeg.exe -i videos/" + user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + user + "-" + filename + fileExtenstion)];
+                case 57:
+                    _f.sent();
+                    return [3 /*break*/, 60];
+                case 58: return [4 /*yield*/, nrc.run("ffmpeg -i videos/" + user + "-" + filename + ".webm -threads " + threads + " -r " + fps + " -c:v libx264 -crf 20 -preset fast videos/" + user + "-" + filename + fileExtenstion)];
+                case 59:
+                    _f.sent();
+                    _f.label = 60;
+                case 60:
                     encoding_timer.stop();
-                    if (!(tempDelete == true)) return [3 /*break*/, 57];
+                    if (!(tempDelete == true)) return [3 /*break*/, 62];
                     console.log("Encoding has finished.\nDeleting temporary stream file.");
                     return [4 /*yield*/, fs.unlinkSync("./videos/" + user + "-" + filename + ".webm")];
-                case 56:
+                case 61:
                     _f.sent();
-                    _f.label = 57;
-                case 57:
+                    _f.label = 62;
+                case 62:
                     removeSilence = function () { return __awaiter(_this, void 0, void 0, function () {
                         var getList;
                         return __generator(this, function (_a) {
@@ -792,27 +814,39 @@ function startRecording() {
                                                                     rounds = k;
                                                                 }
                                                                 console.log("Cuts: " + rounds);
-                                                                if (!(rounds != 0)) return [3 /*break*/, 26];
+                                                                if (!(rounds != 0)) return [3 /*break*/, 31];
                                                                 d = 0;
                                                                 _b.label = 13;
                                                             case 13:
-                                                                if (!(d < end.length)) return [3 /*break*/, 23];
+                                                                if (!(d < end.length)) return [3 /*break*/, 28];
                                                                 continueCutting = false;
                                                                 console.log("Cutting " + end[d] + " - " + start[d]);
                                                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1000); })];
                                                             case 14:
                                                                 _b.sent();
                                                                 cut = void 0;
+                                                                if (!(experimental == true)) return [3 /*break*/, 19];
                                                                 if (!(start[d] == 0)) return [3 /*break*/, 16];
-                                                                return [4 /*yield*/, exec("ffmpeg -t 1 -i videos/" + user + "-" + filename + fileExtenstion + " -r " + fps + " -ss " + end[d] + " pieces/piece" + d + ".mp4")];
+                                                                return [4 /*yield*/, exec("ffmpeg -t 1 -i videos/" + user + "-" + filename + fileExtenstion + " -r " + fps + "  -c:v copy -ss " + end[d] + " pieces/piece" + d + ".mp4")];
                                                             case 15:
                                                                 cut = _b.sent();
                                                                 return [3 /*break*/, 18];
-                                                            case 16: return [4 /*yield*/, exec("ffmpeg -t " + start[d] + " -i videos/" + user + "-" + filename + fileExtenstion + " -r " + fps + " -ss " + end[d] + " pieces/piece" + d + ".mp4")];
+                                                            case 16: return [4 /*yield*/, exec("ffmpeg -t " + start[d] + " -i videos/" + user + "-" + filename + fileExtenstion + "  -c:v copy -r " + fps + " -ss " + end[d] + " pieces/piece" + d + ".mp4")];
                                                             case 17:
                                                                 cut = _b.sent();
                                                                 _b.label = 18;
-                                                            case 18:
+                                                            case 18: return [3 /*break*/, 23];
+                                                            case 19:
+                                                                if (!(start[d] == 0)) return [3 /*break*/, 21];
+                                                                return [4 /*yield*/, exec("ffmpeg -t 1 -i videos/" + user + "-" + filename + fileExtenstion + " -r " + fps + " -ss " + end[d] + " pieces/piece" + d + ".mp4")];
+                                                            case 20:
+                                                                cut = _b.sent();
+                                                                return [3 /*break*/, 23];
+                                                            case 21: return [4 /*yield*/, exec("ffmpeg -t " + start[d] + " -i videos/" + user + "-" + filename + fileExtenstion + " -r " + fps + " -ss " + end[d] + " pieces/piece" + d + ".mp4")];
+                                                            case 22:
+                                                                cut = _b.sent();
+                                                                _b.label = 23;
+                                                            case 23:
                                                                 cut.on("close", function () {
                                                                     return __awaiter(this, void 0, void 0, function () {
                                                                         return __generator(this, function (_a) {
@@ -821,25 +855,25 @@ function startRecording() {
                                                                         });
                                                                     });
                                                                 });
-                                                                _b.label = 19;
-                                                            case 19:
-                                                                if (!(continueCutting == false)) return [3 /*break*/, 21];
+                                                                _b.label = 24;
+                                                            case 24:
+                                                                if (!(continueCutting == false)) return [3 /*break*/, 26];
                                                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1000); })];
-                                                            case 20:
+                                                            case 25:
                                                                 _b.sent();
-                                                                return [3 /*break*/, 19];
-                                                            case 21:
+                                                                return [3 /*break*/, 24];
+                                                            case 26:
                                                                 logger.write("file pieces/piece" + d + ".mp4\n");
-                                                                _b.label = 22;
-                                                            case 22:
+                                                                _b.label = 27;
+                                                            case 27:
                                                                 d++;
                                                                 return [3 /*break*/, 13];
-                                                            case 23: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2000); })];
-                                                            case 24:
+                                                            case 28: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2000); })];
+                                                            case 29:
                                                                 _b.sent();
                                                                 console.log("Piecing video together");
                                                                 return [4 /*yield*/, exec("ffmpeg -f concat -safe 0 -i pieces.txt -c copy videos/" + user + "-" + filename + "-cut" + fileExtenstion)];
-                                                            case 25:
+                                                            case 30:
                                                                 final = _b.sent();
                                                                 final.on("close", function () {
                                                                     return __awaiter(this, void 0, void 0, function () {
@@ -881,29 +915,30 @@ function startRecording() {
                                                                         });
                                                                     });
                                                                 });
-                                                                return [3 /*break*/, 33];
-                                                            case 26:
+                                                                return [3 /*break*/, 38];
+                                                            case 31:
                                                                 console.log("Skipping all cuts since video has little to no silence");
+                                                                skipCutting = true;
                                                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-                                                            case 27:
+                                                            case 32:
                                                                 _b.sent();
-                                                                _b.label = 28;
-                                                            case 28:
-                                                                _b.trys.push([28, 31, , 32]);
+                                                                _b.label = 33;
+                                                            case 33:
+                                                                _b.trys.push([33, 36, , 37]);
                                                                 return [4 /*yield*/, fs.unlinkSync("pieces.txt")];
-                                                            case 29:
+                                                            case 34:
                                                                 _b.sent();
                                                                 return [4 /*yield*/, fs.unlinkSync("silence.txt")];
-                                                            case 30:
+                                                            case 35:
                                                                 _b.sent();
-                                                                return [3 /*break*/, 32];
-                                                            case 31:
+                                                                return [3 /*break*/, 37];
+                                                            case 36:
                                                                 err_5 = _b.sent();
-                                                                return [3 /*break*/, 32];
-                                                            case 32:
+                                                                return [3 /*break*/, 37];
+                                                            case 37:
                                                                 resolve("");
-                                                                _b.label = 33;
-                                                            case 33: return [2 /*return*/];
+                                                                _b.label = 38;
+                                                            case 38: return [2 /*return*/];
                                                         }
                                                     });
                                                 });
@@ -927,13 +962,12 @@ function startRecording() {
                                     _a.sent();
                                     _a.label = 3;
                                 case 3:
-                                    if (silence == true) {
+                                    if (silence == true && skipCutting != true) {
                                         outputName = user + "-" + filename + "-cut" + fileExtenstion;
                                     }
                                     else {
                                         outputName = user + "-" + filename + fileExtenstion;
                                     }
-                                    console.log(outputName);
                                     fs.rename("./videos/" + outputName, "./videos/" + user + "/" + outputName, function (err) {
                                         if (err) {
                                             throw err;
@@ -945,23 +979,23 @@ function startRecording() {
                             }
                         });
                     }); };
-                    if (!(silence == true)) return [3 /*break*/, 59];
+                    if (!(silence == true)) return [3 /*break*/, 64];
                     return [4 /*yield*/, removeSilence()];
-                case 58:
+                case 63:
                     _f.sent();
-                    _f.label = 59;
-                case 59:
-                    if (!(organizeFiles == true)) return [3 /*break*/, 61];
+                    _f.label = 64;
+                case 64:
+                    if (!(organizeFiles == true)) return [3 /*break*/, 66];
                     return [4 /*yield*/, organize()];
-                case 60:
+                case 65:
                     _f.sent();
-                    _f.label = 61;
-                case 61: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
-                case 62:
+                    _f.label = 66;
+                case 66: return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 2500); })];
+                case 67:
                     _f.sent();
                     console.clear();
                     return [4 /*yield*/, printLogo()];
-                case 63:
+                case 68:
                     _f.sent();
                     if (cutVideo == true) {
                         console.log("\n\nYour file is ready. File:" + user + "-" + filename + "-cut.mp4\n");

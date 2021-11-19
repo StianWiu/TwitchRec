@@ -11,7 +11,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V1.8.1")
+      .right("V1.8.2")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -66,8 +66,12 @@ program.option(
   "Choose if file should be automatically sorted into folders [Optional]"
 );
 program.option(
-  "-a, --ad <boolean>",
+  "-ad, --skipAd <boolean>",
   "If program should wait 1 minute to avoid recording ads [Optional]"
+);
+program.option(
+  "-x, --experimental <boolean>",
+  "If program should use fast method for encoding. NOT RECCOMENDED possible loss in quality and desync between audio and video [Optional]"
 );
 
 program.parse(process.argv);
@@ -90,6 +94,8 @@ let maxSize;
 let cutVideo;
 let organizeFiles;
 let skipAd;
+let experimental;
+let skipCutting;
 
 const getTime = () => {
   let date_ob = new Date();
@@ -199,10 +205,15 @@ const checkConfiguration = () => {
     } else {
       organizeFiles = true;
     }
-    if (options.ad == "false") {
+    if (options.skipAd == "false") {
       skipAd = false;
     } else {
       skipAd = true;
+    }
+    if (options.experimental == "true") {
+      experimental = true;
+    } else {
+      experimental = false;
     }
   } else {
     console.log("Missing argument -w or --windows");
@@ -226,6 +237,7 @@ async function startRecording() {
   console.log(`Cut silence: ${silence}`);
   console.log(`Organize: ${organizeFiles}`);
   console.log(`Skip ad: ${skipAd}`);
+  console.log(`Experimental encoding: ${experimental}`);
   console.log(`Max filesize: ${maxSize} \n`);
 
   const filename = randomstring.generate({
@@ -469,6 +481,7 @@ async function startRecording() {
   console.log("Fullscreening stream");
   await page.keyboard.press("f");
   const file = fs.createWriteStream(`./videos/${user}-${filename}.webm`);
+
   if (skipAd == true) {
     console.log("Waiting for 1 minute to avoid ads");
     await new Promise((resolve) => setTimeout(resolve, 60000));
@@ -517,14 +530,26 @@ async function startRecording() {
   );
   encoding_timer.start();
   printProgress("encoding");
-  if (windows == true) {
-    await nrc.run(
-      `ffmpeg.exe -i videos/${user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${user}-${filename}${fileExtenstion}`
-    );
+  if (experimental == true) {
+    if (windows == true) {
+      await nrc.run(
+        `ffmpeg.exe -i videos/${user}-${filename}.webm -c:v copy -c:a aac -strict experimental videos/${user}-${filename}${fileExtenstion}`
+      );
+    } else {
+      await nrc.run(
+        `ffmpeg.exe -i videos/${user}-${filename}.webm -c:v copy -c:a aac -strict experimental videos/${user}-${filename}${fileExtenstion}`
+      );
+    }
   } else {
-    await nrc.run(
-      `ffmpeg -i videos/${user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${user}-${filename}${fileExtenstion}`
-    );
+    if (windows == true) {
+      await nrc.run(
+        `ffmpeg.exe -i videos/${user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${user}-${filename}${fileExtenstion}`
+      );
+    } else {
+      await nrc.run(
+        `ffmpeg -i videos/${user}-${filename}.webm -threads ${threads} -r ${fps} -c:v libx264 -crf 20 -preset fast videos/${user}-${filename}${fileExtenstion}`
+      );
+    }
   }
   encoding_timer.stop();
   if (tempDelete == true) {
@@ -588,14 +613,26 @@ async function startRecording() {
             console.log(`Cutting ${end[d]} - ${start[d]}`);
             await new Promise((resolve) => setTimeout(resolve, 1000));
             let cut;
-            if (start[d] == 0) {
-              cut = await exec(
-                `ffmpeg -t 1 -i videos/${user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
-              );
+            if (experimental == true) {
+              if (start[d] == 0) {
+                cut = await exec(
+                  `ffmpeg -t 1 -i videos/${user}-${filename}${fileExtenstion} -r ${fps}  -c:v copy -ss ${end[d]} pieces/piece${d}.mp4`
+                );
+              } else {
+                cut = await exec(
+                  `ffmpeg -t ${start[d]} -i videos/${user}-${filename}${fileExtenstion}  -c:v copy -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
+                );
+              }
             } else {
-              cut = await exec(
-                `ffmpeg -t ${start[d]} -i videos/${user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
-              );
+              if (start[d] == 0) {
+                cut = await exec(
+                  `ffmpeg -t 1 -i videos/${user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
+                );
+              } else {
+                cut = await exec(
+                  `ffmpeg -t ${start[d]} -i videos/${user}-${filename}${fileExtenstion} -r ${fps} -ss ${end[d]} pieces/piece${d}.mp4`
+                );
+              }
             }
             cut.on("close", async function () {
               continueCutting = true;
@@ -628,6 +665,7 @@ async function startRecording() {
           });
         } else {
           console.log("Skipping all cuts since video has little to no silence");
+          skipCutting = true;
           await new Promise((resolve) => setTimeout(resolve, 5000));
           try {
             await fs.unlinkSync(`pieces.txt`);
@@ -644,12 +682,12 @@ async function startRecording() {
       await fs.mkdirSync(`./videos/${user}`);
     }
     let outputName;
-    if (silence == true) {
+    if (silence == true && skipCutting != true) {
       outputName = `${user}-${filename}-cut${fileExtenstion}`;
     } else {
       outputName = `${user}-${filename}${fileExtenstion}`;
     }
-    console.log(outputName);
+
     fs.rename(
       `./videos/${outputName}`,
       `./videos/${user}/${outputName}`,
