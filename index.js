@@ -279,12 +279,7 @@ function startRecording() {
                             height: 1080
                         },
                         ignoreDefaultArgs: ["--enable-automation"],
-                        args: [
-                            "--start-fullscreen",
-                            "--disable-infobars",
-                            "--no-sandbox",
-                            "--disable-setuid-sandbox",
-                        ]
+                        args: ["--start-fullscreen", "--disable-infobars"]
                     })];
                 case 3:
                     browser = _f.sent();
