@@ -12,14 +12,13 @@ Feel free to take as much as you want from this project and use it on your own. 
 
 # Features
 
-  - Record only audio
-  - Record only video
-  - Automatically cut out silence | Still work in progress as there still are some bugs needing to be fixed
-  - Set custom fps
-  - Record only certain categories
-  - Once done recording & encoding automatically wait for streamer to start streaming again
-  - Enable/Disable recording rerun streams
-
+- Record only audio
+- Record only video
+- Automatically cut out silence | Still work in progress as there still are some bugs needing to be fixed
+- Set custom fps
+- Record only certain categories
+- Once done recording & encoding automatically wait for streamer to start streaming again
+- Enable/Disable recording rerun streams
 
 # Required
 
@@ -47,6 +46,11 @@ $ node index.js --user pignuuuu --windows false --frames 32 --threads 4
 # To see all options run
 $ node index.js --help
 ```
+
+# Issues
+
+- `Running as root without --no-sandbox is not supported. `
+  - You can't run this program with root permissions without getting a bunch of weird problems. The recommended way of fixing this is to run your command without root permissions and make sure the user you have has full acces to delete, move & rename files. If you are insisting on running it with root. You could go into the sourcecode and add `"--no-sandbox" ` to the `args:` section. [See this for an explaination](https://developers.google.com/web/tools/puppeteer/troubleshooting#setting_up_chrome_linux_sandbox)
 
 # Extra
 
