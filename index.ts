@@ -310,7 +310,7 @@ async function startRecording() {
   stdout.write("[INFO] Waiting for page to load\n");
   await new Promise((resolve) => setTimeout(resolve, 5000));
 
-  const checkIfCorrect = async () => {
+  const clickChatButton = async () => {
     try {
       await Promise.all([
         await page.click(
@@ -320,7 +320,7 @@ async function startRecording() {
       stdout.write('[ACTION] Clicked "Chat" button\n');
     } catch (err) {}
   };
-  await checkIfCorrect();
+  await clickChatButton();
 
   stdout.write("[ACTION] Checking if streamer is live\n");
   if ((await checkIfLive()) == false) {
@@ -442,7 +442,7 @@ async function startRecording() {
       );
     }
   };
-  await checkIfCorrect();
+  await clickChatButton();
   while (
     (await checkIfLive()) == false ||
     (await checkContinueWithRerun()) == false ||

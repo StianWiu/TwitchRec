@@ -230,7 +230,7 @@ var checkConfiguration = function () {
 checkConfiguration();
 function startRecording() {
     return __awaiter(this, void 0, void 0, function () {
-        var filename, timer, recording_timer, encoding_timer, browser, page, originalUrl, checkIfUserExists, checkIfLive, checkIfRerun, checkIfCorrect, checkContinueWithRerun, checkCategory, checkFileSize, printProgress, _a, _b, _c, _d, err_1, file, stream, _e, removeSilence, organize;
+        var filename, timer, recording_timer, encoding_timer, browser, page, originalUrl, checkIfUserExists, checkIfLive, checkIfRerun, clickChatButton, checkContinueWithRerun, checkCategory, checkFileSize, printProgress, _a, _b, _c, _d, err_1, file, stream, _e, removeSilence, organize;
         var _this = this;
         return __generator(this, function (_f) {
             switch (_f.label) {
@@ -346,7 +346,7 @@ function startRecording() {
                     return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                 case 9:
                     _f.sent();
-                    checkIfCorrect = function () { return __awaiter(_this, void 0, void 0, function () {
+                    clickChatButton = function () { return __awaiter(_this, void 0, void 0, function () {
                         var _a, _b, err_2;
                         return __generator(this, function (_c) {
                             switch (_c.label) {
@@ -368,7 +368,7 @@ function startRecording() {
                             }
                         });
                     }); };
-                    return [4 /*yield*/, checkIfCorrect()];
+                    return [4 /*yield*/, clickChatButton()];
                 case 10:
                     _f.sent();
                     process_1.stdout.write("[ACTION] Checking if streamer is live\n");
@@ -549,7 +549,7 @@ function startRecording() {
                             }
                         });
                     }); };
-                    return [4 /*yield*/, checkIfCorrect()];
+                    return [4 /*yield*/, clickChatButton()];
                 case 12:
                     _f.sent();
                     _f.label = 13;
