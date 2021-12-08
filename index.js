@@ -69,6 +69,21 @@ var printLogo = function () {
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
 };
+var printRecording = function () {
+    console.log(logo({
+        name: "Pignuuu",
+        font: "Chunky",
+        lineChars: 10,
+        padding: 2,
+        margin: 3
+    })
+        .emptyLine()
+        .right("V2.0.1")
+        .left("" + user)
+        .emptyLine()
+        .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
+        .render());
+};
 printLogo();
 program.requiredOption("-u, --user <string>", "Twitch username");
 program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
@@ -88,13 +103,15 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
     var browser, page, checkIfUserExists, checkIfUserIsLive, checkIfStreamIsRerun, checkIfRecordRerun, clickChatButton, getFileSize, getFileSizeGb, recordingProgress, startRecording;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0: return [4 /*yield*/, puppeteer.launch({
-                    // headless: false,
-                    defaultViewport: {
-                        width: 1920,
-                        height: 1080
-                    }
-                })];
+            case 0:
+                process_1.stdout.write("\nLoading please wait...");
+                return [4 /*yield*/, puppeteer.launch({
+                        // headless: false,
+                        defaultViewport: {
+                            width: 1920,
+                            height: 1080
+                        }
+                    })];
             case 1:
                 browser = _a.sent();
                 return [4 /*yield*/, browser.newPage()];
@@ -294,7 +311,9 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                             case 10:
                                 _b.sent();
                                 _b.label = 11;
-                            case 11: return [4 /*yield*/, m3u8stream(link[0]).pipe(fs.createWriteStream("videos/" + user + "/" + user + "-" + filename + ".mp4"))];
+                            case 11:
+                                printRecording();
+                                return [4 /*yield*/, m3u8stream(link[0]).pipe(fs.createWriteStream("videos/" + user + "/" + user + "-" + filename + ".mp4"))];
                             case 12:
                                 _b.sent();
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
