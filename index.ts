@@ -32,7 +32,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.0.1")
+      .right("V2.1.0")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -124,6 +124,39 @@ const startProcess = async () => {
   };
   await clickChatButton();
 
+  const getFileSize = async () => {
+    var fileInfo = fs.statSync(`videos/${user}/${user}-${filename}.mp4`);
+    var fileSize = fileInfo.size;
+    return fileSize;
+  };
+  const getFileSizeGb = async () => {
+    var stats = fs.statSync(`videos/${user}/${user}-${filename}.mp4`);
+    var fileSizeInBytes = stats.size;
+    var fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
+    var fileSizeInGigabytes = fileSizeInMegabytes * 0.001;
+    return fileSizeInGigabytes.toString().substring(0, 6);
+  };
+  const recordingProgress = async () => {
+    console.clear();
+    console.log(
+      logo({
+        name: "Pignuuu",
+        font: "Chunky",
+        lineChars: 10,
+        padding: 2,
+        margin: 3,
+      })
+        .emptyLine()
+        .left(`User: ${user}`)
+        .emptyLine()
+        .left(`Filesize: ${await getFileSizeGb()} GB`)
+        .left(`Running for: ${timer.format("D:%d H:%h M:%m S:%s")}`)
+        .left(`Recording: ${recording_timer.format("D:%d H:%h M:%m S:%s")}`)
+        .left(`Rerun: ${await checkIfStreamIsRerun()}`)
+        .render()
+    );
+  };
+
   const startRecording = async () => {
     stdout.write("\n[INFO] Getting raw stream url");
     await page.goto(`https://pwn.sh/tools/getstream.html`);
@@ -148,6 +181,15 @@ const startProcess = async () => {
     await m3u8stream(link[0]).pipe(
       fs.createWriteStream(`videos/${user}/${user}-${filename}.mp4`)
     );
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+    recordingProgress();
+    var variableFileSize = await getFileSize();
+    await new Promise((resolve) => setTimeout(resolve, 30000));
+    while (variableFileSize != (await getFileSize())) {
+      variableFileSize = await getFileSize();
+      recordingProgress();
+      await new Promise((resolve) => setTimeout(resolve, 30000));
+    }
   };
 
   (async () => {
@@ -163,10 +205,22 @@ const startProcess = async () => {
         await new Promise((resolve) => setTimeout(resolve, 5000));
       }
       await startRecording();
+      await printLogo();
+      stdout.write(
+        `\n\nYour file is ready. File:./${user}/${user}-${filename}.mp4\n`
+      );
+      timer.stop();
+      stdout.write(
+        timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s\n")
+      );
+      stdout.write(
+        recording_timer.format("[INFO] Recorded for D:%d H:%h M:%m S:%s\n")
+      );
     } else {
       stdout.write("\n[INFO] User does not exist. Exiting");
       process.exit();
     }
   })();
 };
+
 startProcess();
