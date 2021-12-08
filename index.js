@@ -64,7 +64,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V2.0.0")
+        .right("V2.0.1")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -205,7 +205,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
-                                process_1.stdout.write("\nGetting raw stream url");
+                                process_1.stdout.write("\n[INFO] Getting raw stream url");
                                 return [4 /*yield*/, page.goto("https://pwn.sh/tools/getstream.html")];
                             case 1:
                                 _a.sent();
@@ -233,7 +233,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                             case 8:
                                 link = _a.sent();
                                 browser.close();
-                                process_1.stdout.write("\nRecording");
+                                process_1.stdout.write("\n[ACTION] Recording started");
                                 recording_timer.start();
                                 return [4 /*yield*/, fs.existsSync("./videos/" + user)];
                             case 9:
@@ -256,7 +256,8 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                             case 0: return [4 /*yield*/, checkIfUserExists()];
                             case 1:
                                 if (!_b.sent()) return [3 /*break*/, 9];
-                                process_1.stdout.write("\nUser exitsts");
+                                process_1.stdout.write("\n[INFO] User exists");
+                                process_1.stdout.write("\n[INFO] Recording will start when user goes live or starts a rerun.");
                                 _b.label = 2;
                             case 2: return [4 /*yield*/, checkIfUserIsLive()];
                             case 3:
@@ -277,7 +278,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 _b.sent();
                                 return [3 /*break*/, 10];
                             case 9:
-                                process_1.stdout.write("\nUser does not exist");
+                                process_1.stdout.write("\n[INFO] User does not exist. Exiting");
                                 process.exit();
                                 _b.label = 10;
                             case 10: return [2 /*return*/];
