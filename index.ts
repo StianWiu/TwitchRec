@@ -32,7 +32,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.0.0")
+      .right("V2.0.1")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -125,7 +125,7 @@ const startProcess = async () => {
   await clickChatButton();
 
   const startRecording = async () => {
-    stdout.write("\nGetting raw stream url");
+    stdout.write("\n[INFO] Getting raw stream url");
     await page.goto(`https://pwn.sh/tools/getstream.html`);
     await page.waitForSelector("#input-url");
     await page.click("#input-url");
@@ -140,7 +140,7 @@ const startProcess = async () => {
       )
     );
     browser.close();
-    stdout.write("\nRecording");
+    stdout.write("\n[ACTION] Recording started");
     recording_timer.start();
     if (!(await fs.existsSync(`./videos/${user}`))) {
       await fs.mkdirSync(`./videos/${user}`);
@@ -152,7 +152,10 @@ const startProcess = async () => {
 
   (async () => {
     if (await checkIfUserExists()) {
-      stdout.write("\nUser exitsts");
+      stdout.write("\n[INFO] User exists");
+      stdout.write(
+        "\n[INFO] Recording will start when user goes live or starts a rerun."
+      );
       while (
         (await checkIfUserIsLive()) == false ||
         (await checkIfRecordRerun()) == false
@@ -161,7 +164,7 @@ const startProcess = async () => {
       }
       await startRecording();
     } else {
-      stdout.write("\nUser does not exist");
+      stdout.write("\n[INFO] User does not exist. Exiting");
       process.exit();
     }
   })();
