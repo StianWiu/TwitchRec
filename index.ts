@@ -40,6 +40,27 @@ const printLogo = () => {
       .render()
   );
 };
+
+const printRecording = () => {
+  console.log(
+    logo({
+      name: "Pignuuu",
+      font: "Chunky",
+      lineChars: 10,
+      padding: 2,
+      margin: 3,
+    })
+      .emptyLine()
+      .right("V2.0.1")
+      .left(`${user}`)
+      .emptyLine()
+      .center(
+        'Twitch recording software. Developed by Pignuuu. "--help" for options'
+      )
+      .render()
+  );
+};
+
 printLogo();
 program.requiredOption("-u, --user <string>", "Twitch username");
 program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
@@ -58,6 +79,7 @@ const checkConfiguration = () => {
 checkConfiguration();
 
 const startProcess = async () => {
+  stdout.write("\nLoading please wait...");
   const browser = await puppeteer.launch({
     // headless: false,
     defaultViewport: {
@@ -145,6 +167,7 @@ const startProcess = async () => {
     if (!(await fs.existsSync(`./videos/${user}`))) {
       await fs.mkdirSync(`./videos/${user}`);
     }
+    printRecording();
     await m3u8stream(link[0]).pipe(
       fs.createWriteStream(`videos/${user}/${user}-${filename}.mp4`)
     );
