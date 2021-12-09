@@ -16,8 +16,8 @@ Feel free to take as much as you want from this project and use it on your own. 
 - Record only video [NOT AVALIABLE CURRENTLY]
 - Automatically cut out silence | Still work in progress as there still are some bugs needing to be fixed [NOT AVALIABLE CURRENTLY]
 - Set custom fps [NOT AVALIABLE CURRENTLY]
-- Record only certain categories [NOT AVALIABLE CURRENTLY]
-- Once done recording & encoding automatically wait for streamer to start streaming again
+- Record only certain categories
+- Once done recording automatically wait for streamer to start streaming again [NOT AVALIABLE CURRENTLY]
 - Enable/Disable recording rerun streams
 
 # Required
