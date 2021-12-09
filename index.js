@@ -65,7 +65,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V2.2.0")
+        .right("V2.2.1")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .render());
@@ -79,7 +79,7 @@ var printRecording = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V2.2.0")
+        .right("V2.2.1")
         .left("" + user)
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
@@ -115,6 +115,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                 process_1.stdout.write("\nLoading please wait...");
                 return [4 /*yield*/, puppeteer.launch({
                         headless: false,
+                        args: ["--no-sandbox"],
                         defaultViewport: {
                             width: 1920,
                             height: 1080

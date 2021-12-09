@@ -33,7 +33,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.2.0")
+      .right("V2.2.1")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -52,7 +52,7 @@ const printRecording = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.2.0")
+      .right("V2.2.1")
       .left(`${user}`)
       .emptyLine()
       .center(
@@ -87,11 +87,11 @@ const checkConfiguration = () => {
   }
 };
 checkConfiguration();
-
 const startProcess = async () => {
   stdout.write("\nLoading please wait...");
   const browser = await puppeteer.launch({
     headless: false,
+    args: ["--no-sandbox"],
     defaultViewport: {
       width: 1920,
       height: 1080,
