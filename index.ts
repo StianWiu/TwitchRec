@@ -90,7 +90,7 @@ checkConfiguration();
 const startProcess = async () => {
   stdout.write("\nLoading please wait...");
   const browser = await puppeteer.launch({
-    headless: false,
+    // headless: false,
     args: ["--no-sandbox"],
     defaultViewport: {
       width: 1920,

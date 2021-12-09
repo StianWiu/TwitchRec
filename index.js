@@ -114,7 +114,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
             case 0:
                 process_1.stdout.write("\nLoading please wait...");
                 return [4 /*yield*/, puppeteer.launch({
-                        headless: false,
+                        // headless: false,
                         args: ["--no-sandbox"],
                         defaultViewport: {
                             width: 1920,
