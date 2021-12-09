@@ -17,6 +17,7 @@ const program = new Command();
 
 let user;
 let rerunEnable;
+let category;
 
 const timer = new Timer({ label: "main-timer" });
 const recording_timer = new Timer({ label: "recording-timer" });
@@ -32,7 +33,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.1.0")
+      .right("V2.2.0")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -51,7 +52,7 @@ const printRecording = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.0.1")
+      .right("V2.2.0")
       .left(`${user}`)
       .emptyLine()
       .center(
@@ -64,6 +65,10 @@ const printRecording = () => {
 printLogo();
 program.requiredOption("-u, --user <string>", "Twitch username");
 program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
+program.option(
+  "-c, --category <string>",
+  "Only record certain category [Optional]"
+);
 
 program.parse(process.argv);
 const options = program.opts();
@@ -75,13 +80,18 @@ const checkConfiguration = () => {
   } else {
     rerunEnable = true;
   }
+  if (options.category) {
+    category = options.category.toLowerCase();
+  } else {
+    category = undefined;
+  }
 };
 checkConfiguration();
 
 const startProcess = async () => {
   stdout.write("\nLoading please wait...");
   const browser = await puppeteer.launch({
-    // headless: false,
+    headless: false,
     defaultViewport: {
       width: 1920,
       height: 1080,
@@ -151,6 +161,7 @@ const startProcess = async () => {
     var fileSize = fileInfo.size;
     return fileSize;
   };
+
   const getFileSizeGb = async () => {
     var stats = fs.statSync(`videos/${user}/${user}-${filename}.mp4`);
     var fileSizeInBytes = stats.size;
@@ -158,6 +169,37 @@ const startProcess = async () => {
     var fileSizeInGigabytes = fileSizeInMegabytes * 0.001;
     return fileSizeInGigabytes.toString().substring(0, 6);
   };
+
+  const checkCategory = async () => {
+    if (category == undefined) {
+      return true;
+    }
+    let value1;
+    let value2;
+    try {
+      let element1 = await page.$(
+        "#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMexhI > div.Layout-sc-nxg1ff-0.dglwHV > div.Layout-sc-nxg1ff-0.kBOtQI > div > div:nth-child(2) > div > div > div.Layout-sc-nxg1ff-0.ftYIWt > a > span"
+      );
+      value1 = await page.evaluate((el) => el.textContent, element1);
+      value1 = value1.toLowerCase();
+    } catch (err) {}
+    if (value1 == category) {
+      return true;
+    }
+    try {
+      let element2 = await page.$(
+        "#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div.Layout-sc-nxg1ff-0.hMFNaU.metadata-layout__split-top > div.Layout-sc-nxg1ff-0 > div > div > div > div > div > a > span"
+      );
+      value2 = await page.evaluate((el) => el.textContent, element2);
+      value2 = value2.toLowerCase();
+    } catch (err) {}
+    if (value2 == category) {
+      return true;
+    } else {
+      return false;
+    }
+  };
+
   const recordingProgress = async () => {
     console.clear();
     console.log(
@@ -194,14 +236,14 @@ const startProcess = async () => {
         (a) => a.getAttribute("href")
       )
     );
-    browser.close();
+    await page.goto(`https://www.twitch.tv/${user}`);
     stdout.write("\n[ACTION] Recording started");
     recording_timer.start();
     if (!(await fs.existsSync(`./videos/${user}`))) {
       await fs.mkdirSync(`./videos/${user}`);
     }
     printRecording();
-    await m3u8stream(link[0]).pipe(
+    const stream = await m3u8stream(link[0]).pipe(
       fs.createWriteStream(`videos/${user}/${user}-${filename}.mp4`)
     );
     await new Promise((resolve) => setTimeout(resolve, 5000));
@@ -211,6 +253,9 @@ const startProcess = async () => {
     while (variableFileSize != (await getFileSize())) {
       variableFileSize = await getFileSize();
       recordingProgress();
+      if ((await checkCategory()) == false) {
+        stream.end();
+      }
       await new Promise((resolve) => setTimeout(resolve, 30000));
     }
   };
@@ -223,7 +268,8 @@ const startProcess = async () => {
       );
       while (
         (await checkIfUserIsLive()) == false ||
-        (await checkIfRecordRerun()) == false
+        (await checkIfRecordRerun()) == false ||
+        (await checkCategory()) == false
       ) {
         await new Promise((resolve) => setTimeout(resolve, 5000));
       }
@@ -239,6 +285,7 @@ const startProcess = async () => {
       stdout.write(
         recording_timer.format("[INFO] Recorded for D:%d H:%h M:%m S:%s\n")
       );
+      process.exit();
     } else {
       stdout.write("\n[INFO] User does not exist. Exiting");
       process.exit();
