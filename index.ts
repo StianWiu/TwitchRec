@@ -34,7 +34,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.3.0")
+      .right("V2.3.1")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -246,7 +246,7 @@ const startProcess = async () => {
       if ((await checkCategory()) == false) {
         stream.end();
       }
-      if ((await getFileSize()) > maxSize || !maxSize == undefined) {
+      if ((await getFileSize()) > maxSize && !maxSize == undefined) {
         stdout.write("\n[INFO] Max file size reached");
         stream.end();
       }

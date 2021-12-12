@@ -66,7 +66,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V2.3.0")
+        .right("V2.3.1")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .center("https://stianwiu.me")
@@ -400,7 +400,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 }
                                 return [4 /*yield*/, getFileSize()];
                             case 21:
-                                if ((_b.sent()) > maxSize || !maxSize == undefined) {
+                                if ((_b.sent()) > maxSize && !maxSize == undefined) {
                                     process_1.stdout.write("\n[INFO] Max file size reached");
                                     stream.end();
                                 }
