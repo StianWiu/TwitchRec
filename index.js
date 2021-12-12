@@ -53,42 +53,30 @@ var program = new commander_1.Command();
 var user;
 var rerunEnable;
 var category;
+var maxSize;
 var timer = new timer_node_1.Timer({ label: "main-timer" });
 var recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
 timer.start();
 var printLogo = function () {
     console.log(logo({
-        name: "Pignuuu",
+        name: "TwitchRec",
         font: "Chunky",
         lineChars: 10,
         padding: 2,
         margin: 3
     })
         .emptyLine()
-        .right("V2.2.1")
+        .right("V2.3.0")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
-        .render());
-};
-var printRecording = function () {
-    console.log(logo({
-        name: "Pignuuu",
-        font: "Chunky",
-        lineChars: 10,
-        padding: 2,
-        margin: 3
-    })
-        .emptyLine()
-        .right("V2.2.1")
-        .left("" + user)
-        .emptyLine()
-        .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
+        .center("https://stianwiu.me")
         .render());
 };
 printLogo();
 program.requiredOption("-u, --user <string>", "Twitch username");
 program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
 program.option("-c, --category <string>", "Only record certain category [Optional]");
+program.option("-m, --max <num>", "How many GB file can become [Optional]");
 program.parse(process.argv);
 var options = program.opts();
 var checkConfiguration = function () {
@@ -104,6 +92,12 @@ var checkConfiguration = function () {
     }
     else {
         category = undefined;
+    }
+    if (options.max) {
+        maxSize = Number(options.max);
+    }
+    else {
+        maxSize = undefined;
     }
 };
 checkConfiguration();
@@ -303,7 +297,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 console.clear();
                                 _b = (_a = console).log;
                                 _e = (_d = logo({
-                                    name: "Pignuuu",
+                                    name: "TwitchRec",
                                     font: "Chunky",
                                     lineChars: 10,
                                     padding: 2,
@@ -324,6 +318,9 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, checkIfStreamIsRerun()];
                             case 2:
                                 _b.apply(_a, [_g.apply(_c, [_h + (_j.sent())])
+                                        .emptyLine()
+                                        .center("Twitch recording software. Developed by Pignuuu.")
+                                        .center("https://stianwiu.me")
                                         .render()]);
                                 return [2 /*return*/];
                         }
@@ -373,9 +370,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                             case 11:
                                 _b.sent();
                                 _b.label = 12;
-                            case 12:
-                                printRecording();
-                                return [4 /*yield*/, m3u8stream(link[0]).pipe(fs.createWriteStream("videos/" + user + "/" + user + "-" + filename + ".mp4"))];
+                            case 12: return [4 /*yield*/, m3u8stream(link[0]).pipe(fs.createWriteStream("videos/" + user + "/" + user + "-" + filename + ".mp4"))];
                             case 13:
                                 stream = _b.sent();
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
@@ -393,7 +388,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 _a = variableFileSize;
                                 return [4 /*yield*/, getFileSize()];
                             case 18:
-                                if (!(_a != (_b.sent()))) return [3 /*break*/, 22];
+                                if (!(_a != (_b.sent()))) return [3 /*break*/, 23];
                                 return [4 /*yield*/, getFileSize()];
                             case 19:
                                 variableFileSize = _b.sent();
@@ -403,62 +398,73 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 if ((_b.sent()) == false) {
                                     stream.end();
                                 }
-                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 30000); })];
+                                return [4 /*yield*/, getFileSize()];
                             case 21:
+                                if ((_b.sent()) > maxSize || !maxSize == undefined) {
+                                    process_1.stdout.write("\n[INFO] Max file size reached");
+                                    stream.end();
+                                }
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 30000); })];
+                            case 22:
                                 _b.sent();
                                 return [3 /*break*/, 17];
-                            case 22: return [2 /*return*/];
+                            case 23: return [2 /*return*/];
                         }
                     });
                 }); };
                 (function () { return __awaiter(void 0, void 0, void 0, function () {
-                    var _a, _b;
-                    return __generator(this, function (_c) {
-                        switch (_c.label) {
+                    var _a, _b, _c, _d, _e;
+                    return __generator(this, function (_f) {
+                        switch (_f.label) {
                             case 0: return [4 /*yield*/, checkIfUserExists()];
                             case 1:
-                                if (!_c.sent()) return [3 /*break*/, 12];
+                                if (!_f.sent()) return [3 /*break*/, 13];
                                 process_1.stdout.write("\n[INFO] User exists");
                                 process_1.stdout.write("\n[INFO] Recording will start when user goes live or starts a rerun.");
-                                _c.label = 2;
+                                _f.label = 2;
                             case 2: return [4 /*yield*/, checkIfUserIsLive()];
                             case 3:
-                                _b = (_c.sent()) == false;
+                                _b = (_f.sent()) == false;
                                 if (_b) return [3 /*break*/, 5];
                                 return [4 /*yield*/, checkIfRecordRerun()];
                             case 4:
-                                _b = (_c.sent()) == false;
-                                _c.label = 5;
+                                _b = (_f.sent()) == false;
+                                _f.label = 5;
                             case 5:
                                 _a = _b;
                                 if (_a) return [3 /*break*/, 7];
                                 return [4 /*yield*/, checkCategory()];
                             case 6:
-                                _a = (_c.sent()) == false;
-                                _c.label = 7;
+                                _a = (_f.sent()) == false;
+                                _f.label = 7;
                             case 7:
                                 if (!_a) return [3 /*break*/, 9];
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                             case 8:
-                                _c.sent();
+                                _f.sent();
                                 return [3 /*break*/, 2];
                             case 9: return [4 /*yield*/, startRecording()];
                             case 10:
-                                _c.sent();
+                                _f.sent();
                                 return [4 /*yield*/, printLogo()];
                             case 11:
-                                _c.sent();
-                                process_1.stdout.write("\n\nYour file is ready. File:./" + user + "/" + user + "-" + filename + ".mp4\n");
+                                _f.sent();
+                                process_1.stdout.write("\n\n[INFO] Your file is ready. File:./" + user + "/" + user + "-" + filename + ".mp4\n");
                                 timer.stop();
+                                _d = (_c = process_1.stdout).write;
+                                _e = "[INFO] Final file size:";
+                                return [4 /*yield*/, getFileSize()];
+                            case 12:
+                                _d.apply(_c, [_e + (_f.sent()) + " GB\n"]);
                                 process_1.stdout.write(timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s\n"));
                                 process_1.stdout.write(recording_timer.format("[INFO] Recorded for D:%d H:%h M:%m S:%s\n"));
                                 process.exit();
-                                return [3 /*break*/, 13];
-                            case 12:
+                                return [3 /*break*/, 14];
+                            case 13:
                                 process_1.stdout.write("\n[INFO] User does not exist. Exiting");
                                 process.exit();
-                                _c.label = 13;
-                            case 13: return [2 /*return*/];
+                                _f.label = 14;
+                            case 14: return [2 /*return*/];
                         }
                     });
                 }); })();

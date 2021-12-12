@@ -18,6 +18,7 @@ const program = new Command();
 let user;
 let rerunEnable;
 let category;
+let maxSize;
 
 const timer = new Timer({ label: "main-timer" });
 const recording_timer = new Timer({ label: "recording-timer" });
@@ -26,38 +27,19 @@ timer.start();
 const printLogo = () => {
   console.log(
     logo({
-      name: "Pignuuu",
+      name: "TwitchRec",
       font: "Chunky",
       lineChars: 10,
       padding: 2,
       margin: 3,
     })
       .emptyLine()
-      .right("V2.2.1")
+      .right("V2.3.0")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
       )
-      .render()
-  );
-};
-
-const printRecording = () => {
-  console.log(
-    logo({
-      name: "Pignuuu",
-      font: "Chunky",
-      lineChars: 10,
-      padding: 2,
-      margin: 3,
-    })
-      .emptyLine()
-      .right("V2.2.1")
-      .left(`${user}`)
-      .emptyLine()
-      .center(
-        'Twitch recording software. Developed by Pignuuu. "--help" for options'
-      )
+      .center("https://stianwiu.me")
       .render()
   );
 };
@@ -69,6 +51,7 @@ program.option(
   "-c, --category <string>",
   "Only record certain category [Optional]"
 );
+program.option("-m, --max <num>", "How many GB file can become [Optional]");
 
 program.parse(process.argv);
 const options = program.opts();
@@ -84,6 +67,11 @@ const checkConfiguration = () => {
     category = options.category.toLowerCase();
   } else {
     category = undefined;
+  }
+  if (options.max) {
+    maxSize = Number(options.max);
+  } else {
+    maxSize = undefined;
   }
 };
 checkConfiguration();
@@ -204,7 +192,7 @@ const startProcess = async () => {
     console.clear();
     console.log(
       logo({
-        name: "Pignuuu",
+        name: "TwitchRec",
         font: "Chunky",
         lineChars: 10,
         padding: 2,
@@ -217,6 +205,9 @@ const startProcess = async () => {
         .left(`Running for: ${timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Recording: ${recording_timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Rerun: ${await checkIfStreamIsRerun()}`)
+        .emptyLine()
+        .center("Twitch recording software. Developed by Pignuuu.")
+        .center("https://stianwiu.me")
         .render()
     );
   };
@@ -242,7 +233,6 @@ const startProcess = async () => {
     if (!(await fs.existsSync(`./videos/${user}`))) {
       await fs.mkdirSync(`./videos/${user}`);
     }
-    printRecording();
     const stream = await m3u8stream(link[0]).pipe(
       fs.createWriteStream(`videos/${user}/${user}-${filename}.mp4`)
     );
@@ -254,6 +244,10 @@ const startProcess = async () => {
       variableFileSize = await getFileSize();
       recordingProgress();
       if ((await checkCategory()) == false) {
+        stream.end();
+      }
+      if ((await getFileSize()) > maxSize || !maxSize == undefined) {
+        stdout.write("\n[INFO] Max file size reached");
         stream.end();
       }
       await new Promise((resolve) => setTimeout(resolve, 30000));
@@ -276,9 +270,10 @@ const startProcess = async () => {
       await startRecording();
       await printLogo();
       stdout.write(
-        `\n\nYour file is ready. File:./${user}/${user}-${filename}.mp4\n`
+        `\n\n[INFO] Your file is ready. File:./${user}/${user}-${filename}.mp4\n`
       );
       timer.stop();
+      stdout.write("[INFO] Final file size:" + (await getFileSize()) + " GB\n");
       stdout.write(
         timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s\n")
       );
