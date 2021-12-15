@@ -66,7 +66,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V2.3.1")
+        .right("V2.3.2")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .center("https://stianwiu.me")
@@ -327,88 +327,91 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     });
                 }); };
                 startRecording = function () { return __awaiter(void 0, void 0, void 0, function () {
-                    var link, stream, variableFileSize, _a;
+                    var page1, link, stream, variableFileSize, _a;
                     return __generator(this, function (_b) {
                         switch (_b.label) {
                             case 0:
                                 process_1.stdout.write("\n[INFO] Getting raw stream url");
-                                return [4 /*yield*/, page.goto("https://pwn.sh/tools/getstream.html")];
+                                return [4 /*yield*/, browser.newPage()];
                             case 1:
-                                _b.sent();
-                                return [4 /*yield*/, page.waitForSelector("#input-url")];
+                                page1 = _b.sent();
+                                return [4 /*yield*/, page1.goto("https://pwn.sh/tools/getstream.html")];
                             case 2:
                                 _b.sent();
-                                return [4 /*yield*/, page.click("#input-url")];
+                                return [4 /*yield*/, page1.waitForSelector("#input-url")];
                             case 3:
                                 _b.sent();
-                                return [4 /*yield*/, page.keyboard.type("twitch.tv/" + options.user)];
+                                return [4 /*yield*/, page1.click("#input-url")];
                             case 4:
                                 _b.sent();
-                                return [4 /*yield*/, page.waitForSelector("#go")];
+                                return [4 /*yield*/, page1.keyboard.type("twitch.tv/" + options.user)];
                             case 5:
                                 _b.sent();
-                                return [4 /*yield*/, page.click("#go")];
+                                return [4 /*yield*/, page1.waitForSelector("#go")];
                             case 6:
                                 _b.sent();
-                                return [4 /*yield*/, page.waitForSelector("#alert_result > a:nth-child(1)")];
+                                return [4 /*yield*/, page1.click("#go")];
                             case 7:
                                 _b.sent();
-                                return [4 /*yield*/, page.evaluate(function () {
+                                return [4 /*yield*/, page1.waitForSelector("#alert_result > a:nth-child(1)")];
+                            case 8:
+                                _b.sent();
+                                return [4 /*yield*/, page1.evaluate(function () {
                                         return Array.from(document.querySelectorAll("#alert_result > a:nth-child(1)"), function (a) { return a.getAttribute("href"); });
                                     })];
-                            case 8:
-                                link = _b.sent();
-                                return [4 /*yield*/, page.goto("https://www.twitch.tv/" + user)];
                             case 9:
+                                link = _b.sent();
+                                return [4 /*yield*/, page1.close()];
+                            case 10:
                                 _b.sent();
                                 process_1.stdout.write("\n[ACTION] Recording started");
                                 recording_timer.start();
                                 return [4 /*yield*/, fs.existsSync("./videos/" + user)];
-                            case 10:
-                                if (!!(_b.sent())) return [3 /*break*/, 12];
-                                return [4 /*yield*/, fs.mkdirSync("./videos/" + user)];
                             case 11:
+                                if (!!(_b.sent())) return [3 /*break*/, 13];
+                                return [4 /*yield*/, fs.mkdirSync("./videos/" + user)];
+                            case 12:
                                 _b.sent();
-                                _b.label = 12;
-                            case 12: return [4 /*yield*/, m3u8stream(link[0]).pipe(fs.createWriteStream("videos/" + user + "/" + user + "-" + filename + ".mp4"))];
-                            case 13:
+                                _b.label = 13;
+                            case 13: return [4 /*yield*/, m3u8stream(link[0]).pipe(fs.createWriteStream("videos/" + user + "/" + user + "-" + filename + ".mp4"))];
+                            case 14:
                                 stream = _b.sent();
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-                            case 14:
+                            case 15:
                                 _b.sent();
                                 recordingProgress();
                                 return [4 /*yield*/, getFileSize()];
-                            case 15:
+                            case 16:
                                 variableFileSize = _b.sent();
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 30000); })];
-                            case 16:
-                                _b.sent();
-                                _b.label = 17;
                             case 17:
+                                _b.sent();
+                                _b.label = 18;
+                            case 18:
                                 _a = variableFileSize;
                                 return [4 /*yield*/, getFileSize()];
-                            case 18:
-                                if (!(_a != (_b.sent()))) return [3 /*break*/, 23];
-                                return [4 /*yield*/, getFileSize()];
                             case 19:
+                                if (!(_a != (_b.sent()))) return [3 /*break*/, 24];
+                                return [4 /*yield*/, getFileSize()];
+                            case 20:
                                 variableFileSize = _b.sent();
                                 recordingProgress();
                                 return [4 /*yield*/, checkCategory()];
-                            case 20:
+                            case 21:
                                 if ((_b.sent()) == false) {
                                     stream.end();
                                 }
-                                return [4 /*yield*/, getFileSize()];
-                            case 21:
-                                if ((_b.sent()) > maxSize && !maxSize == undefined) {
-                                    process_1.stdout.write("\n[INFO] Max file size reached");
+                                return [4 /*yield*/, getFileSizeGb()];
+                            case 22:
+                                if ((_b.sent()) > maxSize && maxSize != undefined) {
                                     stream.end();
+                                    console.log("[INFO] Max file size reached");
                                 }
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 30000); })];
-                            case 22:
+                            case 23:
                                 _b.sent();
-                                return [3 /*break*/, 17];
-                            case 23: return [2 /*return*/];
+                                return [3 /*break*/, 18];
+                            case 24: return [2 /*return*/];
                         }
                     });
                 }); };
@@ -453,7 +456,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 timer.stop();
                                 _d = (_c = process_1.stdout).write;
                                 _e = "[INFO] Final file size:";
-                                return [4 /*yield*/, getFileSize()];
+                                return [4 /*yield*/, getFileSizeGb()];
                             case 12:
                                 _d.apply(_c, [_e + (_f.sent()) + " GB\n"]);
                                 process_1.stdout.write(timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s\n"));

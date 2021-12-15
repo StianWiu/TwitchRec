@@ -34,7 +34,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.3.1")
+      .right("V2.3.2")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -214,20 +214,21 @@ const startProcess = async () => {
 
   const startRecording = async () => {
     stdout.write("\n[INFO] Getting raw stream url");
-    await page.goto(`https://pwn.sh/tools/getstream.html`);
-    await page.waitForSelector("#input-url");
-    await page.click("#input-url");
-    await page.keyboard.type(`twitch.tv/${options.user}`);
-    await page.waitForSelector("#go");
-    await page.click("#go");
-    await page.waitForSelector("#alert_result > a:nth-child(1)");
-    const link = await page.evaluate(() =>
+    const page1 = await browser.newPage(); // open new tab
+    await page1.goto("https://pwn.sh/tools/getstream.html");
+    await page1.waitForSelector("#input-url");
+    await page1.click("#input-url");
+    await page1.keyboard.type(`twitch.tv/${options.user}`);
+    await page1.waitForSelector("#go");
+    await page1.click("#go");
+    await page1.waitForSelector("#alert_result > a:nth-child(1)");
+    const link = await page1.evaluate(() =>
       Array.from(
         document.querySelectorAll("#alert_result > a:nth-child(1)"),
         (a) => a.getAttribute("href")
       )
     );
-    await page.goto(`https://www.twitch.tv/${user}`);
+    await page1.close();
     stdout.write("\n[ACTION] Recording started");
     recording_timer.start();
     if (!(await fs.existsSync(`./videos/${user}`))) {
@@ -246,9 +247,9 @@ const startProcess = async () => {
       if ((await checkCategory()) == false) {
         stream.end();
       }
-      if ((await getFileSize()) > maxSize && !maxSize == undefined) {
-        stdout.write("\n[INFO] Max file size reached");
+      if ((await getFileSizeGb()) > maxSize && maxSize != undefined) {
         stream.end();
+        console.log("[INFO] Max file size reached");
       }
       await new Promise((resolve) => setTimeout(resolve, 30000));
     }
@@ -273,7 +274,9 @@ const startProcess = async () => {
         `\n\n[INFO] Your file is ready. File:./${user}/${user}-${filename}.mp4\n`
       );
       timer.stop();
-      stdout.write("[INFO] Final file size:" + (await getFileSize()) + " GB\n");
+      stdout.write(
+        "[INFO] Final file size:" + (await getFileSizeGb()) + " GB\n"
+      );
       stdout.write(
         timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s\n")
       );
