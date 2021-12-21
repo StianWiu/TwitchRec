@@ -1,6 +1,6 @@
 {
   "name": "twitchrec",
-  "version": "2.3.2",
+  "version": "2.3.3",
   "description": "TwitchRec",
   "main": "index.js",
   "scripts": {
@@ -27,8 +27,10 @@
   "dependencies": {
     "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "asciiart-logo": "^0.2.6",
+    "bug-killer": "^4.4.4",
     "cli-spinner": "^0.2.10",
     "commander": "^8.2.0",
+    "logger": "^0.0.1",
     "m3u8-to-mp4": "^1.0.0",
     "m3u8stream": "^0.8.4",
     "node-run-cmd": "^1.0.1",

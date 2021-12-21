@@ -42,13 +42,48 @@ var puppeteer = require("puppeteer");
 var m3u8stream = require("m3u8stream");
 var randomstring = require("randomstring");
 var logo = require("asciiart-logo");
+var Logger = require("bug-killer");
+// Set configuration for Logger(bug-killer) node module
+// Set configuration for Logger(bug-killer) node module
+Logger.config = {
+    // The error type
+    error: {
+        color: [192, 57, 43],
+        text: "error",
+        level: 1
+    },
+    // The warning type
+    warn: {
+        color: [241, 196, 15],
+        text: "warn ",
+        level: 2
+    },
+    // The info type
+    info: {
+        color: [52, 152, 219],
+        text: "info ",
+        level: 3
+    },
+    action: {
+        color: [88, 232, 95],
+        text: "action ",
+        level: 3
+    },
+    // Display date
+    date: false,
+    // Log level
+    level: 4,
+    // Output stream
+    stream: process.stdout,
+    // The options passed to `util.inspect`
+    inspectOptions: { colors: true }
+};
 var filename = randomstring.generate({
     length: 10,
     charset: "hex"
 });
 var commander_1 = require("commander");
 var timer_node_1 = require("timer-node");
-var process_1 = require("process");
 var program = new commander_1.Command();
 var user;
 var rerunEnable;
@@ -106,7 +141,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
-                process_1.stdout.write("\nLoading please wait...");
+                Logger.log("Loading please wait...", "info");
                 return [4 /*yield*/, puppeteer.launch({
                         // headless: false,
                         args: ["--no-sandbox"],
@@ -208,7 +243,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP > div.channel-root__info.channel-root__info--offline.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.bPMozh.home-header-sticky > div.Layout-sc-nxg1ff-0.Bza-dv > div > div > ul > li:nth-child(5) > a > div > div.ScTextWrapper-sc-18v7095-1.eFGtCR > div")];
                             case 2:
                                 _a.sent();
-                                process_1.stdout.write('[ACTION] Clicked "Chat" button\n');
+                                Logger.log("Clicked 'Chat' button", "action");
                                 return [3 /*break*/, 4];
                             case 3:
                                 err_1 = _a.sent();
@@ -331,7 +366,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     return __generator(this, function (_b) {
                         switch (_b.label) {
                             case 0:
-                                process_1.stdout.write("\n[INFO] Getting raw stream url");
+                                Logger.log("Getting raw stream url", "info");
                                 return [4 /*yield*/, browser.newPage()];
                             case 1:
                                 page1 = _b.sent();
@@ -364,7 +399,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, page1.close()];
                             case 10:
                                 _b.sent();
-                                process_1.stdout.write("\n[ACTION] Recording started");
+                                Logger.log("Recording started", "action");
                                 recording_timer.start();
                                 return [4 /*yield*/, fs.existsSync("./videos/" + user)];
                             case 11:
@@ -405,7 +440,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                             case 22:
                                 if ((_b.sent()) > maxSize && maxSize != undefined) {
                                     stream.end();
-                                    console.log("[INFO] Max file size reached");
+                                    Logger.log("Max file size reached", "info");
                                 }
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 30000); })];
                             case 23:
@@ -422,8 +457,8 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                             case 0: return [4 /*yield*/, checkIfUserExists()];
                             case 1:
                                 if (!_f.sent()) return [3 /*break*/, 13];
-                                process_1.stdout.write("\n[INFO] User exists");
-                                process_1.stdout.write("\n[INFO] Recording will start when user goes live or starts a rerun.");
+                                Logger.log("User exists", "info");
+                                Logger.log("Recording will start when user goes live or starts a rerun", "info");
                                 _f.label = 2;
                             case 2: return [4 /*yield*/, checkIfUserIsLive()];
                             case 3:
@@ -452,19 +487,19 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, printLogo()];
                             case 11:
                                 _f.sent();
-                                process_1.stdout.write("\n\n[INFO] Your file is ready. File:./" + user + "/" + user + "-" + filename + ".mp4\n");
+                                Logger.log("Your file is ready. FIle ./" + user + "/" + user + "-" + filename + ".mp4", "info");
                                 timer.stop();
-                                _d = (_c = process_1.stdout).write;
-                                _e = "[INFO] Final file size:";
+                                _d = (_c = Logger).log;
+                                _e = "Final file size: ";
                                 return [4 /*yield*/, getFileSizeGb()];
                             case 12:
-                                _d.apply(_c, [_e + (_f.sent()) + " GB\n"]);
-                                process_1.stdout.write(timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s\n"));
-                                process_1.stdout.write(recording_timer.format("[INFO] Recorded for D:%d H:%h M:%m S:%s\n"));
+                                _d.apply(_c, [_e + (_f.sent()) + " GB", "info"]);
+                                Logger.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"), "info");
+                                Logger.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"), "info");
                                 process.exit();
                                 return [3 /*break*/, 14];
                             case 13:
-                                process_1.stdout.write("\n[INFO] User does not exist. Exiting");
+                                Logger.log("User does not exist", "action");
                                 process.exit();
                                 _f.label = 14;
                             case 14: return [2 /*return*/];

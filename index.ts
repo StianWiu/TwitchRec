@@ -5,6 +5,43 @@ const puppeteer = require("puppeteer");
 const m3u8stream = require("m3u8stream");
 const randomstring = require("randomstring");
 const logo = require("asciiart-logo");
+const Logger = require("bug-killer");
+
+// Set configuration for Logger(bug-killer) node module
+// Set configuration for Logger(bug-killer) node module
+Logger.config = {
+  // The error type
+  error: {
+    color: [192, 57, 43],
+    text: "error",
+    level: 1,
+  },
+  // The warning type
+  warn: {
+    color: [241, 196, 15],
+    text: "warn ",
+    level: 2,
+  },
+  // The info type
+  info: {
+    color: [52, 152, 219],
+    text: "info ",
+    level: 3,
+  },
+  action: {
+    color: [88, 232, 95],
+    text: "action ",
+    level: 3,
+  },
+  // Display date
+  date: false,
+  // Log level
+  level: 4,
+  // Output stream
+  stream: process.stdout,
+  // The options passed to `util.inspect`
+  inspectOptions: { colors: true },
+};
 
 const filename = randomstring.generate({
   length: 10,
@@ -12,7 +49,6 @@ const filename = randomstring.generate({
 });
 import { Command } from "commander";
 import { Timer } from "timer-node";
-import { stdout } from "process";
 const program = new Command();
 
 let user;
@@ -76,7 +112,7 @@ const checkConfiguration = () => {
 };
 checkConfiguration();
 const startProcess = async () => {
-  stdout.write("\nLoading please wait...");
+  Logger.log("Loading please wait...", "info");
   const browser = await puppeteer.launch({
     // headless: false,
     args: ["--no-sandbox"],
@@ -139,7 +175,7 @@ const startProcess = async () => {
       await page.click(
         "#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP > div.channel-root__info.channel-root__info--offline.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.bPMozh.home-header-sticky > div.Layout-sc-nxg1ff-0.Bza-dv > div > div > ul > li:nth-child(5) > a > div > div.ScTextWrapper-sc-18v7095-1.eFGtCR > div"
       );
-      stdout.write('[ACTION] Clicked "Chat" button\n');
+      Logger.log("Clicked 'Chat' button", "action");
     } catch (err) {}
   };
   await clickChatButton();
@@ -213,7 +249,7 @@ const startProcess = async () => {
   };
 
   const startRecording = async () => {
-    stdout.write("\n[INFO] Getting raw stream url");
+    Logger.log("Getting raw stream url", "info");
     const page1 = await browser.newPage(); // open new tab
     await page1.goto("https://pwn.sh/tools/getstream.html");
     await page1.waitForSelector("#input-url");
@@ -229,7 +265,7 @@ const startProcess = async () => {
       )
     );
     await page1.close();
-    stdout.write("\n[ACTION] Recording started");
+    Logger.log("Recording started", "action");
     recording_timer.start();
     if (!(await fs.existsSync(`./videos/${user}`))) {
       await fs.mkdirSync(`./videos/${user}`);
@@ -249,7 +285,7 @@ const startProcess = async () => {
       }
       if ((await getFileSizeGb()) > maxSize && maxSize != undefined) {
         stream.end();
-        console.log("[INFO] Max file size reached");
+        Logger.log("Max file size reached", "info");
       }
       await new Promise((resolve) => setTimeout(resolve, 30000));
     }
@@ -257,9 +293,10 @@ const startProcess = async () => {
 
   (async () => {
     if (await checkIfUserExists()) {
-      stdout.write("\n[INFO] User exists");
-      stdout.write(
-        "\n[INFO] Recording will start when user goes live or starts a rerun."
+      Logger.log("User exists", "info");
+      Logger.log(
+        "Recording will start when user goes live or starts a rerun",
+        "info"
       );
       while (
         (await checkIfUserIsLive()) == false ||
@@ -270,22 +307,23 @@ const startProcess = async () => {
       }
       await startRecording();
       await printLogo();
-      stdout.write(
-        `\n\n[INFO] Your file is ready. File:./${user}/${user}-${filename}.mp4\n`
+      Logger.log(
+        `Your file is ready. FIle ./${user}/${user}-${filename}.mp4`,
+        "info"
       );
       timer.stop();
-      stdout.write(
-        "[INFO] Final file size:" + (await getFileSizeGb()) + " GB\n"
+      Logger.log(`Final file size: ${await getFileSizeGb()} GB`, "info");
+      Logger.log(
+        timer.format("Entire process took D:%d H:%h M:%m S:%s"),
+        "info"
       );
-      stdout.write(
-        timer.format("[INFO] Entire process took D:%d H:%h M:%m S:%s\n")
-      );
-      stdout.write(
-        recording_timer.format("[INFO] Recorded for D:%d H:%h M:%m S:%s\n")
+      Logger.log(
+        recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"),
+        "info"
       );
       process.exit();
     } else {
-      stdout.write("\n[INFO] User does not exist. Exiting");
+      Logger.log("User does not exist", "action");
       process.exit();
     }
   })();
