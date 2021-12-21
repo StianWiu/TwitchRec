@@ -37,12 +37,6 @@ var __generator = (this && this.__generator) || function (thisArg, body) {
 };
 exports.__esModule = true;
 console.clear();
-var fs = require("fs");
-var puppeteer = require("puppeteer");
-var m3u8stream = require("m3u8stream");
-var randomstring = require("randomstring");
-var logo = require("asciiart-logo");
-var Logger = require("bug-killer");
 try {
     require("fs");
     require("puppeteer");
@@ -52,10 +46,15 @@ try {
     require("bug-killer");
 }
 catch (error) {
-    console.log(error);
-    console.log("Please install the required dependencies by running npm install. Exiting...");
+    console.log("\n\nPlease install the required dependencies by running npm install. Exiting...\n\n");
     process.exit(1);
 }
+var fs = require("fs");
+var puppeteer = require("puppeteer");
+var m3u8stream = require("m3u8stream");
+var randomstring = require("randomstring");
+var logo = require("asciiart-logo");
+var Logger = require("bug-killer");
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
     // The error type
