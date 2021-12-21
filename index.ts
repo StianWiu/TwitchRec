@@ -1,13 +1,25 @@
 console.clear();
-
 const fs = require("fs");
 const puppeteer = require("puppeteer");
 const m3u8stream = require("m3u8stream");
 const randomstring = require("randomstring");
 const logo = require("asciiart-logo");
 const Logger = require("bug-killer");
+try {
+  require("fs");
+  require("puppeteer");
+  require("m3u8stream");
+  require("randomstring");
+  require("asciiart-logo");
+  require("bug-killer");
+} catch (error) {
+  console.log(error);
+  console.log(
+    "Please install the required dependencies by running npm install. Exiting..."
+  );
+  process.exit(1);
+}
 
-// Set configuration for Logger(bug-killer) node module
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
   // The error type
