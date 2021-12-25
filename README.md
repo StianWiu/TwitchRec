@@ -10,14 +10,15 @@ I made this program out of spite. There is a twitch streamer I like that only st
 
 Feel free to take as much as you want from this project and use it on your own. No credits needed but much appreciated.
 
+# Pros & cons
+
+- **[PRO]** It works in a terminal so you can just throw it onto any server with node.js and an internet connection.
+- **[CON]** Not the most straight forward way to do it but accomplishes it's goal. Very hacky code. Also requires thir party website to work but hopefully will be able to not rely on it any more.
+- **[PRO]** Quick and simple install. Requires 2 commands to get set up.
+
 # Features
 
-- Record only audio [NOT AVALIABLE CURRENTLY]
-- Record only video [NOT AVALIABLE CURRENTLY]
-- Automatically cut out silence | Still work in progress as there still are some bugs needing to be fixed [NOT AVALIABLE CURRENTLY]
-- Set custom fps [NOT AVALIABLE CURRENTLY]
 - Record only certain categories
-- Once done recording automatically wait for streamer to start streaming again [NOT AVALIABLE CURRENTLY]
 - Enable/Disable recording rerun streams
 
 # Required
