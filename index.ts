@@ -1,11 +1,14 @@
 console.clear();
 try {
-  require("fs");
-  require("puppeteer");
-  require("m3u8stream");
-  require("randomstring");
   require("asciiart-logo");
   require("bug-killer");
+  require("commander");
+  require("m3u8stream");
+  require("puppeteer");
+  require("randomstring");
+  require("timer-node");
+  require("fs");
+  require("twitch-m3u8");
 } catch (error) {
   console.log(
     "\x1b[31m%s",
@@ -20,7 +23,14 @@ const m3u8stream = require("m3u8stream");
 const randomstring = require("randomstring");
 const logo = require("asciiart-logo");
 const Logger = require("bug-killer");
+const m3u8Info = require("twitch-m3u8");
 
+//   function findCherries(fruit) {
+//     return fruit.name === 'cherries';
+// }
+
+// console.log(inventory.find(findCherries));
+// { name: 'cherries', quantity: 5 }
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
   // The error type
@@ -68,6 +78,7 @@ let user;
 let rerunEnable;
 let category;
 let maxSize;
+let link;
 
 const timer = new Timer({ label: "main-timer" });
 const recording_timer = new Timer({ label: "recording-timer" });
@@ -136,6 +147,7 @@ const startProcess = async () => {
   });
   const page = await browser.newPage();
   await page.goto(`https://www.twitch.tv/${user}`);
+  // Use puppeteer to check if user exists
   const checkIfUserExists = async () => {
     try {
       await page.waitForSelector(
@@ -147,7 +159,7 @@ const startProcess = async () => {
       return true;
     }
   };
-
+  // Use puppeteer to check if specified user is streaming
   const checkIfUserIsLive = async () => {
     try {
       await page.waitForSelector(
@@ -160,6 +172,7 @@ const startProcess = async () => {
     }
   };
 
+  // Use puppeteer to check if specified user is streaming a rerun
   const checkIfStreamIsRerun = async () => {
     try {
       await page.waitForSelector(
@@ -172,6 +185,7 @@ const startProcess = async () => {
     }
   };
 
+  // Check if program is supposed to record a rerun, if not program will wait until stream is truly live
   const checkIfRecordRerun = async () => {
     if (rerunEnable == false && (await checkIfStreamIsRerun()) == true) {
       return false;
@@ -179,6 +193,7 @@ const startProcess = async () => {
       return true;
     }
   };
+  // Use puppeteer to click "Chat" button to open actual stream in case streamear is offline. If this doesn't happen program won't work.
   const clickChatButton = async () => {
     try {
       await page.waitForSelector(
@@ -193,12 +208,14 @@ const startProcess = async () => {
   };
   await clickChatButton();
 
+  // Get current recording's file size in bytes
   const getFileSize = async () => {
     var fileInfo = fs.statSync(`videos/${user}/${user}-${filename}.mp4`);
     var fileSize = fileInfo.size;
     return fileSize;
   };
 
+  // Get current recording's file size in gigabytes
   const getFileSizeGb = async () => {
     var stats = fs.statSync(`videos/${user}/${user}-${filename}.mp4`);
     var fileSizeInBytes = stats.size;
@@ -207,6 +224,7 @@ const startProcess = async () => {
     return fileSizeInGigabytes.toString().substring(0, 6);
   };
 
+  // Check if category is same as specified by user
   const checkCategory = async () => {
     if (category == undefined) {
       return true;
@@ -238,6 +256,7 @@ const startProcess = async () => {
   };
 
   const recordingProgress = async () => {
+    //Print recording progress to console.
     console.clear();
     console.log(
       logo({
@@ -262,28 +281,25 @@ const startProcess = async () => {
   };
 
   const startRecording = async () => {
+    // Make sure ./videos folder exists. If not, create it.
+    if (!(await fs.existsSync(`./videos`))) {
+      await fs.mkdirSync(`./videos`);
+    }
+
     Logger.log("Getting raw stream url", "info");
-    const page1 = await browser.newPage(); // open new tab
-    await page1.goto("https://pwn.sh/tools/getstream.html");
-    await page1.waitForSelector("#input-url");
-    await page1.click("#input-url");
-    await page1.keyboard.type(`twitch.tv/${options.user}`);
-    await page1.waitForSelector("#go");
-    await page1.click("#go");
-    await page1.waitForSelector("#alert_result > a:nth-child(1)");
-    const link = await page1.evaluate(() =>
-      Array.from(
-        document.querySelectorAll("#alert_result > a:nth-child(1)"),
-        (a) => a.getAttribute("href")
-      )
-    );
-    await page1.close();
+    await m3u8Info
+      .getStream(user)
+      .then((data) => {
+        link = data[0].url;
+      })
+      .catch((err) => console.error(err));
+
     Logger.log("Recording started", "action");
     recording_timer.start();
     if (!(await fs.existsSync(`./videos/${user}`))) {
       await fs.mkdirSync(`./videos/${user}`);
     }
-    const stream = await m3u8stream(link[0]).pipe(
+    const stream = await m3u8stream(link).pipe(
       fs.createWriteStream(`videos/${user}/${user}-${filename}.mp4`)
     );
     await new Promise((resolve) => setTimeout(resolve, 5000));

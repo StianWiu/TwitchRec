@@ -32,7 +32,8 @@
     "puppeteer": "^10.4.0",
     "randomstring": "^1.2.1",
     "timer-node": "^5.0.5",
-    "ts-node": "^10.2.1"
+    "ts-node": "^10.2.1",
+    "twitch-m3u8": "^1.1.5"
   },
   "devDependencies": {
     "@types/node": "^16.9.4",
