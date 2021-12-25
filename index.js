@@ -46,7 +46,7 @@ try {
     require("bug-killer");
 }
 catch (error) {
-    console.log("\n\nPlease install the required dependencies by running npm install. Exiting...\n\n");
+    console.log("\x1b[31m%s", "\n\nPlease install the required dependencies by running npm install. Exiting...\n\n");
     process.exit(1);
 }
 var fs = require("fs");
@@ -154,7 +154,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
             case 0:
                 Logger.log("Loading please wait...", "info");
                 return [4 /*yield*/, puppeteer.launch({
-                        // headless: false,
+                        headless: false,
                         args: ["--no-sandbox"],
                         defaultViewport: {
                             width: 1920,
@@ -498,7 +498,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, printLogo()];
                             case 11:
                                 _f.sent();
-                                Logger.log("Your file is ready. FIle ./" + user + "/" + user + "-" + filename + ".mp4", "info");
+                                Logger.log("Your file is ready. File: ./" + user + "/" + user + "-" + filename + ".mp4", "info");
                                 timer.stop();
                                 _d = (_c = Logger).log;
                                 _e = "Final file size: ";

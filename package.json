@@ -1,11 +1,11 @@
 {
   "name": "twitchrec",
-  "version": "2.3.4",
+  "version": "2.3.5",
   "description": "TwitchRec",
   "main": "index.js",
   "scripts": {
-    "tsc": "tsc index.ts -w --skipLibCheck --downlevelIteration",
-    "dev": "nodemon index.ts"
+    "compile": "tsc index.ts -w --skipLibCheck --downlevelIteration",
+    "tsc": "tsc index.ts -w --skipLibCheck --downlevelIteration"
   },
   "repository": {
     "type": "git",
@@ -25,17 +25,11 @@
   },
   "homepage": "https://github.com/StianWiu/TwitchRec#readme",
   "dependencies": {
-    "@ffmpeg-installer/ffmpeg": "^1.1.0",
     "asciiart-logo": "^0.2.6",
-    "cli-spinner": "^0.2.10",
-    "commander": "^8.2.0",
-    "logger": "^0.0.1",
-    "m3u8-to-mp4": "^1.0.0",
+    "bug-killer": "^4.4.4",
+    "commander": "^8.3.0",
     "m3u8stream": "^0.8.4",
-    "node-run-cmd": "^1.0.1",
-    "nodemon": "^2.0.12",
     "puppeteer": "^10.4.0",
-    "puppeteer-stream": "^2.0.6",
     "randomstring": "^1.2.1",
     "timer-node": "^5.0.5",
     "ts-node": "^10.2.1"

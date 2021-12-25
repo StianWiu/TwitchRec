@@ -8,8 +8,10 @@ try {
   require("bug-killer");
 } catch (error) {
   console.log(
+    "\x1b[31m%s",
     "\n\nPlease install the required dependencies by running npm install. Exiting...\n\n"
   );
+
   process.exit(1);
 }
 const fs = require("fs");
@@ -81,7 +83,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.3.2")
+      .right("V2.3.5")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -319,7 +321,7 @@ const startProcess = async () => {
       await startRecording();
       await printLogo();
       Logger.log(
-        `Your file is ready. FIle ./${user}/${user}-${filename}.mp4`,
+        `Your file is ready. File: ./${user}/${user}-${filename}.mp4`,
         "info"
       );
       timer.stop();
