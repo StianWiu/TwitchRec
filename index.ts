@@ -3,12 +3,14 @@ try {
   require("asciiart-logo");
   require("bug-killer");
   require("commander");
+  require("console-clear");
   require("m3u8stream");
   require("puppeteer");
   require("randomstring");
   require("timer-node");
   require("fs");
   require("twitch-m3u8");
+  require("axios");
 } catch (error) {
   console.log(
     "\x1b[31m%s",
@@ -24,13 +26,9 @@ const randomstring = require("randomstring");
 const logo = require("asciiart-logo");
 const Logger = require("bug-killer");
 const m3u8Info = require("twitch-m3u8");
+const axios = require("axios");
+const clear = require("console-clear");
 
-//   function findCherries(fruit) {
-//     return fruit.name === 'cherries';
-// }
-
-// console.log(inventory.find(findCherries));
-// { name: 'cherries', quantity: 5 }
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
   // The error type
@@ -66,6 +64,7 @@ Logger.config = {
   inspectOptions: { colors: true },
 };
 
+// Generate a random string for the file name
 const filename = randomstring.generate({
   length: 10,
   charset: "hex",
@@ -79,6 +78,7 @@ let rerunEnable;
 let category;
 let maxSize;
 let link;
+let loopProgram;
 
 const timer = new Timer({ label: "main-timer" });
 const recording_timer = new Timer({ label: "recording-timer" });
@@ -94,7 +94,7 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.3.5")
+      .right("V2.3.6")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -112,6 +112,10 @@ program.option(
   "Only record certain category [Optional]"
 );
 program.option("-m, --max <num>", "How many GB file can become [Optional]");
+program.option(
+  "-l, --loop <boolean>",
+  "Weather program should infinately loop when stream is over [Optional]"
+);
 
 program.parse(process.argv);
 const options = program.opts();
@@ -132,6 +136,11 @@ const checkConfiguration = () => {
     maxSize = Number(options.max);
   } else {
     maxSize = undefined;
+  }
+  if (options.loop == "true") {
+    loopProgram = true;
+  } else {
+    loopProgram = false;
   }
 };
 checkConfiguration();
@@ -208,13 +217,6 @@ const startProcess = async () => {
   };
   await clickChatButton();
 
-  // Get current recording's file size in bytes
-  const getFileSize = async () => {
-    var fileInfo = fs.statSync(`videos/${user}/${user}-${filename}.mp4`);
-    var fileSize = fileInfo.size;
-    return fileSize;
-  };
-
   // Get current recording's file size in gigabytes
   const getFileSizeGb = async () => {
     var stats = fs.statSync(`videos/${user}/${user}-${filename}.mp4`);
@@ -255,9 +257,18 @@ const startProcess = async () => {
     }
   };
 
+  // Check if stream is live
+  async function checkM3u8StreamUrl(url) {
+    try {
+      await axios.head(url);
+      return true;
+    } catch (err) {
+      return false;
+    }
+  }
+
+  //Print recording progress to console.
   const recordingProgress = async () => {
-    //Print recording progress to console.
-    console.clear();
     console.log(
       logo({
         name: "TwitchRec",
@@ -273,7 +284,7 @@ const startProcess = async () => {
         .left(`Running for: ${timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Recording: ${recording_timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Rerun: ${await checkIfStreamIsRerun()}`)
-        .emptyLine()
+        .emptyLine(`${clear()}`)
         .center("Twitch recording software. Developed by Pignuuu.")
         .center("https://stianwiu.me")
         .render()
@@ -303,20 +314,24 @@ const startProcess = async () => {
       fs.createWriteStream(`videos/${user}/${user}-${filename}.mp4`)
     );
     await new Promise((resolve) => setTimeout(resolve, 5000));
-    recordingProgress();
-    var variableFileSize = await getFileSize();
-    await new Promise((resolve) => setTimeout(resolve, 30000));
-    while (variableFileSize != (await getFileSize())) {
-      variableFileSize = await getFileSize();
-      recordingProgress();
+    await recordingProgress();
+    let finishedRecording = false;
+    while (
+      (await checkM3u8StreamUrl(link)) == true &&
+      finishedRecording == false
+    ) {
+      await recordingProgress();
       if ((await checkCategory()) == false) {
         stream.end();
+        finishedRecording = true;
+        Logger.log("Stream has chagned category", "info");
       }
       if ((await getFileSizeGb()) > maxSize && maxSize != undefined) {
         stream.end();
+        finishedRecording = true;
         Logger.log("Max file size reached", "info");
       }
-      await new Promise((resolve) => setTimeout(resolve, 30000));
+      await new Promise((resolve) => setTimeout(resolve, 5000));
     }
   };
 
@@ -327,29 +342,59 @@ const startProcess = async () => {
         "Recording will start when user goes live or starts a rerun",
         "info"
       );
-      while (
-        (await checkIfUserIsLive()) == false ||
-        (await checkIfRecordRerun()) == false ||
-        (await checkCategory()) == false
-      ) {
-        await new Promise((resolve) => setTimeout(resolve, 5000));
+      while (loopProgram == true) {
+        while (
+          (await checkIfUserIsLive()) == false ||
+          (await checkIfRecordRerun()) == false ||
+          (await checkCategory()) == false
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+        }
+        await startRecording();
+        await printLogo();
+        Logger.log(
+          `Your file is ready. File: ./${user}/${user}-${filename}.mp4`,
+          "info"
+        );
+        timer.stop();
+        Logger.log(`Final file size: ${await getFileSizeGb()} GB`, "info");
+        Logger.log(
+          timer.format("Entire process took D:%d H:%h M:%m S:%s"),
+          "info"
+        );
+        Logger.log(
+          recording_timer.format("Recorded for D:%d H:%h M:%m S:%s\n"),
+          "info"
+        );
+        Logger.log("Waiting for stream to start again", "info");
+        await page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] });
+        await clickChatButton();
       }
-      await startRecording();
-      await printLogo();
-      Logger.log(
-        `Your file is ready. File: ./${user}/${user}-${filename}.mp4`,
-        "info"
-      );
-      timer.stop();
-      Logger.log(`Final file size: ${await getFileSizeGb()} GB`, "info");
-      Logger.log(
-        timer.format("Entire process took D:%d H:%h M:%m S:%s"),
-        "info"
-      );
-      Logger.log(
-        recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"),
-        "info"
-      );
+      if (loopProgram == false) {
+        while (
+          (await checkIfUserIsLive()) == false ||
+          (await checkIfRecordRerun()) == false ||
+          (await checkCategory()) == false
+        ) {
+          await new Promise((resolve) => setTimeout(resolve, 5000));
+        }
+        await startRecording();
+        await printLogo();
+        Logger.log(
+          `Your file is ready. File: ./${user}/${user}-${filename}.mp4`,
+          "info"
+        );
+        timer.stop();
+        Logger.log(`Final file size: ${await getFileSizeGb()} GB`, "info");
+        Logger.log(
+          timer.format("Entire process took D:%d H:%h M:%m S:%s"),
+          "info"
+        );
+        Logger.log(
+          recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"),
+          "info"
+        );
+      }
       process.exit();
     } else {
       Logger.log("User does not exist", "action");

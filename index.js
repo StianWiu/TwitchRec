@@ -41,12 +41,14 @@ try {
     require("asciiart-logo");
     require("bug-killer");
     require("commander");
+    require("console-clear");
     require("m3u8stream");
     require("puppeteer");
     require("randomstring");
     require("timer-node");
     require("fs");
     require("twitch-m3u8");
+    require("axios");
 }
 catch (error) {
     console.log("\x1b[31m%s", "\n\nPlease install the required dependencies by running npm install. Exiting...\n\n");
@@ -59,11 +61,8 @@ var randomstring = require("randomstring");
 var logo = require("asciiart-logo");
 var Logger = require("bug-killer");
 var m3u8Info = require("twitch-m3u8");
-//   function findCherries(fruit) {
-//     return fruit.name === 'cherries';
-// }
-// console.log(inventory.find(findCherries));
-// { name: 'cherries', quantity: 5 }
+var axios = require("axios");
+var clear = require("console-clear");
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
     // The error type
@@ -98,6 +97,7 @@ Logger.config = {
     // The options passed to `util.inspect`
     inspectOptions: { colors: true }
 };
+// Generate a random string for the file name
 var filename = randomstring.generate({
     length: 10,
     charset: "hex"
@@ -110,6 +110,7 @@ var rerunEnable;
 var category;
 var maxSize;
 var link;
+var loopProgram;
 var timer = new timer_node_1.Timer({ label: "main-timer" });
 var recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
 timer.start();
@@ -122,7 +123,7 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V2.3.5")
+        .right("V2.3.6")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .center("https://stianwiu.me")
@@ -133,6 +134,7 @@ program.requiredOption("-u, --user <string>", "Twitch username");
 program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
 program.option("-c, --category <string>", "Only record certain category [Optional]");
 program.option("-m, --max <num>", "How many GB file can become [Optional]");
+program.option("-l, --loop <boolean>", "Weather program should infinately loop when stream is over [Optional]");
 program.parse(process.argv);
 var options = program.opts();
 var checkConfiguration = function () {
@@ -155,10 +157,36 @@ var checkConfiguration = function () {
     else {
         maxSize = undefined;
     }
+    if (options.loop == "true") {
+        loopProgram = true;
+    }
+    else {
+        loopProgram = false;
+    }
 };
 checkConfiguration();
 var startProcess = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var browser, page, checkIfUserExists, checkIfUserIsLive, checkIfStreamIsRerun, checkIfRecordRerun, clickChatButton, getFileSize, getFileSizeGb, checkCategory, recordingProgress, startRecording;
+    // Check if stream is live
+    function checkM3u8StreamUrl(url) {
+        return __awaiter(this, void 0, void 0, function () {
+            var err_1;
+            return __generator(this, function (_a) {
+                switch (_a.label) {
+                    case 0:
+                        _a.trys.push([0, 2, , 3]);
+                        return [4 /*yield*/, axios.head(url)];
+                    case 1:
+                        _a.sent();
+                        return [2 /*return*/, true];
+                    case 2:
+                        err_1 = _a.sent();
+                        return [2 /*return*/, false];
+                    case 3: return [2 /*return*/];
+                }
+            });
+        });
+    }
+    var browser, page, checkIfUserExists, checkIfUserIsLive, checkIfStreamIsRerun, checkIfRecordRerun, clickChatButton, getFileSizeGb, checkCategory, recordingProgress, startRecording;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -253,7 +281,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     });
                 }); };
                 clickChatButton = function () { return __awaiter(void 0, void 0, void 0, function () {
-                    var err_1;
+                    var err_2;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
@@ -267,7 +295,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 Logger.log("Clicked 'Chat' button", "action");
                                 return [3 /*break*/, 4];
                             case 3:
-                                err_1 = _a.sent();
+                                err_2 = _a.sent();
                                 return [3 /*break*/, 4];
                             case 4: return [2 /*return*/];
                         }
@@ -276,14 +304,6 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                 return [4 /*yield*/, clickChatButton()];
             case 4:
                 _a.sent();
-                getFileSize = function () { return __awaiter(void 0, void 0, void 0, function () {
-                    var fileInfo, fileSize;
-                    return __generator(this, function (_a) {
-                        fileInfo = fs.statSync("videos/" + user + "/" + user + "-" + filename + ".mp4");
-                        fileSize = fileInfo.size;
-                        return [2 /*return*/, fileSize];
-                    });
-                }); };
                 getFileSizeGb = function () { return __awaiter(void 0, void 0, void 0, function () {
                     var stats, fileSizeInBytes, fileSizeInMegabytes, fileSizeInGigabytes;
                     return __generator(this, function (_a) {
@@ -295,7 +315,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     });
                 }); };
                 checkCategory = function () { return __awaiter(void 0, void 0, void 0, function () {
-                    var value1, value2, element1, err_2, element2, err_3;
+                    var value1, value2, element1, err_3, element2, err_4;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
@@ -314,7 +334,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 value1 = value1.toLowerCase();
                                 return [3 /*break*/, 5];
                             case 4:
-                                err_2 = _a.sent();
+                                err_3 = _a.sent();
                                 return [3 /*break*/, 5];
                             case 5:
                                 if (value1 == category) {
@@ -332,7 +352,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 value2 = value2.toLowerCase();
                                 return [3 /*break*/, 10];
                             case 9:
-                                err_3 = _a.sent();
+                                err_4 = _a.sent();
                                 return [3 /*break*/, 10];
                             case 10:
                                 if (value2 == category) {
@@ -350,8 +370,6 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     return __generator(this, function (_j) {
                         switch (_j.label) {
                             case 0:
-                                //Print recording progress to console.
-                                console.clear();
                                 _b = (_a = console).log;
                                 _e = (_d = logo({
                                     name: "TwitchRec",
@@ -375,7 +393,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, checkIfStreamIsRerun()];
                             case 2:
                                 _b.apply(_a, [_g.apply(_c, [_h + (_j.sent())])
-                                        .emptyLine()
+                                        .emptyLine("" + clear())
                                         .center("Twitch recording software. Developed by Pignuuu.")
                                         .center("https://stianwiu.me")
                                         .render()]);
@@ -384,16 +402,16 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     });
                 }); };
                 startRecording = function () { return __awaiter(void 0, void 0, void 0, function () {
-                    var stream, variableFileSize, _a;
-                    return __generator(this, function (_b) {
-                        switch (_b.label) {
+                    var stream, finishedRecording;
+                    return __generator(this, function (_a) {
+                        switch (_a.label) {
                             case 0: return [4 /*yield*/, fs.existsSync("./videos")];
                             case 1:
-                                if (!!(_b.sent())) return [3 /*break*/, 3];
+                                if (!!(_a.sent())) return [3 /*break*/, 3];
                                 return [4 /*yield*/, fs.mkdirSync("./videos")];
                             case 2:
-                                _b.sent();
-                                _b.label = 3;
+                                _a.sent();
+                                _a.label = 3;
                             case 3:
                                 Logger.log("Getting raw stream url", "info");
                                 return [4 /*yield*/, m3u8Info
@@ -402,111 +420,161 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                         link = data[0].url;
                                     })["catch"](function (err) { return console.error(err); })];
                             case 4:
-                                _b.sent();
+                                _a.sent();
                                 Logger.log("Recording started", "action");
                                 recording_timer.start();
                                 return [4 /*yield*/, fs.existsSync("./videos/" + user)];
                             case 5:
-                                if (!!(_b.sent())) return [3 /*break*/, 7];
+                                if (!!(_a.sent())) return [3 /*break*/, 7];
                                 return [4 /*yield*/, fs.mkdirSync("./videos/" + user)];
                             case 6:
-                                _b.sent();
-                                _b.label = 7;
+                                _a.sent();
+                                _a.label = 7;
                             case 7: return [4 /*yield*/, m3u8stream(link).pipe(fs.createWriteStream("videos/" + user + "/" + user + "-" + filename + ".mp4"))];
                             case 8:
-                                stream = _b.sent();
+                                stream = _a.sent();
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                             case 9:
-                                _b.sent();
-                                recordingProgress();
-                                return [4 /*yield*/, getFileSize()];
+                                _a.sent();
+                                return [4 /*yield*/, recordingProgress()];
                             case 10:
-                                variableFileSize = _b.sent();
-                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 30000); })];
-                            case 11:
-                                _b.sent();
-                                _b.label = 12;
+                                _a.sent();
+                                finishedRecording = false;
+                                _a.label = 11;
+                            case 11: return [4 /*yield*/, checkM3u8StreamUrl(link)];
                             case 12:
-                                _a = variableFileSize;
-                                return [4 /*yield*/, getFileSize()];
+                                if (!((_a.sent()) == true &&
+                                    finishedRecording == false)) return [3 /*break*/, 17];
+                                return [4 /*yield*/, recordingProgress()];
                             case 13:
-                                if (!(_a != (_b.sent()))) return [3 /*break*/, 18];
-                                return [4 /*yield*/, getFileSize()];
-                            case 14:
-                                variableFileSize = _b.sent();
-                                recordingProgress();
+                                _a.sent();
                                 return [4 /*yield*/, checkCategory()];
-                            case 15:
-                                if ((_b.sent()) == false) {
+                            case 14:
+                                if ((_a.sent()) == false) {
                                     stream.end();
+                                    finishedRecording = true;
+                                    Logger.log("Stream has chagned category", "info");
                                 }
                                 return [4 /*yield*/, getFileSizeGb()];
-                            case 16:
-                                if ((_b.sent()) > maxSize && maxSize != undefined) {
+                            case 15:
+                                if ((_a.sent()) > maxSize && maxSize != undefined) {
                                     stream.end();
+                                    finishedRecording = true;
                                     Logger.log("Max file size reached", "info");
                                 }
-                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 30000); })];
-                            case 17:
-                                _b.sent();
-                                return [3 /*break*/, 12];
-                            case 18: return [2 /*return*/];
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                            case 16:
+                                _a.sent();
+                                return [3 /*break*/, 11];
+                            case 17: return [2 /*return*/];
                         }
                     });
                 }); };
                 (function () { return __awaiter(void 0, void 0, void 0, function () {
-                    var _a, _b, _c, _d, _e;
-                    return __generator(this, function (_f) {
-                        switch (_f.label) {
+                    var _a, _b, _c, _d, _e, _f, _g, _h, _j, _k;
+                    return __generator(this, function (_l) {
+                        switch (_l.label) {
                             case 0: return [4 /*yield*/, checkIfUserExists()];
                             case 1:
-                                if (!_f.sent()) return [3 /*break*/, 13];
+                                if (!_l.sent()) return [3 /*break*/, 29];
                                 Logger.log("User exists", "info");
                                 Logger.log("Recording will start when user goes live or starts a rerun", "info");
-                                _f.label = 2;
-                            case 2: return [4 /*yield*/, checkIfUserIsLive()];
-                            case 3:
-                                _b = (_f.sent()) == false;
-                                if (_b) return [3 /*break*/, 5];
-                                return [4 /*yield*/, checkIfRecordRerun()];
+                                _l.label = 2;
+                            case 2:
+                                if (!(loopProgram == true)) return [3 /*break*/, 16];
+                                _l.label = 3;
+                            case 3: return [4 /*yield*/, checkIfUserIsLive()];
                             case 4:
-                                _b = (_f.sent()) == false;
-                                _f.label = 5;
+                                _b = (_l.sent()) == false;
+                                if (_b) return [3 /*break*/, 6];
+                                return [4 /*yield*/, checkIfRecordRerun()];
                             case 5:
-                                _a = _b;
-                                if (_a) return [3 /*break*/, 7];
-                                return [4 /*yield*/, checkCategory()];
+                                _b = (_l.sent()) == false;
+                                _l.label = 6;
                             case 6:
-                                _a = (_f.sent()) == false;
-                                _f.label = 7;
+                                _a = _b;
+                                if (_a) return [3 /*break*/, 8];
+                                return [4 /*yield*/, checkCategory()];
                             case 7:
-                                if (!_a) return [3 /*break*/, 9];
-                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                                _a = (_l.sent()) == false;
+                                _l.label = 8;
                             case 8:
-                                _f.sent();
-                                return [3 /*break*/, 2];
-                            case 9: return [4 /*yield*/, startRecording()];
-                            case 10:
-                                _f.sent();
-                                return [4 /*yield*/, printLogo()];
+                                if (!_a) return [3 /*break*/, 10];
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                            case 9:
+                                _l.sent();
+                                return [3 /*break*/, 3];
+                            case 10: return [4 /*yield*/, startRecording()];
                             case 11:
-                                _f.sent();
+                                _l.sent();
+                                return [4 /*yield*/, printLogo()];
+                            case 12:
+                                _l.sent();
                                 Logger.log("Your file is ready. File: ./" + user + "/" + user + "-" + filename + ".mp4", "info");
                                 timer.stop();
                                 _d = (_c = Logger).log;
                                 _e = "Final file size: ";
                                 return [4 /*yield*/, getFileSizeGb()];
-                            case 12:
-                                _d.apply(_c, [_e + (_f.sent()) + " GB", "info"]);
+                            case 13:
+                                _d.apply(_c, [_e + (_l.sent()) + " GB", "info"]);
+                                Logger.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"), "info");
+                                Logger.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s\n"), "info");
+                                Logger.log("Waiting for stream to start again", "info");
+                                return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
+                            case 14:
+                                _l.sent();
+                                return [4 /*yield*/, clickChatButton()];
+                            case 15:
+                                _l.sent();
+                                return [3 /*break*/, 2];
+                            case 16:
+                                if (!(loopProgram == false)) return [3 /*break*/, 28];
+                                _l.label = 17;
+                            case 17: return [4 /*yield*/, checkIfUserIsLive()];
+                            case 18:
+                                _g = (_l.sent()) == false;
+                                if (_g) return [3 /*break*/, 20];
+                                return [4 /*yield*/, checkIfRecordRerun()];
+                            case 19:
+                                _g = (_l.sent()) == false;
+                                _l.label = 20;
+                            case 20:
+                                _f = _g;
+                                if (_f) return [3 /*break*/, 22];
+                                return [4 /*yield*/, checkCategory()];
+                            case 21:
+                                _f = (_l.sent()) == false;
+                                _l.label = 22;
+                            case 22:
+                                if (!_f) return [3 /*break*/, 24];
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                            case 23:
+                                _l.sent();
+                                return [3 /*break*/, 17];
+                            case 24: return [4 /*yield*/, startRecording()];
+                            case 25:
+                                _l.sent();
+                                return [4 /*yield*/, printLogo()];
+                            case 26:
+                                _l.sent();
+                                Logger.log("Your file is ready. File: ./" + user + "/" + user + "-" + filename + ".mp4", "info");
+                                timer.stop();
+                                _j = (_h = Logger).log;
+                                _k = "Final file size: ";
+                                return [4 /*yield*/, getFileSizeGb()];
+                            case 27:
+                                _j.apply(_h, [_k + (_l.sent()) + " GB", "info"]);
                                 Logger.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"), "info");
                                 Logger.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"), "info");
+                                _l.label = 28;
+                            case 28:
                                 process.exit();
-                                return [3 /*break*/, 14];
-                            case 13:
+                                return [3 /*break*/, 30];
+                            case 29:
                                 Logger.log("User does not exist", "action");
                                 process.exit();
-                                _f.label = 14;
-                            case 14: return [2 /*return*/];
+                                _l.label = 30;
+                            case 30: return [2 /*return*/];
                         }
                     });
                 }); })();

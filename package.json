@@ -1,6 +1,6 @@
 {
   "name": "twitchrec",
-  "version": "2.3.5",
+  "version": "2.3.6",
   "description": "TwitchRec",
   "main": "index.js",
   "scripts": {
@@ -26,8 +26,10 @@
   "homepage": "https://github.com/StianWiu/TwitchRec#readme",
   "dependencies": {
     "asciiart-logo": "^0.2.6",
+    "axios": "^0.24.0",
     "bug-killer": "^4.4.4",
     "commander": "^8.3.0",
+    "console-clear": "^1.1.1",
     "m3u8stream": "^0.8.4",
     "puppeteer": "^10.4.0",
     "randomstring": "^1.2.1",
