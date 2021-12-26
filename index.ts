@@ -114,7 +114,7 @@ program.option(
 program.option("-m, --max <num>", "How many GB file can become [Optional]");
 program.option(
   "-l, --loop <boolean>",
-  "Weather program should infinately loop when stream is over [Optional]"
+  "Weather program should infinitely loop when stream is over [Optional]"
 );
 
 program.parse(process.argv);
@@ -147,7 +147,7 @@ checkConfiguration();
 const startProcess = async () => {
   Logger.log("Loading please wait...", "info");
   const browser = await puppeteer.launch({
-    // headless: false,
+    // headless: false, // Uncomment this line to see the browser pop up
     args: ["--no-sandbox"],
     defaultViewport: {
       width: 1920,

@@ -134,7 +134,7 @@ program.requiredOption("-u, --user <string>", "Twitch username");
 program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
 program.option("-c, --category <string>", "Only record certain category [Optional]");
 program.option("-m, --max <num>", "How many GB file can become [Optional]");
-program.option("-l, --loop <boolean>", "Weather program should infinately loop when stream is over [Optional]");
+program.option("-l, --loop <boolean>", "Weather program should infinitely loop when stream is over [Optional]");
 program.parse(process.argv);
 var options = program.opts();
 var checkConfiguration = function () {
@@ -192,7 +192,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
             case 0:
                 Logger.log("Loading please wait...", "info");
                 return [4 /*yield*/, puppeteer.launch({
-                        // headless: false,
+                        // headless: false, // Uncomment this line to see the browser pop up
                         args: ["--no-sandbox"],
                         defaultViewport: {
                             width: 1920,
