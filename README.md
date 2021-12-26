@@ -50,5 +50,5 @@ In order to edit the code you will need to go into the [index.ts](https://github
 Then to compile it into JavaScript
 
 ```bash
-$ npm run tsc
+$ npm run compile
 ```
