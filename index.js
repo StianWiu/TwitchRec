@@ -476,105 +476,109 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                         switch (_l.label) {
                             case 0: return [4 /*yield*/, checkIfUserExists()];
                             case 1:
-                                if (!_l.sent()) return [3 /*break*/, 29];
+                                if (!_l.sent()) return [3 /*break*/, 30];
                                 Logger.log("User exists", "info");
-                                Logger.log("Recording will start when user goes live or starts a rerun", "info");
-                                _l.label = 2;
+                                return [4 /*yield*/, checkIfUserIsLive()];
                             case 2:
-                                if (!(loopProgram == true)) return [3 /*break*/, 16];
+                                if ((_l.sent()) == false) {
+                                    Logger.log("Recording will start when user goes live or starts a rerun", "info");
+                                }
                                 _l.label = 3;
-                            case 3: return [4 /*yield*/, checkIfUserIsLive()];
-                            case 4:
-                                _b = (_l.sent()) == false;
-                                if (_b) return [3 /*break*/, 6];
-                                return [4 /*yield*/, checkIfRecordRerun()];
+                            case 3:
+                                if (!(loopProgram == true)) return [3 /*break*/, 17];
+                                _l.label = 4;
+                            case 4: return [4 /*yield*/, checkIfUserIsLive()];
                             case 5:
                                 _b = (_l.sent()) == false;
-                                _l.label = 6;
+                                if (_b) return [3 /*break*/, 7];
+                                return [4 /*yield*/, checkIfRecordRerun()];
                             case 6:
-                                _a = _b;
-                                if (_a) return [3 /*break*/, 8];
-                                return [4 /*yield*/, checkCategory()];
+                                _b = (_l.sent()) == false;
+                                _l.label = 7;
                             case 7:
-                                _a = (_l.sent()) == false;
-                                _l.label = 8;
+                                _a = _b;
+                                if (_a) return [3 /*break*/, 9];
+                                return [4 /*yield*/, checkCategory()];
                             case 8:
-                                if (!_a) return [3 /*break*/, 10];
-                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                                _a = (_l.sent()) == false;
+                                _l.label = 9;
                             case 9:
+                                if (!_a) return [3 /*break*/, 11];
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                            case 10:
                                 _l.sent();
-                                return [3 /*break*/, 3];
-                            case 10: return [4 /*yield*/, startRecording()];
-                            case 11:
+                                return [3 /*break*/, 4];
+                            case 11: return [4 /*yield*/, startRecording()];
+                            case 12:
                                 _l.sent();
                                 return [4 /*yield*/, printLogo()];
-                            case 12:
+                            case 13:
                                 _l.sent();
                                 Logger.log("Your file is ready. File: ./" + user + "/" + user + "-" + filename + ".mp4", "info");
                                 timer.stop();
                                 _d = (_c = Logger).log;
                                 _e = "Final file size: ";
                                 return [4 /*yield*/, getFileSizeGb()];
-                            case 13:
+                            case 14:
                                 _d.apply(_c, [_e + (_l.sent()) + " GB", "info"]);
                                 Logger.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"), "info");
                                 Logger.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s\n"), "info");
                                 Logger.log("Waiting for stream to start again", "info");
                                 return [4 /*yield*/, page.reload({ waitUntil: ["networkidle0", "domcontentloaded"] })];
-                            case 14:
-                                _l.sent();
-                                return [4 /*yield*/, clickChatButton()];
                             case 15:
                                 _l.sent();
-                                return [3 /*break*/, 2];
+                                return [4 /*yield*/, clickChatButton()];
                             case 16:
-                                if (!(loopProgram == false)) return [3 /*break*/, 28];
-                                _l.label = 17;
-                            case 17: return [4 /*yield*/, checkIfUserIsLive()];
-                            case 18:
-                                _g = (_l.sent()) == false;
-                                if (_g) return [3 /*break*/, 20];
-                                return [4 /*yield*/, checkIfRecordRerun()];
+                                _l.sent();
+                                return [3 /*break*/, 3];
+                            case 17:
+                                if (!(loopProgram == false)) return [3 /*break*/, 29];
+                                _l.label = 18;
+                            case 18: return [4 /*yield*/, checkIfUserIsLive()];
                             case 19:
                                 _g = (_l.sent()) == false;
-                                _l.label = 20;
+                                if (_g) return [3 /*break*/, 21];
+                                return [4 /*yield*/, checkIfRecordRerun()];
                             case 20:
-                                _f = _g;
-                                if (_f) return [3 /*break*/, 22];
-                                return [4 /*yield*/, checkCategory()];
+                                _g = (_l.sent()) == false;
+                                _l.label = 21;
                             case 21:
-                                _f = (_l.sent()) == false;
-                                _l.label = 22;
+                                _f = _g;
+                                if (_f) return [3 /*break*/, 23];
+                                return [4 /*yield*/, checkCategory()];
                             case 22:
-                                if (!_f) return [3 /*break*/, 24];
-                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                                _f = (_l.sent()) == false;
+                                _l.label = 23;
                             case 23:
+                                if (!_f) return [3 /*break*/, 25];
+                                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+                            case 24:
                                 _l.sent();
-                                return [3 /*break*/, 17];
-                            case 24: return [4 /*yield*/, startRecording()];
-                            case 25:
+                                return [3 /*break*/, 18];
+                            case 25: return [4 /*yield*/, startRecording()];
+                            case 26:
                                 _l.sent();
                                 return [4 /*yield*/, printLogo()];
-                            case 26:
+                            case 27:
                                 _l.sent();
                                 Logger.log("Your file is ready. File: ./" + user + "/" + user + "-" + filename + ".mp4", "info");
                                 timer.stop();
                                 _j = (_h = Logger).log;
                                 _k = "Final file size: ";
                                 return [4 /*yield*/, getFileSizeGb()];
-                            case 27:
+                            case 28:
                                 _j.apply(_h, [_k + (_l.sent()) + " GB", "info"]);
                                 Logger.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"), "info");
                                 Logger.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"), "info");
-                                _l.label = 28;
-                            case 28:
-                                process.exit();
-                                return [3 /*break*/, 30];
+                                _l.label = 29;
                             case 29:
+                                process.exit();
+                                return [3 /*break*/, 31];
+                            case 30:
                                 Logger.log("User does not exist", "error");
                                 process.exit();
-                                _l.label = 30;
-                            case 30: return [2 /*return*/];
+                                _l.label = 31;
+                            case 31: return [2 /*return*/];
                         }
                     });
                 }); })();

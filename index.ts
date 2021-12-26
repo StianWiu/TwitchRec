@@ -338,10 +338,12 @@ const startProcess = async () => {
   (async () => {
     if (await checkIfUserExists()) {
       Logger.log("User exists", "info");
-      Logger.log(
-        "Recording will start when user goes live or starts a rerun",
-        "info"
-      );
+      if ((await checkIfUserIsLive()) == false) {
+        Logger.log(
+          "Recording will start when user goes live or starts a rerun",
+          "info"
+        );
+      }
       while (loopProgram == true) {
         while (
           (await checkIfUserIsLive()) == false ||
