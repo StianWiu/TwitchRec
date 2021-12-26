@@ -8,7 +8,7 @@ This was made for windows and ubuntu so it has not been tested in any other oper
 
 I made this program out of spite. There is a twitch streamer I like that only streams at 4am my time and their VOD's are sub only. So I just leave this program running on my server so I have the stream saved for later.
 
-Feel free to take as much as you want from this project and use it on your own. No credits needed but much appreciated.
+Feel free to take as much as you want from this project and use it on your own. No credit needed but much appreciated.
 
 # Pros & cons
 
