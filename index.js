@@ -571,7 +571,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 process.exit();
                                 return [3 /*break*/, 30];
                             case 29:
-                                Logger.log("User does not exist", "action");
+                                Logger.log("User does not exist", "error");
                                 process.exit();
                                 _l.label = 30;
                             case 30: return [2 /*return*/];

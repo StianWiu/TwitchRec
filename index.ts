@@ -397,7 +397,7 @@ const startProcess = async () => {
       }
       process.exit();
     } else {
-      Logger.log("User does not exist", "action");
+      Logger.log("User does not exist", "error");
       process.exit();
     }
   })();
