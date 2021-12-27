@@ -39,16 +39,17 @@ exports.__esModule = true;
 console.clear();
 try {
     require("asciiart-logo");
+    require("axios");
     require("bug-killer");
     require("commander");
     require("console-clear");
     require("m3u8stream");
+    require("prompt-confirm");
     require("puppeteer");
     require("randomstring");
     require("timer-node");
     require("fs");
     require("twitch-m3u8");
-    require("axios");
 }
 catch (error) {
     console.log("\x1b[31m%s", "\n\nPlease install the required dependencies by running npm install. Exiting...\n\n");
@@ -63,6 +64,7 @@ var Logger = require("bug-killer");
 var m3u8Info = require("twitch-m3u8");
 var axios = require("axios");
 var clear = require("console-clear");
+var confirm = require("prompt-confirm");
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
     // The error type
@@ -131,40 +133,94 @@ var printLogo = function () {
 };
 printLogo();
 program.requiredOption("-u, --user <string>", "Twitch username");
-program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
-program.option("-c, --category <string>", "Only record certain category [Optional]");
-program.option("-m, --max <num>", "How many GB file can become [Optional]");
-program.option("-l, --loop <boolean>", "Weather program should infinitely loop when stream is over [Optional]");
+program.option("-r, --rerun <boolean>", "Should the program record reruns");
+program.option("-c, --category <string>", "Only record certain category");
+program.option("-m, --max <num>", "How many GB file can become");
+program.option("-l, --loop <boolean>", "Weather program should infinitely loop when stream is over");
+program.option("-y, --yes", "Skip settings confirmation");
 program.parse(process.argv);
 var options = program.opts();
-var checkConfiguration = function () {
-    user = options.user.toLowerCase();
-    if (options.rerun == "false") {
-        rerunEnable = false;
-    }
-    else {
-        rerunEnable = true;
-    }
-    if (options.category) {
-        category = options.category.toLowerCase();
-    }
-    else {
-        category = undefined;
-    }
-    if (options.max) {
-        maxSize = Number(options.max);
-    }
-    else {
-        maxSize = undefined;
-    }
-    if (options.loop == "true") {
-        loopProgram = true;
-    }
-    else {
-        loopProgram = false;
-    }
-};
-checkConfiguration();
+var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, function () {
+    var continueProgram, prompt_1, _a, _b;
+    return __generator(this, function (_c) {
+        switch (_c.label) {
+            case 0:
+                user = options.user.toLowerCase();
+                if (options.rerun == "false") {
+                    rerunEnable = false;
+                }
+                else {
+                    rerunEnable = true;
+                }
+                if (options.category) {
+                    category = options.category.toLowerCase();
+                }
+                else {
+                    category = "disabled";
+                }
+                if (options.max) {
+                    maxSize = Number(options.max);
+                }
+                else {
+                    maxSize = "disabled";
+                }
+                if (options.loop == "true") {
+                    loopProgram = true;
+                }
+                else {
+                    loopProgram = false;
+                }
+                console.clear();
+                continueProgram = false;
+                if (!!options.yes) return [3 /*break*/, 3];
+                console.log(logo({
+                    name: "Settings",
+                    font: "Chunky",
+                    lineChars: 10,
+                    padding: 2,
+                    margin: 3
+                })
+                    .emptyLine()
+                    .center("Are these settings correct?")
+                    .emptyLine()
+                    .left("Username: " + user)
+                    .left("Reruns: " + rerunEnable)
+                    .left("Category: " + category)
+                    .left("Max size: " + maxSize)
+                    .left("Loop: " + loopProgram)
+                    .emptyLine()
+                    .center("You can skip this by adding -y or --yes to the command")
+                    .render());
+                prompt_1 = new confirm("Are these settings correct?");
+                _b = (_a = prompt_1).ask;
+                return [4 /*yield*/, function (answer) {
+                        if (!answer) {
+                            Logger.log("Program stopped by user", "warn");
+                            process.exit();
+                        }
+                        continueProgram = true;
+                        console.clear();
+                        printLogo();
+                    }];
+            case 1: return [4 /*yield*/, _b.apply(_a, [_c.sent()])];
+            case 2:
+                _c.sent();
+                return [3 /*break*/, 4];
+            case 3:
+                console.clear();
+                printLogo();
+                continueProgram = true;
+                _c.label = 4;
+            case 4:
+                if (!(continueProgram == false)) return [3 /*break*/, 6];
+                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
+            case 5:
+                _c.sent();
+                return [3 /*break*/, 4];
+            case 6: return [2 /*return*/];
+        }
+    });
+}); };
 var startProcess = function () { return __awaiter(void 0, void 0, void 0, function () {
     // Check if stream is live
     function checkM3u8StreamUrl(url) {
@@ -189,7 +245,9 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
     var browser, page, checkIfUserExists, checkIfUserIsLive, checkIfStreamIsRerun, checkIfRecordRerun, clickChatButton, getFileSizeGb, checkCategory, recordingProgress, startRecording;
     return __generator(this, function (_a) {
         switch (_a.label) {
-            case 0:
+            case 0: return [4 /*yield*/, checkConfiguration()];
+            case 1:
+                _a.sent();
                 Logger.log("Loading please wait...", "info");
                 return [4 /*yield*/, puppeteer.launch({
                         // headless: false, // Uncomment this line to see the browser pop up
@@ -199,13 +257,13 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                             height: 1080
                         }
                     })];
-            case 1:
+            case 2:
                 browser = _a.sent();
                 return [4 /*yield*/, browser.newPage()];
-            case 2:
+            case 3:
                 page = _a.sent();
                 return [4 /*yield*/, page.goto("https://www.twitch.tv/" + user)];
-            case 3:
+            case 4:
                 _a.sent();
                 checkIfUserExists = function () { return __awaiter(void 0, void 0, void 0, function () {
                     var error_1;
@@ -302,7 +360,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     });
                 }); };
                 return [4 /*yield*/, clickChatButton()];
-            case 4:
+            case 5:
                 _a.sent();
                 getFileSizeGb = function () { return __awaiter(void 0, void 0, void 0, function () {
                     var stats, fileSizeInBytes, fileSizeInMegabytes, fileSizeInGigabytes;
@@ -319,7 +377,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     return __generator(this, function (_a) {
                         switch (_a.label) {
                             case 0:
-                                if (category == undefined) {
+                                if (category == "disabled") {
                                     return [2 /*return*/, true];
                                 }
                                 _a.label = 1;
@@ -457,7 +515,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 }
                                 return [4 /*yield*/, getFileSizeGb()];
                             case 15:
-                                if ((_a.sent()) > maxSize && maxSize != undefined) {
+                                if ((_a.sent()) > maxSize && maxSize != "disabled") {
                                     stream.end();
                                     finishedRecording = true;
                                     Logger.log("Max file size reached", "info");

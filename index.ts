@@ -1,16 +1,17 @@
 console.clear();
 try {
   require("asciiart-logo");
+  require("axios");
   require("bug-killer");
   require("commander");
   require("console-clear");
   require("m3u8stream");
+  require("prompt-confirm");
   require("puppeteer");
   require("randomstring");
   require("timer-node");
   require("fs");
   require("twitch-m3u8");
-  require("axios");
 } catch (error) {
   console.log(
     "\x1b[31m%s",
@@ -28,6 +29,7 @@ const Logger = require("bug-killer");
 const m3u8Info = require("twitch-m3u8");
 const axios = require("axios");
 const clear = require("console-clear");
+const confirm = require("prompt-confirm");
 
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
@@ -70,6 +72,7 @@ const filename = randomstring.generate({
   charset: "hex",
 });
 import { Command } from "commander";
+import { stdout } from "process";
 import { Timer } from "timer-node";
 const program = new Command();
 
@@ -106,21 +109,19 @@ const printLogo = () => {
 
 printLogo();
 program.requiredOption("-u, --user <string>", "Twitch username");
-program.option("-r, --rerun <boolean>", "Record reruns [Optional]");
-program.option(
-  "-c, --category <string>",
-  "Only record certain category [Optional]"
-);
-program.option("-m, --max <num>", "How many GB file can become [Optional]");
+program.option("-r, --rerun <boolean>", "Should the program record reruns");
+program.option("-c, --category <string>", "Only record certain category");
+program.option("-m, --max <num>", "How many GB file can become");
 program.option(
   "-l, --loop <boolean>",
-  "Weather program should infinitely loop when stream is over [Optional]"
+  "Weather program should infinitely loop when stream is over"
 );
+program.option("-y, --yes", "Skip settings confirmation");
 
 program.parse(process.argv);
 const options = program.opts();
 
-const checkConfiguration = () => {
+const checkConfiguration = async () => {
   user = options.user.toLowerCase();
   if (options.rerun == "false") {
     rerunEnable = false;
@@ -130,21 +131,64 @@ const checkConfiguration = () => {
   if (options.category) {
     category = options.category.toLowerCase();
   } else {
-    category = undefined;
+    category = "disabled";
   }
   if (options.max) {
     maxSize = Number(options.max);
   } else {
-    maxSize = undefined;
+    maxSize = "disabled";
   }
   if (options.loop == "true") {
     loopProgram = true;
   } else {
     loopProgram = false;
   }
+  console.clear();
+  let continueProgram = false;
+  if (!options.yes) {
+    console.log(
+      logo({
+        name: "Settings",
+        font: "Chunky",
+        lineChars: 10,
+        padding: 2,
+        margin: 3,
+      })
+        .emptyLine()
+        .center("Are these settings correct?")
+        .emptyLine()
+        .left(`Username: ${user}`)
+        .left(`Reruns: ${rerunEnable}`)
+        .left(`Category: ${category}`)
+        .left(`Max size: ${maxSize}`)
+        .left(`Loop: ${loopProgram}`)
+        .emptyLine()
+        .center("You can skip this by adding -y or --yes to the command")
+        .render()
+    );
+    const prompt = new confirm("Are these settings correct?");
+    await prompt.ask(
+      await function (answer) {
+        if (!answer) {
+          Logger.log("Program stopped by user", "warn");
+          process.exit();
+        }
+        continueProgram = true;
+        console.clear();
+        printLogo();
+      }
+    );
+  } else {
+    console.clear();
+    printLogo();
+    continueProgram = true;
+  }
+  while (continueProgram == false) {
+    await new Promise((resolve) => setTimeout(resolve, 5000));
+  }
 };
-checkConfiguration();
 const startProcess = async () => {
+  await checkConfiguration();
   Logger.log("Loading please wait...", "info");
   const browser = await puppeteer.launch({
     // headless: false, // Uncomment this line to see the browser pop up
@@ -228,7 +272,7 @@ const startProcess = async () => {
 
   // Check if category is same as specified by user
   const checkCategory = async () => {
-    if (category == undefined) {
+    if (category == "disabled") {
       return true;
     }
     let value1;
@@ -326,7 +370,7 @@ const startProcess = async () => {
         finishedRecording = true;
         Logger.log("Stream has chagned category", "info");
       }
-      if ((await getFileSizeGb()) > maxSize && maxSize != undefined) {
+      if ((await getFileSizeGb()) > maxSize && maxSize != "disabled") {
         stream.end();
         finishedRecording = true;
         Logger.log("Max file size reached", "info");
