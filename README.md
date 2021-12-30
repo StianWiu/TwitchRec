@@ -1,12 +1,8 @@
 # About
 
-This is my side project Twitch-Recorder.
-
-The way this program works is, it uses [puppeteer](https://github.com/puppeteer/puppeteer) to open a twitch stream checking if it is live and whether it is a rerun and more. Once it has gotten the required information and knows the specified user is live it will grab the twitch stream m3u8stream link. Using this link it will use [m3u8stream](https://www.npmjs.com/package/m3u8stream) to record that URL to a mp4 format.
+The program works by using [puppeteer](https://github.com/puppeteer/puppeteer) to open a twitch stream checking if it is live and whether it is a rerun and more. Once it has gotten the required information and knows the specified user is live it will grab the twitch stream m3u8stream link. Using this link it will use [m3u8stream](https://www.npmjs.com/package/m3u8stream) to record that URL to a mp4 format.
 
 This was made for windows and ubuntu so it has not been tested in any other operating system. Though it will most likely still work. Please see [Requirements](#requirements) section.
-
-I made this program out of spite. There is a twitch streamer I like that only streams at 4am my time and their VOD's are sub only. So I just leave this program running on my server so I have the stream saved for later.
 
 Feel free to take as much as you want from this project and use it on your own. No credit needed but much appreciated.
 
@@ -71,7 +67,7 @@ If you are experiencing issues please open an issue on [GitHub](https://github.c
 
 # Extra
 
-In order to edit the code you will need to go into the [index.ts](https://github.com/Pignuuu/twitch-recorder/blob/main/index.ts) file and add your code there$.
+In order to edit the code you will need to go into the [index.ts](https://github.com/Pignuuu/twitch-recorder/blob/main/index.ts) file and add your code there.
 
 Then to compile it into JavaScript
 
