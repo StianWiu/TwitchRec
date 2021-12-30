@@ -33,7 +33,7 @@
     "console-clear": "^1.1.1",
     "m3u8stream": "^0.8.4",
     "prompt-confirm": "^2.0.4",
-    "puppeteer": "^10.4.0",
+    "puppeteer": "^13.0.1",
     "randomstring": "^1.2.1",
     "timer-node": "^5.0.5",
     "ts-node": "^10.2.1",
