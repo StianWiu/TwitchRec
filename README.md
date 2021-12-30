@@ -21,11 +21,11 @@ You can also install this without the -g but it will not be available globally.
 # Example commands
 
 ```bash
-$ node index.js -u <username>
+$ twitchrec -u <username>
 
-$ node index.js -u <username> -r <true/false> -c <category> -m <num> -l <true/false>
+$ twitchrec -u <username> -r <true/false> -c <category> -m <num> -l <true/false>
 
-$ node index.js --user <username> --rerun <true/false> --category <category> --max <num> --loop <true/false>
+$ twitchrec --user <username> --rerun <true/false> --category <category> --max <num> --loop <true/false>
 ```
 
 # Issues
