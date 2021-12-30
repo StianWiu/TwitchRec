@@ -8,7 +8,7 @@ You can also install this without the -g but it will not be available globally.
 
 # Options
 
-```
+```bash
 -h, --help # Display help for command
 
 -u, --user <string> # Twitch username [Required]
