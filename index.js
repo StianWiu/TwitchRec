@@ -56,9 +56,7 @@ catch (error) {
     console.log("\x1b[31m%s", "\n\nPlease install the required dependencies by running npm install. Exiting...\n\n");
     process.exit(1);
 }
-var fs = require("fs"), puppeteer = require("puppeteer"), m3u8stream = require("m3u8stream"), randomstring = require("randomstring"), logo = require("asciiart-logo"), Logger = require("bug-killer"), m3u8Info = require("twitch-m3u8"), axios = require("axios"), 
-// clear = require("console-clear"),
-confirm = require("prompt-confirm");
+var fs = require("fs"), puppeteer = require("puppeteer"), m3u8stream = require("m3u8stream"), randomstring = require("randomstring"), logo = require("asciiart-logo"), Logger = require("bug-killer"), m3u8Info = require("twitch-m3u8"), axios = require("axios"), confirm = require("prompt-confirm");
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
     // The error type

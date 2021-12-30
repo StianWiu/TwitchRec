@@ -29,7 +29,6 @@ const fs = require("fs"),
   Logger = require("bug-killer"),
   m3u8Info = require("twitch-m3u8"),
   axios = require("axios"),
-  // clear = require("console-clear"),
   confirm = require("prompt-confirm");
 
 // Set configuration for Logger(bug-killer) node module
