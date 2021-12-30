@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 "use strict";
 var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -55,16 +56,7 @@ catch (error) {
     console.log("\x1b[31m%s", "\n\nPlease install the required dependencies by running npm install. Exiting...\n\n");
     process.exit(1);
 }
-var fs = require("fs");
-var puppeteer = require("puppeteer");
-var m3u8stream = require("m3u8stream");
-var randomstring = require("randomstring");
-var logo = require("asciiart-logo");
-var Logger = require("bug-killer");
-var m3u8Info = require("twitch-m3u8");
-var axios = require("axios");
-var clear = require("console-clear");
-var confirm = require("prompt-confirm");
+var fs = require("fs"), puppeteer = require("puppeteer"), m3u8stream = require("m3u8stream"), randomstring = require("randomstring"), logo = require("asciiart-logo"), Logger = require("bug-killer"), m3u8Info = require("twitch-m3u8"), axios = require("axios"), clear = require("console-clear"), confirm = require("prompt-confirm");
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
     // The error type
@@ -107,12 +99,7 @@ var filename = randomstring.generate({
 var commander_1 = require("commander");
 var timer_node_1 = require("timer-node");
 var program = new commander_1.Command();
-var user;
-var rerunEnable;
-var category;
-var maxSize;
-var link;
-var loopProgram;
+var user, rerunEnable, category, maxSize, link, loopProgram;
 var timer = new timer_node_1.Timer({ label: "main-timer" });
 var recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
 timer.start();

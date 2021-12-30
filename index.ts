@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 console.clear();
 try {
   require("asciiart-logo");
@@ -20,16 +21,16 @@ try {
 
   process.exit(1);
 }
-const fs = require("fs");
-const puppeteer = require("puppeteer");
-const m3u8stream = require("m3u8stream");
-const randomstring = require("randomstring");
-const logo = require("asciiart-logo");
-const Logger = require("bug-killer");
-const m3u8Info = require("twitch-m3u8");
-const axios = require("axios");
-const clear = require("console-clear");
-const confirm = require("prompt-confirm");
+const fs = require("fs"),
+  puppeteer = require("puppeteer"),
+  m3u8stream = require("m3u8stream"),
+  randomstring = require("randomstring"),
+  logo = require("asciiart-logo"),
+  Logger = require("bug-killer"),
+  m3u8Info = require("twitch-m3u8"),
+  axios = require("axios"),
+  clear = require("console-clear"),
+  confirm = require("prompt-confirm");
 
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
@@ -72,16 +73,10 @@ const filename = randomstring.generate({
   charset: "hex",
 });
 import { Command } from "commander";
-import { stdout } from "process";
 import { Timer } from "timer-node";
 const program = new Command();
 
-let user;
-let rerunEnable;
-let category;
-let maxSize;
-let link;
-let loopProgram;
+let user, rerunEnable, category, maxSize, link, loopProgram;
 
 const timer = new Timer({ label: "main-timer" });
 const recording_timer = new Timer({ label: "recording-timer" });
