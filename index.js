@@ -56,7 +56,9 @@ catch (error) {
     console.log("\x1b[31m%s", "\n\nPlease install the required dependencies by running npm install. Exiting...\n\n");
     process.exit(1);
 }
-var fs = require("fs"), puppeteer = require("puppeteer"), m3u8stream = require("m3u8stream"), randomstring = require("randomstring"), logo = require("asciiart-logo"), Logger = require("bug-killer"), m3u8Info = require("twitch-m3u8"), axios = require("axios"), clear = require("console-clear"), confirm = require("prompt-confirm");
+var fs = require("fs"), puppeteer = require("puppeteer"), m3u8stream = require("m3u8stream"), randomstring = require("randomstring"), logo = require("asciiart-logo"), Logger = require("bug-killer"), m3u8Info = require("twitch-m3u8"), axios = require("axios"), 
+// clear = require("console-clear"),
+confirm = require("prompt-confirm");
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
     // The error type
@@ -170,11 +172,11 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                     .emptyLine()
                     .center("Are these settings correct?")
                     .emptyLine()
-                    .left("Username: " + user)
-                    .left("Reruns: " + rerunEnable)
-                    .left("Category: " + category)
-                    .left("Max size: " + maxSize)
-                    .left("Loop: " + loopProgram)
+                    .left("Username: ".concat(user))
+                    .left("Reruns: ".concat(rerunEnable))
+                    .left("Category: ".concat(category))
+                    .left("Max size: ".concat(maxSize))
+                    .left("Loop: ".concat(loopProgram))
                     .emptyLine()
                     .center("You can skip this by adding -y or --yes to the command")
                     .render());
@@ -249,7 +251,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                 return [4 /*yield*/, browser.newPage()];
             case 3:
                 page = _a.sent();
-                return [4 /*yield*/, page.goto("https://www.twitch.tv/" + user)];
+                return [4 /*yield*/, page.goto("https://www.twitch.tv/".concat(user))];
             case 4:
                 _a.sent();
                 checkIfUserExists = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -352,7 +354,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                 getFileSizeGb = function () { return __awaiter(void 0, void 0, void 0, function () {
                     var stats, fileSizeInBytes, fileSizeInMegabytes, fileSizeInGigabytes;
                     return __generator(this, function (_a) {
-                        stats = fs.statSync("videos/" + user + "/" + user + "-" + filename + ".mp4");
+                        stats = fs.statSync("videos/".concat(user, "/").concat(user, "-").concat(filename, ".mp4"));
                         fileSizeInBytes = stats.size;
                         fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
                         fileSizeInGigabytes = fileSizeInMegabytes * 0.001;
@@ -424,21 +426,21 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                     margin: 3
                                 })
                                     .emptyLine()
-                                    .left("User: " + user)
+                                    .left("User: ".concat(user))
                                     .emptyLine())
                                     .left;
-                                _f = "Filesize: ";
+                                _f = "Filesize: ".concat;
                                 return [4 /*yield*/, getFileSizeGb()];
                             case 1:
-                                _g = (_c = _e.apply(_d, [_f + (_j.sent()) + " GB"])
-                                    .left("Running for: " + timer.format("D:%d H:%h M:%m S:%s"))
-                                    .left("Recording: " + recording_timer.format("D:%d H:%h M:%m S:%s")))
+                                _g = (_c = _e.apply(_d, [_f.apply("Filesize: ", [_j.sent(), " GB"])])
+                                    .left("Running for: ".concat(timer.format("D:%d H:%h M:%m S:%s")))
+                                    .left("Recording: ".concat(recording_timer.format("D:%d H:%h M:%m S:%s"))))
                                     .left;
-                                _h = "Rerun: ";
+                                _h = "Rerun: ".concat;
                                 return [4 /*yield*/, checkIfStreamIsRerun()];
                             case 2:
-                                _b.apply(_a, [_g.apply(_c, [_h + (_j.sent())])
-                                        .emptyLine("" + clear())
+                                _b.apply(_a, [_g.apply(_c, [_h.apply("Rerun: ", [_j.sent()])])
+                                        .emptyLine("".concat(console.clear()))
                                         .center("Twitch recording software. Developed by Pignuuu.")
                                         .center("https://stianwiu.me")
                                         .render()]);
@@ -468,14 +470,14 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 _a.sent();
                                 Logger.log("Recording started", "action");
                                 recording_timer.start();
-                                return [4 /*yield*/, fs.existsSync("./videos/" + user)];
+                                return [4 /*yield*/, fs.existsSync("./videos/".concat(user))];
                             case 5:
                                 if (!!(_a.sent())) return [3 /*break*/, 7];
-                                return [4 /*yield*/, fs.mkdirSync("./videos/" + user)];
+                                return [4 /*yield*/, fs.mkdirSync("./videos/".concat(user))];
                             case 6:
                                 _a.sent();
                                 _a.label = 7;
-                            case 7: return [4 /*yield*/, m3u8stream(link).pipe(fs.createWriteStream("videos/" + user + "/" + user + "-" + filename + ".mp4"))];
+                            case 7: return [4 /*yield*/, m3u8stream(link).pipe(fs.createWriteStream("videos/".concat(user, "/").concat(user, "-").concat(filename, ".mp4")))];
                             case 8:
                                 stream = _a.sent();
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
@@ -559,13 +561,13 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, printLogo()];
                             case 13:
                                 _l.sent();
-                                Logger.log("Your file is ready. File: ./" + user + "/" + user + "-" + filename + ".mp4", "info");
+                                Logger.log("Your file is ready. File: ./".concat(user, "/").concat(user, "-").concat(filename, ".mp4"), "info");
                                 timer.stop();
                                 _d = (_c = Logger).log;
-                                _e = "Final file size: ";
+                                _e = "Final file size: ".concat;
                                 return [4 /*yield*/, getFileSizeGb()];
                             case 14:
-                                _d.apply(_c, [_e + (_l.sent()) + " GB", "info"]);
+                                _d.apply(_c, [_e.apply("Final file size: ", [_l.sent(), " GB"]), "info"]);
                                 Logger.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"), "info");
                                 Logger.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s\n"), "info");
                                 Logger.log("Waiting for stream to start again", "info");
@@ -606,13 +608,13 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, printLogo()];
                             case 27:
                                 _l.sent();
-                                Logger.log("Your file is ready. File: ./" + user + "/" + user + "-" + filename + ".mp4", "info");
+                                Logger.log("Your file is ready. File: ./".concat(user, "/").concat(user, "-").concat(filename, ".mp4"), "info");
                                 timer.stop();
                                 _j = (_h = Logger).log;
-                                _k = "Final file size: ";
+                                _k = "Final file size: ".concat;
                                 return [4 /*yield*/, getFileSizeGb()];
                             case 28:
-                                _j.apply(_h, [_k + (_l.sent()) + " GB", "info"]);
+                                _j.apply(_h, [_k.apply("Final file size: ", [_l.sent(), " GB"]), "info"]);
                                 Logger.log(timer.format("Entire process took D:%d H:%h M:%m S:%s"), "info");
                                 Logger.log(recording_timer.format("Recorded for D:%d H:%h M:%m S:%s"), "info");
                                 _l.label = 29;

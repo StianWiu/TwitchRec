@@ -29,7 +29,7 @@ const fs = require("fs"),
   Logger = require("bug-killer"),
   m3u8Info = require("twitch-m3u8"),
   axios = require("axios"),
-  clear = require("console-clear"),
+  // clear = require("console-clear"),
   confirm = require("prompt-confirm");
 
 // Set configuration for Logger(bug-killer) node module
@@ -323,7 +323,7 @@ const startProcess = async () => {
         .left(`Running for: ${timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Recording: ${recording_timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Rerun: ${await checkIfStreamIsRerun()}`)
-        .emptyLine(`${clear()}`)
+        .emptyLine(`${console.clear()}`)
         .center("Twitch recording software. Developed by Pignuuu.")
         .center("https://stianwiu.me")
         .render()
