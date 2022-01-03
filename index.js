@@ -173,7 +173,7 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                     .left("Username: ".concat(user))
                     .left("Reruns: ".concat(rerunEnable))
                     .left("Category: ".concat(category))
-                    .left("Max size: ".concat(maxSize))
+                    .left("Max size: ".concat(maxSize, "gb"))
                     .left("Loop: ".concat(loopProgram))
                     .emptyLine()
                     .center("You can skip this by adding -y or --yes to the command")
