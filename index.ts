@@ -5,7 +5,6 @@ try {
   require("axios");
   require("bug-killer");
   require("commander");
-  require("console-clear");
   require("m3u8stream");
   require("prompt-confirm");
   require("puppeteer");
