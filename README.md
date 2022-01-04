@@ -15,7 +15,7 @@ You can also install this without the -g but it will not be available globally.
 -r, --rerun <boolean> # Record reruns
 -c, --category <string> # Only record certain category
 -m, --max <num> # How many GB file can become
--l, --loop <boolean> # Weather program should infinitely loop when stream is over
+-l, --loop <boolean> # Whether program should infinitely loop when stream is over
 ```
 
 # Example commands
