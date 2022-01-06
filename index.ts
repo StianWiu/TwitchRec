@@ -74,7 +74,7 @@ import { Command } from "commander";
 import { Timer } from "timer-node";
 const program = new Command();
 
-let user, rerunEnable, category, maxSize, link, loopProgram;
+let user, rerunEnable, category, maxSize, link, loopProgram, directoryPath;
 
 const timer = new Timer({ label: "main-timer" });
 const recording_timer = new Timer({ label: "recording-timer" });
@@ -109,7 +109,8 @@ program.option(
   "-l, --loop <boolean>",
   "Weather program should infinitely loop when stream is over"
 );
-program.option("-y, --yes", "Skip settings confirmation");
+program.option("-y, --yes <boolean>", "Skip settings confirmation");
+program.option("-d, --directory <string>", "Where to save the files produced");
 
 program.parse(process.argv);
 const options = program.opts();
@@ -136,6 +137,23 @@ const checkConfiguration = async () => {
   } else {
     loopProgram = false;
   }
+  if (options.directory) {
+    directoryPath = options.directory;
+    if (directoryPath.substr(directoryPath.length - 1) != "/") {
+      directoryPath = directoryPath + "/";
+    }
+    try {
+      fs.accessSync(directoryPath, fs.constants.W_OK);
+    } catch (err) {
+      Logger.log(
+        `Couldn't find or couldn't write to ${directoryPath}`,
+        "error"
+      );
+      process.exit();
+    }
+  } else {
+    directoryPath = "./";
+  }
   console.clear();
   let continueProgram = false;
   if (!options.yes) {
@@ -155,6 +173,7 @@ const checkConfiguration = async () => {
         .left(`Category: ${category}`)
         .left(`Max size: ${maxSize}gb`)
         .left(`Loop: ${loopProgram}`)
+        .left(`Directory: ${directoryPath}`)
         .emptyLine()
         .center("You can skip this by adding -y or --yes to the command")
         .render()
@@ -256,7 +275,9 @@ const startProcess = async () => {
 
   // Get current recording's file size in gigabytes
   const getFileSizeGb = async () => {
-    var stats = fs.statSync(`videos/${user}/${user}-${filename}.mp4`);
+    var stats = fs.statSync(
+      `${directoryPath}videos/${user}/${user}-${filename}.mp4`
+    );
     var fileSizeInBytes = stats.size;
     var fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
     var fileSizeInGigabytes = fileSizeInMegabytes * 0.001;
@@ -330,8 +351,8 @@ const startProcess = async () => {
 
   const startRecording = async () => {
     // Make sure ./videos folder exists. If not, create it.
-    if (!(await fs.existsSync(`./videos`))) {
-      await fs.mkdirSync(`./videos`);
+    if (!(await fs.existsSync(`${directoryPath}videos`))) {
+      await fs.mkdirSync(`${directoryPath}videos`);
     }
 
     Logger.log("Getting raw stream url", "info");
@@ -344,11 +365,13 @@ const startProcess = async () => {
 
     Logger.log("Recording started", "action");
     recording_timer.start();
-    if (!(await fs.existsSync(`./videos/${user}`))) {
-      await fs.mkdirSync(`./videos/${user}`);
+    if (!(await fs.existsSync(`${directoryPath}videos/${user}`))) {
+      await fs.mkdirSync(`${directoryPath}videos/${user}`);
     }
     const stream = await m3u8stream(link).pipe(
-      fs.createWriteStream(`videos/${user}/${user}-${filename}.mp4`)
+      fs.createWriteStream(
+        `${directoryPath}videos/${user}/${user}-${filename}.mp4`
+      )
     );
     await new Promise((resolve) => setTimeout(resolve, 5000));
     await recordingProgress();
@@ -366,7 +389,7 @@ const startProcess = async () => {
       if ((await getFileSizeGb()) > maxSize && maxSize != "disabled") {
         stream.end();
         finishedRecording = true;
-        Logger.log("Max file size reached", "info");
+        Logger.log("Max file size reached", "warn");
       }
       await new Promise((resolve) => setTimeout(resolve, 5000));
     }
@@ -420,7 +443,7 @@ const startProcess = async () => {
         await startRecording();
         await printLogo();
         Logger.log(
-          `Your file is ready. File: ./${user}/${user}-${filename}.mp4`,
+          `Your file is ready. File: ${directoryPath}${user}/${user}-${filename}.mp4`,
           "info"
         );
         timer.stop();

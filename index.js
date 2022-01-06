@@ -98,7 +98,7 @@ var filename = randomstring.generate({
 var commander_1 = require("commander");
 var timer_node_1 = require("timer-node");
 var program = new commander_1.Command();
-var user, rerunEnable, category, maxSize, link, loopProgram;
+var user, rerunEnable, category, maxSize, link, loopProgram, directoryPath;
 var timer = new timer_node_1.Timer({ label: "main-timer" });
 var recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
 timer.start();
@@ -123,7 +123,8 @@ program.option("-r, --rerun <boolean>", "Should the program record reruns");
 program.option("-c, --category <string>", "Only record certain category");
 program.option("-m, --max <num>", "How many GB file can become");
 program.option("-l, --loop <boolean>", "Weather program should infinitely loop when stream is over");
-program.option("-y, --yes", "Skip settings confirmation");
+program.option("-y, --yes <boolean>", "Skip settings confirmation");
+program.option("-d, --directory <string>", "Where to save the files produced");
 program.parse(process.argv);
 var options = program.opts();
 var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -156,6 +157,22 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                 else {
                     loopProgram = false;
                 }
+                if (options.directory) {
+                    directoryPath = options.directory;
+                    if (directoryPath.substr(directoryPath.length - 1) != "/") {
+                        directoryPath = directoryPath + "/";
+                    }
+                    try {
+                        fs.accessSync(directoryPath, fs.constants.W_OK);
+                    }
+                    catch (err) {
+                        Logger.log("Couldn't find or couldn't write to ".concat(directoryPath), "error");
+                        process.exit();
+                    }
+                }
+                else {
+                    directoryPath = "./";
+                }
                 console.clear();
                 continueProgram = false;
                 if (!!options.yes) return [3 /*break*/, 3];
@@ -174,6 +191,7 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                     .left("Category: ".concat(category))
                     .left("Max size: ".concat(maxSize, "gb"))
                     .left("Loop: ".concat(loopProgram))
+                    .left("Directory: ".concat(directoryPath))
                     .emptyLine()
                     .center("You can skip this by adding -y or --yes to the command")
                     .render());
@@ -351,7 +369,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                 getFileSizeGb = function () { return __awaiter(void 0, void 0, void 0, function () {
                     var stats, fileSizeInBytes, fileSizeInMegabytes, fileSizeInGigabytes;
                     return __generator(this, function (_a) {
-                        stats = fs.statSync("videos/".concat(user, "/").concat(user, "-").concat(filename, ".mp4"));
+                        stats = fs.statSync("".concat(directoryPath, "videos/").concat(user, "/").concat(user, "-").concat(filename, ".mp4"));
                         fileSizeInBytes = stats.size;
                         fileSizeInMegabytes = fileSizeInBytes / (1024 * 1024);
                         fileSizeInGigabytes = fileSizeInMegabytes * 0.001;
@@ -449,10 +467,10 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                     var stream, finishedRecording;
                     return __generator(this, function (_a) {
                         switch (_a.label) {
-                            case 0: return [4 /*yield*/, fs.existsSync("./videos")];
+                            case 0: return [4 /*yield*/, fs.existsSync("".concat(directoryPath, "videos"))];
                             case 1:
                                 if (!!(_a.sent())) return [3 /*break*/, 3];
-                                return [4 /*yield*/, fs.mkdirSync("./videos")];
+                                return [4 /*yield*/, fs.mkdirSync("".concat(directoryPath, "videos"))];
                             case 2:
                                 _a.sent();
                                 _a.label = 3;
@@ -467,14 +485,14 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 _a.sent();
                                 Logger.log("Recording started", "action");
                                 recording_timer.start();
-                                return [4 /*yield*/, fs.existsSync("./videos/".concat(user))];
+                                return [4 /*yield*/, fs.existsSync("".concat(directoryPath, "videos/").concat(user))];
                             case 5:
                                 if (!!(_a.sent())) return [3 /*break*/, 7];
-                                return [4 /*yield*/, fs.mkdirSync("./videos/".concat(user))];
+                                return [4 /*yield*/, fs.mkdirSync("".concat(directoryPath, "videos/").concat(user))];
                             case 6:
                                 _a.sent();
                                 _a.label = 7;
-                            case 7: return [4 /*yield*/, m3u8stream(link).pipe(fs.createWriteStream("videos/".concat(user, "/").concat(user, "-").concat(filename, ".mp4")))];
+                            case 7: return [4 /*yield*/, m3u8stream(link).pipe(fs.createWriteStream("".concat(directoryPath, "videos/").concat(user, "/").concat(user, "-").concat(filename, ".mp4")))];
                             case 8:
                                 stream = _a.sent();
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
@@ -504,7 +522,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 if ((_a.sent()) > maxSize && maxSize != "disabled") {
                                     stream.end();
                                     finishedRecording = true;
-                                    Logger.log("Max file size reached", "info");
+                                    Logger.log("Max file size reached", "warn");
                                 }
                                 return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
                             case 16:
@@ -605,7 +623,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, printLogo()];
                             case 27:
                                 _l.sent();
-                                Logger.log("Your file is ready. File: ./".concat(user, "/").concat(user, "-").concat(filename, ".mp4"), "info");
+                                Logger.log("Your file is ready. File: ".concat(directoryPath).concat(user, "/").concat(user, "-").concat(filename, ".mp4"), "info");
                                 timer.stop();
                                 _j = (_h = Logger).log;
                                 _k = "Final file size: ".concat;
