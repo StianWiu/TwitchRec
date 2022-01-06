@@ -128,7 +128,7 @@ const checkConfiguration = async () => {
     category = "disabled";
   }
   if (options.max) {
-    maxSize = Number(options.max);
+    maxSize = Number(options.max) + "GB";
   } else {
     maxSize = "disabled";
   }
@@ -171,7 +171,7 @@ const checkConfiguration = async () => {
         .left(`Username: ${user}`)
         .left(`Reruns: ${rerunEnable}`)
         .left(`Category: ${category}`)
-        .left(`Max size: ${maxSize}gb`)
+        .left(`Max size: ${maxSize}`)
         .left(`Loop: ${loopProgram}`)
         .left(`Directory: ${directoryPath}`)
         .emptyLine()
