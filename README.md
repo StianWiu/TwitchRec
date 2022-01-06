@@ -27,7 +27,7 @@ You can also install this without the -g but it will not be available globally.
 -c, --category <string> # Only record certain category
 -m, --max <num> # How many GB file can become
 -l, --loop <boolean> # Whether program should infinitely loop when stream is over
--d, --directory <string> # Whether program should infinitely loop when stream is over
+-d, --directory <string> # Where program should save files created
 ```
 
 # Example commands
