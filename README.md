@@ -27,6 +27,7 @@ You can also install this without the -g but it will not be available globally.
 -c, --category <string> # Only record certain category
 -m, --max <num> # How many GB file can become
 -l, --loop <boolean> # Whether program should infinitely loop when stream is over
+-d, --directory <string> # Whether program should infinitely loop when stream is over
 ```
 
 # Example commands
@@ -34,9 +35,9 @@ You can also install this without the -g but it will not be available globally.
 ```bash
 $ twitchrec -u <username>
 
-$ twitchrec -u <username> -r <true/false> -c <category> -m <num> -l <true/false>
+$ twitchrec -u <username> -r <true/false> -c <category> -m <num> -l <true/false> -d <path>
 
-$ twitchrec --user <username> --rerun <true/false> --category <category> --max <num> --loop <true/false>
+$ twitchrec --user <username> --rerun <true/false> --category <category> --max <num> --loop <true/false> --directory <path>
 ```
 
 # Issues
