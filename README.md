@@ -1,4 +1,7 @@
 <p align='center'>
+    <a href="https://github.com/StianWiu/TwitchRec/actions/workflows/node.js.yml">
+        <img alt="Github test" src="https://github.com/StianWiu/TwitchRec/actions/workflows/node.js.yml/badge.svg">
+    </a>
     <a href='https://www.npmjs.com/package/twitchrec'>
         <img src='https://img.shields.io/npm/v/twitchrec.svg' alt='Latest npm version'>
         <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/stianwiu/twitchrec">
