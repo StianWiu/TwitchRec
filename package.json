@@ -7,7 +7,7 @@
   "scripts": {
     "compile": "tsc index.ts -w --skipLibCheck --downlevelIteration",
     "tsc": "tsc index.ts -w --skipLibCheck --downlevelIteration",
-    "test": "tsc index.ts"
+    "build": "tsc index.ts"
   },
   "repository": {
     "type": "git",
