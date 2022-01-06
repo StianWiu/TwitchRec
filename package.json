@@ -1,6 +1,6 @@
 {
   "name": "twitchrec",
-  "version": "2.3.15",
+  "version": "2.4.0",
   "description": "TwitchRec",
   "main": "index.js",
   "bin": "index.js",
