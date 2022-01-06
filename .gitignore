@@ -91,3 +91,5 @@ typings/
 *.mp4
 *.webm
 *.mp3
+
+.videos/
