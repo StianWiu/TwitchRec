@@ -1,3 +1,14 @@
+<p align='center'>
+    <a href='https://www.npmjs.com/package/twitchrec'>
+        <img src='https://img.shields.io/npm/v/twitchrec.svg' alt='Latest npm version'>
+        <img alt="GitHub last commit" src="https://img.shields.io/github/last-commit/stianwiu/twitchrec">
+        <img alt="GitHub commit activity" src="https://img.shields.io/github/commit-activity/m/stianwiu/twitchrec">
+        <img alt="GitHub repo size" src="https://img.shields.io/github/repo-size/stianwiu/twitchrec">
+        <img src='https://img.shields.io/npm/dm/twitchrec.svg' alt='Dependents'>
+        <img alt="GitHub Repo stars" src="https://img.shields.io/github/stars/stianwiu/twitchrec?style=social">
+    </a>
+</p>
+
 # Install
 
 ```bash

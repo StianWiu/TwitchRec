@@ -153,7 +153,7 @@ const checkConfiguration = async () => {
         .left(`Username: ${user}`)
         .left(`Reruns: ${rerunEnable}`)
         .left(`Category: ${category}`)
-        .left(`Max size: ${maxSize}`)
+        .left(`Max size: ${maxSize}gb`)
         .left(`Loop: ${loopProgram}`)
         .emptyLine()
         .center("You can skip this by adding -y or --yes to the command")
