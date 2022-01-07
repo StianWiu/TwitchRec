@@ -123,7 +123,7 @@ program.option("-r, --rerun <boolean>", "Should the program record reruns");
 program.option("-c, --category <string>", "Only record certain category");
 program.option("-m, --max <num>", "How many GB file can become");
 program.option("-l, --loop <boolean>", "Weather program should infinitely loop when stream is over");
-program.option("-y, --yes <boolean>", "Skip settings confirmation");
+program.option("-y, --yes", "Skip settings confirmation");
 program.option("-d, --directory <string>", "Where to save the files produced");
 program.parse(process.argv);
 var options = program.opts();

@@ -109,7 +109,7 @@ program.option(
   "-l, --loop <boolean>",
   "Weather program should infinitely loop when stream is over"
 );
-program.option("-y, --yes <boolean>", "Skip settings confirmation");
+program.option("-y, --yes", "Skip settings confirmation");
 program.option("-d, --directory <string>", "Where to save the files produced");
 
 program.parse(process.argv);
