@@ -543,7 +543,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, checkIfUserIsLive()];
                             case 2:
                                 if ((_l.sent()) == false) {
-                                    Logger.log("Recording will start when user goes live or starts a rerun", "info");
+                                    Logger.log("Recording will start when ".concat(user, " goes live or starts a rerun"), "info");
                                 }
                                 _l.label = 3;
                             case 3:
