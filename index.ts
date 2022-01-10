@@ -6,7 +6,7 @@ try {
   require("bug-killer");
   require("commander");
   require("m3u8stream");
-  require("prompt-confirm");
+  require("enquirer");
   require("puppeteer");
   require("randomstring");
   require("timer-node");
@@ -28,7 +28,7 @@ const fs = require("fs"),
   Logger = require("bug-killer"),
   m3u8Info = require("twitch-m3u8"),
   axios = require("axios"),
-  confirm = require("prompt-confirm");
+  { Confirm } = require("enquirer");
 
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
@@ -155,7 +155,6 @@ const checkConfiguration = async () => {
     directoryPath = "./";
   }
   console.clear();
-  let continueProgram = false;
   if (!options.yes) {
     console.log(
       logo({
@@ -178,25 +177,23 @@ const checkConfiguration = async () => {
         .center("You can skip this by adding -y or --yes to the command")
         .render()
     );
-    const prompt = new confirm("Are these settings correct?");
-    await prompt.ask(
-      await function (answer) {
-        if (!answer) {
-          Logger.log("Program stopped by user", "warn");
-          process.exit();
-        }
-        continueProgram = true;
-        console.clear();
-        printLogo();
+
+    const prompt = new Confirm({
+      name: "question",
+      message: "Are these settings correct?",
+    });
+
+    await prompt.run().then((answer) => {
+      if (!answer) {
+        Logger.log("Program stopped by user", "warn");
+        process.exit();
       }
-    );
+      console.clear();
+      printLogo();
+    });
   } else {
     console.clear();
     printLogo();
-    continueProgram = true;
-  }
-  while (continueProgram == false) {
-    await new Promise((resolve) => setTimeout(resolve, 5000));
   }
 };
 const startProcess = async () => {

@@ -44,7 +44,7 @@ try {
     require("bug-killer");
     require("commander");
     require("m3u8stream");
-    require("prompt-confirm");
+    require("enquirer");
     require("puppeteer");
     require("randomstring");
     require("timer-node");
@@ -55,7 +55,7 @@ catch (error) {
     console.log("\x1b[31m%s", "\n\nPlease install the required dependencies by running npm install. Exiting...\n\n");
     process.exit(1);
 }
-var fs = require("fs"), puppeteer = require("puppeteer"), m3u8stream = require("m3u8stream"), randomstring = require("randomstring"), logo = require("asciiart-logo"), Logger = require("bug-killer"), m3u8Info = require("twitch-m3u8"), axios = require("axios"), confirm = require("prompt-confirm");
+var fs = require("fs"), puppeteer = require("puppeteer"), m3u8stream = require("m3u8stream"), randomstring = require("randomstring"), logo = require("asciiart-logo"), Logger = require("bug-killer"), m3u8Info = require("twitch-m3u8"), axios = require("axios"), Confirm = require("enquirer").Confirm;
 // Set configuration for Logger(bug-killer) node module
 Logger.config = {
     // The error type
@@ -128,9 +128,9 @@ program.option("-d, --directory <string>", "Where to save the files produced");
 program.parse(process.argv);
 var options = program.opts();
 var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var continueProgram, prompt_1, _a, _b;
-    return __generator(this, function (_c) {
-        switch (_c.label) {
+    var prompt_1;
+    return __generator(this, function (_a) {
+        switch (_a.label) {
             case 0:
                 user = options.user.toLowerCase();
                 if (options.rerun == "false") {
@@ -174,8 +174,7 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                     directoryPath = "./";
                 }
                 console.clear();
-                continueProgram = false;
-                if (!!options.yes) return [3 /*break*/, 3];
+                if (!!options.yes) return [3 /*break*/, 2];
                 console.log(logo({
                     name: "Settings",
                     font: "Chunky",
@@ -195,33 +194,26 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                     .emptyLine()
                     .center("You can skip this by adding -y or --yes to the command")
                     .render());
-                prompt_1 = new confirm("Are these settings correct?");
-                _b = (_a = prompt_1).ask;
-                return [4 /*yield*/, function (answer) {
+                prompt_1 = new Confirm({
+                    name: "question",
+                    message: "Are these settings correct?"
+                });
+                return [4 /*yield*/, prompt_1.run().then(function (answer) {
                         if (!answer) {
                             Logger.log("Program stopped by user", "warn");
                             process.exit();
                         }
-                        continueProgram = true;
                         console.clear();
                         printLogo();
-                    }];
-            case 1: return [4 /*yield*/, _b.apply(_a, [_c.sent()])];
+                    })];
+            case 1:
+                _a.sent();
+                return [3 /*break*/, 3];
             case 2:
-                _c.sent();
-                return [3 /*break*/, 4];
-            case 3:
                 console.clear();
                 printLogo();
-                continueProgram = true;
-                _c.label = 4;
-            case 4:
-                if (!(continueProgram == false)) return [3 /*break*/, 6];
-                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 5000); })];
-            case 5:
-                _c.sent();
-                return [3 /*break*/, 4];
-            case 6: return [2 /*return*/];
+                _a.label = 3;
+            case 3: return [2 /*return*/];
         }
     });
 }); };
