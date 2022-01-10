@@ -21,17 +21,6 @@ You can also install this without the -g but it will not be available globally.
 
 # Options
 
-```bash
--h, --help # Display help for command
-
--u, --user <string> # Twitch username [Required]
--r, --rerun <boolean> # Record reruns
--c, --category <string> # Only record certain category
--m, --max <num> # How many GB file can become
--l, --loop <boolean> # Whether program should infinitely loop when stream is over
--d, --directory <string> # Where program should save files created
-```
-
 | **Name**         | **Type**  | **Description**                    | **Input** | **Required** |
 | ---------------- | --------- | ---------------------------------- | --------- | ------------ |
 | `-h --help`      | `Extra`   | Display information about program. |           | ☓            |
