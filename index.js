@@ -43,8 +43,8 @@ try {
     require("axios");
     require("bug-killer");
     require("commander");
-    require("m3u8stream");
     require("enquirer");
+    require("m3u8stream");
     require("puppeteer");
     require("randomstring");
     require("timer-node");
