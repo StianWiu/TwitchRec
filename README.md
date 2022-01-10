@@ -24,12 +24,12 @@ You can also install this without the -g but it will not be available globally.
 | **Name**         | **Type**  | **Description**                    | **Input** | **Required** |
 | ---------------- | --------- | ---------------------------------- | --------- | ------------ |
 | `-h --help`      | `Extra`   | Display information about program. |           | ☓            |
-| `-u --user`      | `setting` | Specify what user to record        | `string ` | ✓            |
-| `-r --rerun`     | `setting` | Enable or disable reruns           | `boolean` | ☓            |
+| `-u --user`      | `setting` | Specify what user to record.       | `string ` | ✓            |
+| `-r --rerun`     | `setting` | Enable or disable reruns.          | `boolean` | ☓            |
 | `-c --category`  | `setting` | Chose specific category to record. | `string ` | ☓            |
-| `-m --max`       | `setting` | Control how large file can become  | `number ` | ☓            |
-| `-l --loop`      | `setting` | Automatically wait for next stream | `boolean` | ☓            |
-| `-d --directory` | `setting` | Chose what directory to save to    | `string ` | ☓            |
+| `-m --max`       | `setting` | Control how large file can become. | `number ` | ☓            |
+| `-l --loop`      | `setting` | Automatically wait for next stream.| `boolean` | ☓            |
+| `-d --directory` | `setting` | Chose what directory to save to.   | `string ` | ☓            |
 
 # Example commands
 
