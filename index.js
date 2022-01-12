@@ -98,7 +98,7 @@ var filename = randomstring.generate({
 var commander_1 = require("commander");
 var timer_node_1 = require("timer-node");
 var program = new commander_1.Command();
-var user, rerunEnable, category, maxSize, link, loopProgram, directoryPath;
+var user, rerunEnable, category, maxSize, link, loopProgram, directoryPath, selectedQuality;
 var timer = new timer_node_1.Timer({ label: "main-timer" });
 var recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
 timer.start();
@@ -111,7 +111,6 @@ var printLogo = function () {
         margin: 3
     })
         .emptyLine()
-        .right("V2.3.6")
         .emptyLine()
         .center('Twitch recording software. Developed by Pignuuu. "--help" for options')
         .center("https://stianwiu.me")
@@ -125,6 +124,7 @@ program.option("-m, --max <num>", "How many GB file can become");
 program.option("-l, --loop <boolean>", "Weather program should infinitely loop when stream is over");
 program.option("-y, --yes", "Skip settings confirmation");
 program.option("-d, --directory <string>", "Where to save the files produced");
+program.option("-q, --quality <num>", "What quality to record at, 0 is highest");
 program.parse(process.argv);
 var options = program.opts();
 var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, function () {
@@ -150,6 +150,12 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                 }
                 else {
                     maxSize = "disabled";
+                }
+                if (options.quality) {
+                    selectedQuality = options.quality;
+                }
+                else {
+                    selectedQuality = 0;
                 }
                 if (options.loop == "true") {
                     loopProgram = true;
@@ -191,6 +197,7 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                     .left("Max size: ".concat(maxSize))
                     .left("Loop: ".concat(loopProgram))
                     .left("Directory: ".concat(directoryPath))
+                    .left("Quality: ".concat(selectedQuality))
                     .emptyLine()
                     .center("You can skip this by adding -y or --yes to the command")
                     .render());
@@ -436,10 +443,10 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                     .left("User: ".concat(user))
                                     .emptyLine())
                                     .left;
-                                _f = "Filesize: ".concat;
+                                _f = "File size: ".concat;
                                 return [4 /*yield*/, getFileSizeGb()];
                             case 1:
-                                _g = (_c = _e.apply(_d, [_f.apply("Filesize: ", [_j.sent(), " GB"])])
+                                _g = (_c = _e.apply(_d, [_f.apply("File size: ", [_j.sent(), " GB"])])
                                     .left("Running for: ".concat(timer.format("D:%d H:%h M:%m S:%s")))
                                     .left("Recording: ".concat(recording_timer.format("D:%d H:%h M:%m S:%s"))))
                                     .left;
@@ -471,7 +478,13 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, m3u8Info
                                         .getStream(user)
                                         .then(function (data) {
-                                        link = data[0].url;
+                                        if (selectedQuality < data.length && selectedQuality >= 0) {
+                                            link = data[selectedQuality].url;
+                                        }
+                                        else {
+                                            Logger.error("You can't record at that quality", "error");
+                                            process.exit();
+                                        }
                                     })["catch"](function (err) { return console.error(err); })];
                             case 4:
                                 _a.sent();
@@ -507,7 +520,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 if ((_a.sent()) == false) {
                                     stream.end();
                                     finishedRecording = true;
-                                    Logger.log("Stream has chagned category", "info");
+                                    Logger.log("Stream has changed category", "info");
                                 }
                                 return [4 /*yield*/, getFileSizeGb()];
                             case 15:

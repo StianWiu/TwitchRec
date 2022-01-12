@@ -74,7 +74,14 @@ import { Command } from "commander";
 import { Timer } from "timer-node";
 const program = new Command();
 
-let user, rerunEnable, category, maxSize, link, loopProgram, directoryPath;
+let user,
+  rerunEnable,
+  category,
+  maxSize,
+  link,
+  loopProgram,
+  directoryPath,
+  selectedQuality;
 
 const timer = new Timer({ label: "main-timer" });
 const recording_timer = new Timer({ label: "recording-timer" });
@@ -90,7 +97,6 @@ const printLogo = () => {
       margin: 3,
     })
       .emptyLine()
-      .right("V2.3.6")
       .emptyLine()
       .center(
         'Twitch recording software. Developed by Pignuuu. "--help" for options'
@@ -111,6 +117,10 @@ program.option(
 );
 program.option("-y, --yes", "Skip settings confirmation");
 program.option("-d, --directory <string>", "Where to save the files produced");
+program.option(
+  "-q, --quality <num>",
+  "What quality to record at, 0 is highest"
+);
 
 program.parse(process.argv);
 const options = program.opts();
@@ -131,6 +141,11 @@ const checkConfiguration = async () => {
     maxSize = Number(options.max) + "GB";
   } else {
     maxSize = "disabled";
+  }
+  if (options.quality) {
+    selectedQuality = options.quality;
+  } else {
+    selectedQuality = 0;
   }
   if (options.loop == "true") {
     loopProgram = true;
@@ -173,6 +188,7 @@ const checkConfiguration = async () => {
         .left(`Max size: ${maxSize}`)
         .left(`Loop: ${loopProgram}`)
         .left(`Directory: ${directoryPath}`)
+        .left(`Quality: ${selectedQuality}`)
         .emptyLine()
         .center("You can skip this by adding -y or --yes to the command")
         .render()
@@ -255,7 +271,7 @@ const startProcess = async () => {
       return true;
     }
   };
-  // Use puppeteer to click "Chat" button to open actual stream in case streamear is offline. If this doesn't happen program won't work.
+  // Use puppeteer to click "Chat" button to open actual stream in case streamer is offline. If this doesn't happen program won't work.
   const clickChatButton = async () => {
     try {
       await page.waitForSelector(
@@ -335,7 +351,7 @@ const startProcess = async () => {
         .emptyLine()
         .left(`User: ${user}`)
         .emptyLine()
-        .left(`Filesize: ${await getFileSizeGb()} GB`)
+        .left(`File size: ${await getFileSizeGb()} GB`)
         .left(`Running for: ${timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Recording: ${recording_timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Rerun: ${await checkIfStreamIsRerun()}`)
@@ -356,7 +372,12 @@ const startProcess = async () => {
     await m3u8Info
       .getStream(user)
       .then((data) => {
-        link = data[0].url;
+        if (selectedQuality < data.length && selectedQuality >= 0) {
+          link = data[selectedQuality].url;
+        } else {
+          Logger.error("You can't record at that quality", "error");
+          process.exit();
+        }
       })
       .catch((err) => console.error(err));
 
@@ -381,7 +402,7 @@ const startProcess = async () => {
       if ((await checkCategory()) == false) {
         stream.end();
         finishedRecording = true;
-        Logger.log("Stream has chagned category", "info");
+        Logger.log("Stream has changed category", "info");
       }
       if ((await getFileSizeGb()) > maxSize && maxSize != "disabled") {
         stream.end();
