@@ -21,24 +21,25 @@ You can also install this without the -g but it will not be available globally.
 
 # Options
 
-| **Name**         | **Type**  | **Description**                    | **Input** | **Required** |
-| ---------------- | --------- | ---------------------------------- | --------- | ------------ |
-| `-h --help`      | `Extra`   | Display information about program. |           | ☓            |
-| `-u --user`      | `setting` | Specify what user to record        | `string ` | ✓            |
-| `-r --rerun`     | `setting` | Enable or disable reruns           | `boolean` | ☓            |
-| `-c --category`  | `setting` | Chose specific category to record. | `string ` | ☓            |
-| `-m --max`       | `setting` | Control how large file can become  | `number ` | ☓            |
-| `-l --loop`      | `setting` | Automatically wait for next stream | `boolean` | ☓            |
-| `-d --directory` | `setting` | Chose what directory to save to    | `string ` | ☓            |
+| **Name**         | **Type**  | **Description**                      | **Input** | **Required** |
+| ---------------- | --------- | ------------------------------------ | --------- | ------------ |
+| `-h --help`      | `Extra`   | Display information about program.   |           | ☓            |
+| `-u --user`      | `setting` | Specify what user to record          | `string ` | ✓            |
+| `-r --rerun`     | `setting` | Enable or disable reruns             | `boolean` | ☓            |
+| `-c --category`  | `setting` | Chose specific category to record.   | `string ` | ☓            |
+| `-m --max`       | `setting` | Control how large file can become    | `number ` | ☓            |
+| `-l --loop`      | `setting` | Automatically wait for next stream   | `boolean` | ☓            |
+| `-d --directory` | `setting` | Chose what directory to save to      | `string ` | ☓            |
+| `-q --quality`   | `setting` | What quality to record. 0 is highest | `num `    | ☓            |
 
 # Example commands
 
 ```bash
 $ twitchrec -u <username>
 
-$ twitchrec -u <username> -r <true/false> -c <category> -m <num> -l <true/false> -d <path>
+$ twitchrec -u <username> -r <true/false> -c <category> -m <num> -l <true/false> -d <path> -q <num>
 
-$ twitchrec --user <username> --rerun <true/false> --category <category> --max <num> --loop <true/false> --directory <path>
+$ twitchrec --user <username> --rerun <true/false> --category <category> --max <num> --loop <true/false> --directory <path> --quality <num>
 ```
 
 # Issues
@@ -52,6 +53,7 @@ If you are experiencing issues please open an issue on [GitHub](https://github.c
 - Enable/Disable recording rerun streams
 - Continue waiting for next stream after stream is done
 - Automatically sorts recorded vods into folders based on streamer username
+- Choose what quality to record.
 
 # How it's done
 
@@ -59,7 +61,7 @@ The program works by using [puppeteer](https://github.com/puppeteer/puppeteer) t
 
 This was made for windows and ubuntu so it has not been tested in any other operating system. Though it will most likely still work. Please see [Requirements](#requirements) section.
 
-Feel free to take as much as you want from this project and use it on your own. No credit needed but much appreciated.
+Feel free to take as much as you want from this project and use it on your own.
 
 # Requirements
 
