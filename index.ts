@@ -81,7 +81,8 @@ let user,
   link,
   loopProgram,
   directoryPath,
-  selectedQuality;
+  selectedQuality,
+  finalQuality;
 
 const timer = new Timer({ label: "main-timer" });
 const recording_timer = new Timer({ label: "recording-timer" });
@@ -355,6 +356,7 @@ const startProcess = async () => {
         .left(`Running for: ${timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Recording: ${recording_timer.format("D:%d H:%h M:%m S:%s")}`)
         .left(`Rerun: ${await checkIfStreamIsRerun()}`)
+        .left(`Quality: ${finalQuality}`)
         .emptyLine(`${console.clear()}`)
         .center("Twitch recording software. Developed by Pignuuu.")
         .center("https://stianwiu.me")
@@ -374,6 +376,8 @@ const startProcess = async () => {
       .then((data) => {
         if (selectedQuality < data.length && selectedQuality >= 0) {
           link = data[selectedQuality].url;
+          finalQuality = data[selectedQuality].quality;
+          Logger.log(`Quality set to: ${finalQuality}`, "info");
         } else {
           Logger.error("You can't record at that quality", "error");
           process.exit();

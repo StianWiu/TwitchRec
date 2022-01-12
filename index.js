@@ -98,7 +98,7 @@ var filename = randomstring.generate({
 var commander_1 = require("commander");
 var timer_node_1 = require("timer-node");
 var program = new commander_1.Command();
-var user, rerunEnable, category, maxSize, link, loopProgram, directoryPath, selectedQuality;
+var user, rerunEnable, category, maxSize, link, loopProgram, directoryPath, selectedQuality, finalQuality;
 var timer = new timer_node_1.Timer({ label: "main-timer" });
 var recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
 timer.start();
@@ -454,6 +454,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 return [4 /*yield*/, checkIfStreamIsRerun()];
                             case 2:
                                 _b.apply(_a, [_g.apply(_c, [_h.apply("Rerun: ", [_j.sent()])])
+                                        .left("Quality: ".concat(finalQuality))
                                         .emptyLine("".concat(console.clear()))
                                         .center("Twitch recording software. Developed by Pignuuu.")
                                         .center("https://stianwiu.me")
@@ -480,6 +481,8 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                         .then(function (data) {
                                         if (selectedQuality < data.length && selectedQuality >= 0) {
                                             link = data[selectedQuality].url;
+                                            finalQuality = data[selectedQuality].quality;
+                                            Logger.log("Quality set to: ".concat(finalQuality), "info");
                                         }
                                         else {
                                             Logger.error("You can't record at that quality", "error");
