@@ -122,6 +122,7 @@ program.option(
   "-q, --quality <num>",
   "What quality to record at, 0 is highest"
 );
+program.option("-v, --vod <string>", "Download vod using vod id");
 
 program.parse(process.argv);
 const options = program.opts();
@@ -169,6 +170,49 @@ const checkConfiguration = async () => {
     }
   } else {
     directoryPath = "./";
+  }
+  if (options.vod) {
+    let vodUrl;
+    await m3u8Info
+      .getVod(options.vod)
+      .then((data) => {
+        vodUrl = data[1].url;
+      })
+      .catch((err) => console.error(err));
+    if (!(await fs.existsSync(`${directoryPath}videos/${user}`))) {
+      await fs.mkdirSync(`${directoryPath}videos/${user}`);
+    }
+    const vod = await m3u8stream(vodUrl).pipe(
+      fs.createWriteStream(
+        `${directoryPath}videos/${user}/${user}-${filename}-vod.mp4`
+      )
+    );
+    let recording = true;
+    while (recording == true) {
+      await new Promise((resolve) => setTimeout(resolve, 1000));
+      vod.on("finish", () => {
+        recording = false;
+      });
+      console.log(
+        logo({
+          name: "TwitchRec",
+          font: "Chunky",
+          lineChars: 10,
+          padding: 2,
+          margin: 3,
+        })
+          .emptyLine()
+          .left(`Downloading for: ${timer.format("D:%d H:%h M:%m S:%s")}`)
+          .emptyLine(``)
+          .left(`Vod is being downloaded`)
+          .emptyLine(`${console.clear()}`)
+          .center("Twitch recording software. Developed by Pignuuu.")
+          .center("https://stianwiu.me")
+          .render()
+      );
+    }
+    Logger.log("Vod download finished", "info");
+    process.exit();
   }
   console.clear();
   if (!options.yes) {

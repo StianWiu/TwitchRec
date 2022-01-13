@@ -125,10 +125,11 @@ program.option("-l, --loop <boolean>", "Weather program should infinitely loop w
 program.option("-y, --yes", "Skip settings confirmation");
 program.option("-d, --directory <string>", "Where to save the files produced");
 program.option("-q, --quality <num>", "What quality to record at, 0 is highest");
+program.option("-v, --vod <string>", "Download vod using vod id");
 program.parse(process.argv);
 var options = program.opts();
 var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, function () {
-    var prompt_1;
+    var vodUrl_1, vod, recording_1, prompt_1;
     return __generator(this, function (_a) {
         switch (_a.label) {
             case 0:
@@ -179,8 +180,57 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                 else {
                     directoryPath = "./";
                 }
+                if (!options.vod) return [3 /*break*/, 9];
+                return [4 /*yield*/, m3u8Info
+                        .getVod(options.vod)
+                        .then(function (data) {
+                        vodUrl_1 = data[1].url;
+                    })["catch"](function (err) { return console.error(err); })];
+            case 1:
+                _a.sent();
+                return [4 /*yield*/, fs.existsSync("".concat(directoryPath, "videos/").concat(user))];
+            case 2:
+                if (!!(_a.sent())) return [3 /*break*/, 4];
+                return [4 /*yield*/, fs.mkdirSync("".concat(directoryPath, "videos/").concat(user))];
+            case 3:
+                _a.sent();
+                _a.label = 4;
+            case 4: return [4 /*yield*/, m3u8stream(vodUrl_1).pipe(fs.createWriteStream("".concat(directoryPath, "videos/").concat(user, "/").concat(user, "-").concat(filename, "-vod.mp4")))];
+            case 5:
+                vod = _a.sent();
+                recording_1 = true;
+                _a.label = 6;
+            case 6:
+                if (!(recording_1 == true)) return [3 /*break*/, 8];
+                return [4 /*yield*/, new Promise(function (resolve) { return setTimeout(resolve, 1000); })];
+            case 7:
+                _a.sent();
+                vod.on("finish", function () {
+                    recording_1 = false;
+                });
+                console.log(logo({
+                    name: "TwitchRec",
+                    font: "Chunky",
+                    lineChars: 10,
+                    padding: 2,
+                    margin: 3
+                })
+                    .emptyLine()
+                    .left("Downloading for: ".concat(timer.format("D:%d H:%h M:%m S:%s")))
+                    .emptyLine("")
+                    .left("Vod is being downloaded")
+                    .emptyLine("".concat(console.clear()))
+                    .center("Twitch recording software. Developed by Pignuuu.")
+                    .center("https://stianwiu.me")
+                    .render());
+                return [3 /*break*/, 6];
+            case 8:
+                Logger.log("Vod download finished", "info");
+                process.exit();
+                _a.label = 9;
+            case 9:
                 console.clear();
-                if (!!options.yes) return [3 /*break*/, 2];
+                if (!!options.yes) return [3 /*break*/, 11];
                 console.log(logo({
                     name: "Settings",
                     font: "Chunky",
@@ -213,14 +263,14 @@ var checkConfiguration = function () { return __awaiter(void 0, void 0, void 0, 
                         console.clear();
                         printLogo();
                     })];
-            case 1:
+            case 10:
                 _a.sent();
-                return [3 /*break*/, 3];
-            case 2:
+                return [3 /*break*/, 12];
+            case 11:
                 console.clear();
                 printLogo();
-                _a.label = 3;
-            case 3: return [2 /*return*/];
+                _a.label = 12;
+            case 12: return [2 /*return*/];
         }
     });
 }); };
