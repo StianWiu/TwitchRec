@@ -31,6 +31,7 @@ You can also install this without the -g but it will not be available globally.
 | `-l --loop`      | `setting` | Automatically wait for next stream   | `boolean` | ☓            |
 | `-d --directory` | `setting` | Chose what directory to save to      | `string ` | ☓            |
 | `-q --quality`   | `setting` | What quality to record. 0 is highest | `num `    | ☓            |
+| `-v --vod`       | `tool`    | Record vod using vod ID              | `string ` | ☓            |
 
 # Example commands
 
@@ -40,6 +41,10 @@ $ twitchrec -u <username>
 $ twitchrec -u <username> -r <true/false> -c <category> -m <num> -l <true/false> -d <path> -q <num>
 
 $ twitchrec --user <username> --rerun <true/false> --category <category> --max <num> --loop <true/false> --directory <path> --quality <num>
+
+$ twitchrec -u <username> -v <vodID>
+
+$ twitchrec --user <username> --vod <vodID>
 ```
 
 # Issues
@@ -54,6 +59,7 @@ If you are experiencing issues please open an issue on [GitHub](https://github.c
 - Continue waiting for next stream after stream is done
 - Automatically sorts recorded vods into folders based on streamer username
 - Choose what quality to record.
+- Record vods in max quality
 
 # How it's done
 
