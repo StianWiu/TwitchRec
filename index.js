@@ -90,15 +90,15 @@ Logger.config = {
     // The options passed to `util.inspect`
     inspectOptions: { colors: true }
 };
-// Generate a random string for the file name
-var filename = randomstring.generate({
-    length: 10,
-    charset: "hex"
-});
 var commander_1 = require("commander");
 var timer_node_1 = require("timer-node");
 var program = new commander_1.Command();
-var user, rerunEnable, category, maxSize, link, loopProgram, directoryPath, selectedQuality, finalQuality;
+var user, rerunEnable, category, maxSize, link, loopProgram, directoryPath, selectedQuality, finalQuality, filename;
+// Generate a random string for the file name
+filename = randomstring.generate({
+    length: 10,
+    charset: "hex"
+});
 var timer = new timer_node_1.Timer({ label: "main-timer" });
 var recording_timer = new timer_node_1.Timer({ label: "recording-timer" });
 timer.start();
@@ -606,6 +606,11 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 _l.label = 3;
                             case 3:
                                 if (!(loopProgram == true)) return [3 /*break*/, 17];
+                                // Generate a random string for the file name
+                                filename = randomstring.generate({
+                                    length: 10,
+                                    charset: "hex"
+                                });
                                 _l.label = 4;
                             case 4: return [4 /*yield*/, checkIfUserIsLive()];
                             case 5:

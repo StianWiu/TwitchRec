@@ -65,11 +65,6 @@ Logger.config = {
   inspectOptions: { colors: true },
 };
 
-// Generate a random string for the file name
-const filename = randomstring.generate({
-  length: 10,
-  charset: "hex",
-});
 import { Command } from "commander";
 import { Timer } from "timer-node";
 const program = new Command();
@@ -82,7 +77,14 @@ let user,
   loopProgram,
   directoryPath,
   selectedQuality,
-  finalQuality;
+  finalQuality,
+  filename;
+
+// Generate a random string for the file name
+filename = randomstring.generate({
+  length: 10,
+  charset: "hex",
+});
 
 const timer = new Timer({ label: "main-timer" });
 const recording_timer = new Timer({ label: "recording-timer" });
@@ -471,6 +473,11 @@ const startProcess = async () => {
         );
       }
       while (loopProgram == true) {
+        // Generate a random string for the file name
+        filename = randomstring.generate({
+          length: 10,
+          charset: "hex",
+        });
         while (
           (await checkIfUserIsLive()) == false ||
           (await checkIfRecordRerun()) == false ||
