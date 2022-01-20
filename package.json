@@ -15,10 +15,10 @@
   },
   "keywords": [
     "puppeteer",
-    "puppeteer-stream",
-    "twitch",
+    "m3u8",
+    "m3u8stream",
     "record",
-    "ffmpeg"
+    "cli",
   ],
   "author": "Stian Wiu",
   "license": "ISC",
