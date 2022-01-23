@@ -33,7 +33,7 @@
     "commander": "^8.3.0",
     "enquirer": "^2.3.6",
     "m3u8stream": "^0.8.4",
-    "puppeteer": "^13.0.1",
+    "puppeteer": "^9.1.1",
     "randomstring": "^1.2.1",
     "timer-node": "^5.0.5",
     "ts-node": "^10.2.1",
