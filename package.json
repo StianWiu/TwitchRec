@@ -30,7 +30,7 @@
     "asciiart-logo": "^0.2.6",
     "axios": "^0.25.0",
     "bug-killer": "^4.4.4",
-    "commander": "^8.3.0",
+    "commander": "^9.0.0",
     "enquirer": "^2.3.6",
     "m3u8stream": "^0.8.4",
     "puppeteer": "^9.1.1",
