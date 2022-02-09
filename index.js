@@ -303,7 +303,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                 _a.sent();
                 Logger.log("Loading please wait...", "info");
                 return [4 /*yield*/, puppeteer.launch({
-                        // headless: false, // Uncomment this line to see the browser pop up
+                        headless: false,
                         args: ["--no-sandbox"],
                         defaultViewport: {
                             width: 1920,
@@ -341,7 +341,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                         switch (_a.label) {
                             case 0:
                                 _a.trys.push([0, 2, , 3]);
-                                return [4 /*yield*/, page.waitForSelector("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div > div > div.Layout-sc-nxg1ff-0.iMHulU > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.dKzslu.tw-halo__indicator > div > div > div", { timeout: 3000 })];
+                                return [4 /*yield*/, page.waitForSelector("#root > div > div.Layout-sc-nxg1ff-0.qViOJ > div.Layout-sc-nxg1ff-0.kXaHWh > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.dzgehN.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.bIubrA > div > div.Layout-sc-nxg1ff-0.kjqBUq > div > div.Layout-sc-nxg1ff-0.eofBxm > div > div > div > a > div.Layout-sc-nxg1ff-0.ScHaloIndicator-sc-1l14b0i-1.eTMKpM.tw-halo__indicator > div > div > div", { timeout: 3000 })];
                             case 1:
                                 _a.sent();
                                 return [2 /*return*/, true];
@@ -358,12 +358,14 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                         switch (_a.label) {
                             case 0:
                                 _a.trys.push([0, 2, , 3]);
-                                return [4 /*yield*/, page.waitForSelector("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div.Layout-sc-nxg1ff-0.hMFNaU.metadata-layout__split-top > div.Layout-sc-nxg1ff-0 > div > div > div > div > div > a > span", { timeout: 3000 })];
+                                return [4 /*yield*/, page.waitForSelector("#root > div > div.Layout-sc-nxg1ff-0.qViOJ > div.Layout-sc-nxg1ff-0.kXaHWh > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.dzgehN.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.bIubrA > div > div.Layout-sc-nxg1ff-0.kqDEiC.metadata-layout__split-top", { timeout: 3000 })];
                             case 1:
                                 _a.sent();
+                                console.log("rerun true");
                                 return [2 /*return*/, true];
                             case 2:
                                 error_3 = _a.sent();
+                                console.log("rerun false");
                                 return [2 /*return*/, false];
                             case 3: return [2 /*return*/];
                         }
@@ -397,10 +399,10 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                         switch (_a.label) {
                             case 0:
                                 _a.trys.push([0, 3, , 4]);
-                                return [4 /*yield*/, page.waitForSelector("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP > div.channel-root__info.channel-root__info--offline.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.bPMozh.home-header-sticky > div.Layout-sc-nxg1ff-0.Bza-dv > div > div > ul > li:nth-child(5) > a > div > div.ScTextWrapper-sc-18v7095-1.eFGtCR > div", { timeout: 3000 })];
+                                return [4 /*yield*/, page.waitForSelector("#root > div > div.Layout-sc-nxg1ff-0.qViOJ > div.Layout-sc-nxg1ff-0.kXaHWh > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.dzgehN > div.channel-root__info.channel-root__info--offline.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.cJNGgb.home-header-sticky > div.Layout-sc-nxg1ff-0.bAswat > div > div > ul > li:nth-child(5) > a", { timeout: 3000 })];
                             case 1:
                                 _a.sent();
-                                return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP > div.channel-root__info.channel-root__info--offline.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.bPMozh.home-header-sticky > div.Layout-sc-nxg1ff-0.Bza-dv > div > div > ul > li:nth-child(5) > a > div > div.ScTextWrapper-sc-18v7095-1.eFGtCR > div")];
+                                return [4 /*yield*/, page.click("#root > div > div.Layout-sc-nxg1ff-0.qViOJ > div.Layout-sc-nxg1ff-0.kXaHWh > main > div.root-scrollable.scrollable-area > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--home.channel-root--unanimated > div.Layout-sc-nxg1ff-0.dzgehN > div.channel-root__info.channel-root__info--offline.channel-root__info--home > div > div.Layout-sc-nxg1ff-0.cJNGgb.home-header-sticky > div.Layout-sc-nxg1ff-0.bAswat > div > div > ul > li:nth-child(5) > a")];
                             case 2:
                                 _a.sent();
                                 Logger.log("Clicked 'Chat' button", "action");
@@ -454,7 +456,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                                 _a.label = 6;
                             case 6:
                                 _a.trys.push([6, 9, , 10]);
-                                return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.ldZtqr > div.Layout-sc-nxg1ff-0.iLYUfX > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.bDMqsP.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.jLilpG > div > div.Layout-sc-nxg1ff-0.hMFNaU.metadata-layout__split-top > div.Layout-sc-nxg1ff-0 > div > div > div > div > div > a > span")];
+                                return [4 /*yield*/, page.$("#root > div > div.Layout-sc-nxg1ff-0.qViOJ > div.Layout-sc-nxg1ff-0.kXaHWh > main > div.root-scrollable.scrollable-area.scrollable-area--suppress-scroll-x > div.simplebar-scroll-content > div > div > div.channel-root.channel-root--watch-chat.channel-root--live.channel-root--watch.channel-root--unanimated > div.Layout-sc-nxg1ff-0.dzgehN.channel-root__main--with-chat > div.channel-root__info.channel-root__info--with-chat > div > div.Layout-sc-nxg1ff-0.bIubrA > div > div > div > div.Layout-sc-nxg1ff-0.bdWyTy > div.Layout-sc-nxg1ff-0.hMomhv > div.Layout-sc-nxg1ff-0.kNMtLK > div > div:nth-child(2) > div > div > div.Layout-sc-nxg1ff-0.kQDQFf > a > span")];
                             case 7:
                                 element2 = _a.sent();
                                 return [4 /*yield*/, page.evaluate(function (el) { return el.textContent; }, element2)];
