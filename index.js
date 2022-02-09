@@ -303,7 +303,7 @@ var startProcess = function () { return __awaiter(void 0, void 0, void 0, functi
                 _a.sent();
                 Logger.log("Loading please wait...", "info");
                 return [4 /*yield*/, puppeteer.launch({
-                        headless: false,
+                        // headless: false, // Uncomment this line to see the browser pop up
                         args: ["--no-sandbox"],
                         defaultViewport: {
                             width: 1920,
