@@ -28,7 +28,7 @@
   "homepage": "https://github.com/StianWiu/TwitchRec#readme",
   "dependencies": {
     "asciiart-logo": "^0.2.6",
-    "axios": "^0.25.0",
+    "axios": "^0.26.0",
     "bug-killer": "^4.4.4",
     "commander": "^9.0.0",
     "enquirer": "^2.3.6",
